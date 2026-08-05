@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Urartoo — Բոլոր զարդերը (Խանութ)</title>
+  <meta name="description" content="Ուրարտու — Բոլոր եզակի ձեռագործ զարդերը․ Օբսիդիան, նռնաքար, փիրուզ, հասպիս, եղնգաքար և ագաթ 925 հարգի արծաթում։">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;0,600&family=Noto+Serif+Armenian:wght@300;400;500;600&family=Noto+Sans+Armenian:wght@300;400;500;600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ═══ 1. STICKY LIGHT HEADER (Slides down smoothly on scroll) ═══ -->
+  <header class="hdr-sticky" id="sticky-header">
+    <button class="burger" aria-label="Մենյու" aria-expanded="false" data-sticky-menu-toggle>
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" data-sticky-menu>
+      <a href="shop.html" class="nav-link active" style="color: var(--amber);">Խանութ</a>
+      <a href="journal.html" class="nav-link">Օրագիր</a>
+      <a href="services.html" class="nav-link">Ծառայություններ</a>
+      <a href="contact.html" class="nav-link">Կապ</a>
+    </nav>
+    <a href="index.html" class="logo">
+      <img src="Images/Urartoo-Logo.webp" alt="Urartoo">
+    </a>
+    <div class="hdr-utils">
+      <a href="#search" class="util-link nav-link">Փնտրել</a>
+      <a href="#account" class="util-link nav-link">Հաշիվ</a>
+      <a href="#cart" class="util-link nav-link" id="cart-link-sticky">Զամբյուղ (<span data-cart-count>0</span>)</a>
+    </div>
+  </header>
+
+  <!-- ═══ 2. STATIC DARK HEADER AT TOP ═══ -->
+  <header class="hdr-static" id="top">
+    <button class="burger" aria-label="Մենյու" aria-expanded="false" data-hero-menu-toggle>
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" data-hero-menu>
+      <a href="shop.html" class="nav-link active" style="color: var(--amber);">Խանութ</a>
+      <a href="journal.html" class="nav-link">Օրագիր</a>
+      <a href="services.html" class="nav-link">Ծառայություններ</a>
+      <a href="contact.html" class="nav-link">Կապ</a>
+    </nav>
+    <a href="index.html" class="logo">
+      <img src="Images/Urartoo-Logo.webp" alt="Urartoo">
+    </a>
+    <div class="hdr-utils">
+      <a href="#search" class="util-link nav-link">Փնտրել</a>
+      <a href="#account" class="util-link nav-link">Հաշիվ</a>
+      <a href="#cart" class="util-link nav-link" id="cart-link-hero">Զամբյուղ (<span data-cart-count>0</span>)</a>
+    </div>
+  </header>
+
+  <!-- ═══ 3. SHOP INTRO (LIGHT SURFACE, CENTERED TITLE, NO BREADCRUMBS) ═══ -->
+  <section class="shop-intro" style="padding: 48px var(--gutter) 36px; text-align: center;" id="hero-section">
+    <h1 style="font-family: Cormorant, serif; font-size: clamp(32px, 4vw, 48px); font-weight: 400; color: var(--obsidian); margin: 0 auto 12px; text-align: center;">Բոլոր զարդերը</h1>
+    <p style="font-size: 15.5px; line-height: 1.7; color: var(--tuff); max-width: 54ch; margin: 0 auto; text-align: center;">Այն ամենը, ինչ այս պահին աշխատանոցում է կամ պատրաստի սպասում է․ երբ զարդը սպառվում է, այն այլևս չի կրկնվում։</p>
+  </section>
+
+  <!-- ═══ 3. SHOP MAIN LAYOUT ═══ -->
+  <section class="shop-layout">
+
+    <button class="mobile-filter-toggle" id="mobile-filter-btn">Ֆիլտրեր</button>
+
+    <!-- Sidebar Filters -->
+    <aside class="shop-sidebar mobile-filter-drawer" id="shop-sidebar">
+      <div class="shop-sidebar-inner">
+
+        <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--obsidian); padding-bottom: 12px;">
+          <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;">Ֆիլտրեր</span>
+          <button class="filter-clear-btn" id="clear-filters-btn">Մաքրել բոլորը</button>
+        </div>
+
+        <!-- Search input -->
+        <div style="margin-top: 16px; border: 1px solid var(--silver); background: #FFFFFF; display: flex; align-items: center; gap: 8px; padding: 10px 12px;">
+          <input type="search" placeholder="Փնտրել քար կամ զարդ" id="shop-search-input" style="width: 100%; border: none; outline: none; font-size: 13px; background: transparent;">
+        </div>
+
+        <!-- Category Filter -->
+        <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--pumice);">
+          <div class="filter-group-title">Տեսակ</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 7px;" id="cat-chips">
+            <button class="filter-chip active" data-cat="all">Բոլորը</button>
+            <button class="filter-chip" data-cat="Մատանիներ">Մատանիներ</button>
+            <button class="filter-chip" data-cat="Վզնոցներ">Վզնոցներ</button>
+            <button class="filter-chip" data-cat="Ապարանջաններ">Ապարանջաններ</button>
+            <button class="filter-chip" data-cat="Ականջօղեր">Ականջօղեր</button>
+          </div>
+        </div>
+
+        <!-- Stone Filter -->
+        <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--pumice);">
+          <div class="filter-group-title">Քար</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 7px;" id="stone-chips">
+            <button class="filter-chip active" data-stone="all">Բոլորը</button>
+            <button class="filter-chip" data-stone="Նռնաքար"><span class="stone-color-dot" style="background:#7B2D3B;"></span>Նռնաքար</button>
+            <button class="filter-chip" data-stone="Օբսիդիան"><span class="stone-color-dot" style="background:#17181A;"></span>Օբսիդիան</button>
+            <button class="filter-chip" data-stone="Փիրուզ"><span class="stone-color-dot" style="background:#2E8C8C;"></span>Փիրուզ</button>
+            <button class="filter-chip" data-stone="Հասպիս"><span class="stone-color-dot" style="background:#A4442B;"></span>Հասպիս</button>
+            <button class="filter-chip" data-stone="Եղնգաքար"><span class="stone-color-dot" style="background:#1B1D1C;"></span>Եղնգաքար</button>
+            <button class="filter-chip" data-stone="Ագաթ"><span class="stone-color-dot" style="background:#C2A379;"></span>Ագաթ</button>
+            <button class="filter-chip" data-stone="Քվարց"><span class="stone-color-dot" style="background:#6B5B4E;"></span>Քվարց</button>
+          </div>
+        </div>
+
+        <!-- Price Range -->
+        <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--pumice);">
+          <div class="filter-group-title">Գին</div>
+          <div class="price-range-inputs">
+            <input type="number" id="price-min" class="price-input" placeholder="Min" value="100">
+            <span style="color: var(--tuff);">—</span>
+            <input type="number" id="price-max" class="price-input" placeholder="Max" value="600">
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- Main Product Section -->
+    <main class="shop-main">
+
+      <div class="shop-results-bar">
+        <div class="results-count" id="results-count">Ցուցադրված է 8 զարդ</div>
+        <div id="active-chips-container" class="active-filters"></div>
+        <label style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--tuff);">
+          Տեսակավորել
+          <select class="sort-select" id="sort-select">
+            <option value="new">Նորերը</option>
+            <option value="low">Գինը՝ ցածրից բարձր</option>
+            <option value="high">Գինը՝ բարձրից ցածր</option>
+            <option value="name">Անվանում՝ Ա–Ֆ</option>
+          </select>
+        </label>
+      </div>
+
+      <!-- Shop Products Grid -->
+      <div class="shop-products-grid" id="shop-products-grid">
+        <!-- Rendered by JS -->
+      </div>
+
+    </main>
+
+  </section>
+
+  <!-- ═══ 4. FOOTER ═══ -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="Images/Urartoo-Logo.webp" alt="Urartoo" class="footer-logo">
+        <p>Հայաստանի տարածքում հավաքված քարեր՝ հղկված և տեղադրված մեկ վարպետի կողմից Երևանում։</p>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Խանութ</div>
+        <a href="shop.html">Մատանիներ</a>
+        <a href="shop.html">Վզնոցներ</a>
+        <a href="shop.html">Ապարանջաններ</a>
+        <a href="shop.html">Ականջօղեր</a>
+        <a href="shop.html">Բոլոր զարդերը</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Բրենդը</div>
+        <a href="index.html#maker">Վարպետը</a>
+        <a href="index.html#stones">Քարերը</a>
+        <a href="services.html">Ծառայություններ</a>
+        <a href="journal.html">Օրագիր</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Սպասարկում</div>
+        <a href="services.html#shipping">Առաքում և վերադարձ</a>
+        <a href="services.html#care">Խնամք և չափսեր</a>
+        <a href="contact.html">Կապ</a>
+        <a href="#instagram">Instagram</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Urartoo · Երևան, Հայաստան</span>
+      <span class="footer-legal">
+        <a href="#terms">Պայմաններ</a>
+        <a href="#privacy">Գաղտնիություն</a>
+      </span>
+    </div>
+  </footer>
+
+<script src="script.js"></script>
+<script src="shop.js"></script>
+</body>
+</html>

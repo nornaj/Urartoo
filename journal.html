@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Urartoo — Օրագիր (Դաշտային նշումներ)</title>
+  <meta name="description" content="Ուրարտու — Դաշտային նշումներ քարերի հավաքման, հղկման և Երևանի աշխատանոցում զարդերի պատրաստման մասին։">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;0,600&family=Noto+Serif+Armenian:wght@300;400;500;600&family=Noto+Sans+Armenian:wght@300;400;500;600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .lead-note-card {
+      display: grid;
+      grid-template-columns: 1fr;
+      background: #FFFFFF;
+      align-items: stretch;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(12,14,13,0.06);
+      transition: box-shadow 0.4s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+    .lead-note-card:hover {
+      box-shadow: 0 12px 32px rgba(12,14,13,0.12);
+    }
+    @media (min-width: 900px) {
+      .lead-note-card {
+        grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      }
+    }
+    .journal-topics-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--pumice);
+      flex-wrap: wrap;
+    }
+    .topic-btn {
+      font-family: var(--font);
+      font-size: 12.5px;
+      font-weight: 500;
+      background: var(--surface);
+      border: 1px solid var(--pumice);
+      padding: 7px 14px;
+      cursor: pointer;
+      color: var(--obsidian);
+      transition: border-color 0.25s ease, background 0.25s ease, color 0.25s ease;
+    }
+    .topic-btn:hover { border-color: var(--amber); }
+    .topic-btn.active {
+      background: var(--obsidian);
+      border-color: var(--obsidian);
+      color: var(--bone);
+    }
+    .journal-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 40px 20px;
+      margin-top: 32px;
+    }
+    @media (min-width: 768px) {
+      .journal-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ 1. STICKY LIGHT HEADER (Slides down smoothly on scroll) ═══ -->
+  <header class="hdr-sticky" id="sticky-header">
+    <button class="burger" aria-label="Մենյու" aria-expanded="false" data-sticky-menu-toggle>
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" data-sticky-menu>
+      <a href="shop.html" class="nav-link">Խանութ</a>
+      <a href="journal.html" class="nav-link active" style="color: var(--amber);">Օրագիր</a>
+      <a href="services.html" class="nav-link">Ծառայություններ</a>
+      <a href="contact.html" class="nav-link">Կապ</a>
+    </nav>
+    <a href="index.html" class="logo">
+      <img src="Images/Urartoo-Logo.webp" alt="Urartoo">
+    </a>
+    <div class="hdr-utils">
+      <a href="#search" class="util-link nav-link">Փնտրել</a>
+      <a href="#account" class="util-link nav-link">Հաշիվ</a>
+      <a href="#cart" class="util-link nav-link" id="cart-link-sticky">Զամբյուղ (<span data-cart-count>0</span>)</a>
+    </div>
+  </header>
+
+  <!-- ═══ 2. STATIC DARK HEADER AT TOP ═══ -->
+  <header class="hdr-static" id="top">
+    <button class="burger" aria-label="Մենյու" aria-expanded="false" data-hero-menu-toggle>
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" data-hero-menu>
+      <a href="shop.html" class="nav-link">Խանութ</a>
+      <a href="journal.html" class="nav-link active" style="color: var(--amber);">Օրագիր</a>
+      <a href="services.html" class="nav-link">Ծառայություններ</a>
+      <a href="contact.html" class="nav-link">Կապ</a>
+    </nav>
+    <a href="index.html" class="logo">
+      <img src="Images/Urartoo-Logo.webp" alt="Urartoo">
+    </a>
+    <div class="hdr-utils">
+      <a href="#search" class="util-link nav-link">Փնտրել</a>
+      <a href="#account" class="util-link nav-link">Հաշիվ</a>
+      <a href="#cart" class="util-link nav-link" id="cart-link-hero">Զամբյուղ (<span data-cart-count>0</span>)</a>
+    </div>
+  </header>
+
+  <!-- ═══ 3. JOURNAL INTRO (LIGHT SURFACE, CENTERED TITLE, NO BREADCRUMBS) ═══ -->
+  <section class="journal-intro" style="padding: 48px var(--gutter) 36px; text-align: center;" id="hero-section">
+    <h1 style="font-family: Cormorant, serif; font-size: clamp(32px, 4vw, 48px); font-weight: 400; color: var(--obsidian); margin: 0 auto 12px; text-align: center;">Դաշտային նշումներ</h1>
+    <p style="font-size: 15.5px; line-height: 1.7; color: var(--tuff); max-width: 52ch; margin: 0 auto; text-align: center;">Պատմություններ լեռնալանջերից, աշխատանոցի գաղտնիքները և գեմոլոգիական նշումներ Armenian gemstones-ի մասին։</p>
+  </section>
+
+  <!-- ═══ 3. FEATURED LEAD ARTICLE ═══ -->
+  <section style="padding: 36px max(var(--gutter), calc((100% - var(--max)) / 2)) 0;">
+    <a href="#lead" class="lead-note-card">
+      <div style="position: relative; overflow: hidden; min-height: 320px; background: var(--warm-light); display: flex; align-items: center; justify-content: center; padding: 24px;">
+        <span style="font-family: var(--mono); font-size: 9.5px; line-height: 1.8; color: rgba(12,14,13,0.36); max-width: 230px; text-align: center;">գլխավոր լուսանկար · օբսիդիանի լանջը Գուտանասարի վրա առավոտյան</span>
+      </div>
+      <div style="display: flex; flex-direction: column; justify-content: center; padding: 40px 36px;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+          <span style="background: var(--obsidian); color: var(--bone); font-size: 9.5px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; padding: 5px 10px;">Վերջինը</span>
+          <span style="font-size: 12.5px; color: var(--tuff);">Սեպտեմբեր 2025 · Քարահավաք · 6 րոպե</span>
+        </div>
+        <h2 style="font-family: Cormorant, serif; font-weight: 400; font-size: clamp(24px, 2.6vw, 38px); line-height: 1.14; letter-spacing: -0.02em; margin: 0 0 16px;">Երեք օր հրաբխի վրա՝ մեկ լավ ապակու կտորի համար</h2>
+        <p style="font-size: 15.5px; line-height: 1.7; color: var(--graphite); margin: 0 0 24px; max-width: 52ch;">Գուտանասարի օբսիդիանը կոտրվում է տասից ինն անգամ սխալ։ Ահա թե ինչ տեսք ունի տասներորդը և ինչ արժեցավ այնտեղ հասնելը։</p>
+        <span style="align-self: start; font-size: 13px; font-weight: 500; border-bottom: 1px solid var(--obsidian); padding-bottom: 3px;">Կարդալ նշումը</span>
+      </div>
+    </a>
+  </section>
+
+  <!-- ═══ 4. ARTICLES GRID & FILTERS ═══ -->
+  <section style="padding: 56px max(var(--gutter), calc((100% - var(--max)) / 2)) 88px;">
+
+    <div class="journal-topics-bar">
+      <div style="display: flex; flex-wrap: wrap; gap: 7px;" id="journal-topic-btns">
+        <button class="topic-btn active" data-topic="all">Բոլոր նշումները</button>
+        <button class="topic-btn" data-topic="Քարահավաք">Քարահավաք</button>
+        <button class="topic-btn" data-topic="Աշխատանոց">Աշխատանոց</button>
+        <button class="topic-btn" data-topic="Գեմոլոգիա">Գեմոլոգիա</button>
+        <button class="topic-btn" data-topic="Ստուդիա">Ստուդիա</button>
+      </div>
+      <span style="font-size: 13px; color: var(--tuff);" id="journal-count">Ցուցադրված է 6 նշում</span>
+    </div>
+
+    <div class="journal-grid" id="journal-grid">
+      <!-- Rendered by JS -->
+    </div>
+
+    <!-- Newsletter Banner inside Journal -->
+    <div style="background: var(--sand); display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; align-items: center; padding: 40px 32px; margin-top: 72px;">
+      <div>
+        <div style="font-size: 17px; font-weight: 500; margin-bottom: 8px;">Նշումներ և նոր զարդեր նամակով</div>
+        <p style="font-size: 14px; line-height: 1.65; color: var(--graphite); margin: 0;">Ամիսը մեկ անգամ․ որտեղ եմ եղել, ինչ է դուրս եկել հողից և ինչն է պատրաստվում հայտնվել խանութում։</p>
+      </div>
+      <div>
+        <div class="newsletter-form">
+          <input type="email" placeholder="ձեր@էլ.փոստը" id="journal-nl-email">
+          <button type="button" id="journal-nl-btn">Բաժանորդագրվել</button>
+        </div>
+        <div class="newsletter-status" id="journal-nl-status">Ամենաշատը մեկ նամակ ամսական։</div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ═══ 5. FOOTER ═══ -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="Images/Urartoo-Logo.webp" alt="Urartoo" class="footer-logo">
+        <p>Հայաստանի տարածքում հավաքված քարեր՝ հղկված և տեղադրված մեկ վարպետի կողմից Երևանում։</p>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Խանութ</div>
+        <a href="shop.html">Մատանիներ</a>
+        <a href="shop.html">Վզնոցներ</a>
+        <a href="shop.html">Ապարանջաններ</a>
+        <a href="shop.html">Ականջօղեր</a>
+        <a href="shop.html">Բոլոր զարդերը</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Բրենդը</div>
+        <a href="index.html#maker">Վարպետը</a>
+        <a href="index.html#stones">Քարերը</a>
+        <a href="services.html">Ծառայություններ</a>
+        <a href="journal.html">Օրագիր</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Սպասարկում</div>
+        <a href="services.html#shipping">Առաքում և վերադարձ</a>
+        <a href="services.html#care">Խնամք և չափսեր</a>
+        <a href="contact.html">Կապ</a>
+        <a href="#instagram">Instagram</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Urartoo · Երևան, Հայաստան</span>
+      <span class="footer-legal">
+        <a href="#terms">Պայմաններ</a>
+        <a href="#privacy">Գաղտնիություն</a>
+      </span>
+    </div>
+  </footer>
+
+<script src="script.js"></script>
+<script>
+  const posts = [
+    { id: 1, topic: 'Քարահավաք', date: 'Սեպտեմբեր 2025', read: '6 րոպե', title: 'Երեք օր հրաբխի վրա՝ մեկ լավ ապակու կտորի համար', excerpt: 'Գուտանասարի օբսիդիանը կոտրվում է տասից ինն անգամ սխալ։ Ահա թե ինչ տեսք ունի տասներորդը։' },
+    { id: 2, topic: 'Գեմոլոգիա', date: 'Հուլիս 2025', read: '4 րոպե', title: 'Ինչու է գետի նռնաքարը հղկվում այլ կերպ, քան հանքինը', excerpt: 'Գետի ջուրը դարերի ընթացքում արդեն իսկ հղկել է քարի թույլ կողմերը։ Մեզ մնում է գտնել երակը։' },
+    { id: 3, topic: 'Աշխատանոց', date: 'Մայիս 2025', read: '5 րոպե', title: 'Անհամաչափ քարի տեղադրումը արծաթում', excerpt: 'Երբ քարը բնական ձև ունի, շրջանակը պետք է կրկնի նրա հետագիծը, ոչ թե ստիպի դառնալ երկրաչափական։' },
+    { id: 4, topic: 'Ստուդիա', date: 'Ապրիլ 2025', read: '3 րոպե', title: '925 արծաթի մշակումը և հնեցումը', excerpt: 'Ինչպես է օքսիդացումը ընդգծում հայկական քարերի խորությունն ու բնական փայլը։' },
+    { id: 5, topic: 'Քարահավաք', date: 'Մարտ 2025', read: '7 րոպե', title: 'Սյունիքի հին պղնձի հանքերի փիրուզը', excerpt: 'Գարնանը, երբ ձյունը հալվում է, Սյունիքի հին ակոսներում հայտնվում են կապույտ երակներ։' },
+    { id: 6, topic: 'Գեմոլոգիա', date: 'Փետրվար 2025', read: '5 րոպե', title: 'Արենիի հասպիսի երկաթյա շերտերը', excerpt: 'Կարմիր և դեղնավուն շերտերով հասպիսը Հայաստանի ամենատաք քարերից մեկն է։' }
+  ];
+
+  let currentTopic = 'all';
+  const gridEl = document.getElementById('journal-grid');
+  const countEl = document.getElementById('journal-count');
+
+  function renderPosts() {
+    let filtered = posts.filter(p => currentTopic === 'all' || p.topic === currentTopic);
+    countEl.textContent = 'Ցուցադրված է ' + filtered.length + ' նշում';
+    gridEl.innerHTML = filtered.map(p => `
+      <a href="#note-${p.id}" class="note-card">
+        <div class="note-img">
+          <div class="note-img-inner">
+            <span class="placeholder-text" style="font-family:var(--mono);font-size:9.5px;line-height:1.8;color:rgba(12,14,13,0.3);max-width:180px;text-align:center;">
+              ${p.topic} · ${p.date}
+            </span>
+          </div>
+        </div>
+        <div class="note-meta">
+          <span style="color:var(--patina);font-weight:500;">${p.topic}</span> · ${p.date} · ${p.read}
+        </div>
+        <div class="note-title">${p.title}</div>
+        <p style="font-size:14px;line-height:1.65;color:var(--graphite);margin:8px 0 0;">${p.excerpt}</p>
+      </a>
+    `).join('');
+  }
+
+  document.querySelectorAll('#journal-topic-btns .topic-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('#journal-topic-btns .topic-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentTopic = btn.dataset.topic;
+      renderPosts();
+    });
+  });
+
+  document.getElementById('journal-nl-btn')?.addEventListener('click', function () {
+    const email = document.getElementById('journal-nl-email');
+    const status = document.getElementById('journal-nl-status');
+    if (email && email.value.includes('@')) {
+      status.textContent = 'Շնորհակալություն, դուք ցուցակում եք։';
+      this.textContent = 'Բաժանորդագրված';
+      this.disabled = true;
+    }
+  });
+
+  renderPosts();
+</script>
+</body>
+</html>

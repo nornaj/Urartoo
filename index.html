@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Urartoo — Հայաստանում ձեռքով հավաքված քարերով զարդեր</title>
+  <meta name="description" content="Օբսիդիան, նռնաքար, փիրուզ և հասպիս՝ ձեռքով հավաքված Հայաստանի տարածքում, ապա տեղադրված 925 հարգի արծաթում մեկ առ մեկ։ Ոչ մի զարդ երբեք չի կրկնվում։">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;0,600&family=Noto+Serif+Armenian:wght@300;400;500;600&family=Noto+Sans+Armenian:wght@300;400;500;600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ═══ 1. STICKY LIGHT HEADER (Appears smoothly after Hero, Fixed) ═══ -->
+  <header class="hdr-sticky" id="sticky-header">
+    <button class="burger" aria-label="Մենյու" aria-expanded="false" data-sticky-menu-toggle>
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" data-sticky-menu>
+      <a href="shop.html" class="nav-link">Խանութ</a>
+      <a href="journal.html" class="nav-link">Օրագիր</a>
+      <a href="services.html" class="nav-link">Ծառայություններ</a>
+      <a href="contact.html" class="nav-link">Կապ</a>
+    </nav>
+    <a href="#top" class="logo">
+      <img src="Images/Urartoo-Logo.webp" alt="Urartoo">
+    </a>
+    <div class="hdr-utils">
+      <a href="#search" class="util-link nav-link">Փնտրել</a>
+      <a href="#account" class="util-link nav-link">Հաշիվ</a>
+      <a href="#cart" class="util-link nav-link" id="cart-link-sticky">Զամբյուղ (<span data-cart-count>0</span>)</a>
+    </div>
+  </header>
+
+  <!-- ═══ 2. HERO SECTION (With Static Hero Header inside) ═══ -->
+  <section class="hero" id="hero-section">
+    <div class="hero-noise"></div>
+    <div class="hero-glow"></div>
+
+    <!-- Static Header 1 (Stays in Hero, dark theme) -->
+    <header class="hdr-hero" id="top">
+      <button class="burger" aria-label="Մենյու" aria-expanded="false" data-hero-menu-toggle>
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="nav" data-hero-menu>
+        <a href="shop.html" class="nav-link">Խանութ</a>
+        <a href="journal.html" class="nav-link">Օրագիր</a>
+        <a href="services.html" class="nav-link">Ծառայություններ</a>
+        <a href="contact.html" class="nav-link">Կապ</a>
+      </nav>
+      <a href="#top" class="logo">
+        <img src="Images/Urartoo-Logo.webp" alt="Urartoo">
+      </a>
+      <div class="hdr-utils">
+        <a href="#search" class="util-link nav-link">Փնտրել</a>
+        <a href="#account" class="util-link nav-link">Հաշիվ</a>
+        <a href="#cart" class="util-link nav-link" id="cart-link-hero">Զամբյուղ (<span data-cart-count>0</span>)</a>
+      </div>
+    </header>
+
+    <div class="hero-inner">
+      <h1>Հողը տալիս է քարը։</h1>
+      <p class="hero-sub">Օբսիդիան հրաբուխներից, նռնաքար գետերի հունից, փիրուզ հարավի պղնձի հանքերից։ Գտնված ձեռքով, հղկված մեկ անգամ, տեղադրված 925 հարգի արծաթում։ Ոչ մի զարդ երբեք չի կրկնվում։</p>
+      <div class="hero-cta">
+        <a href="shop.html" class="btn-primary">Տեսնել բոլոր զարդերը</a>
+        <a href="#stones" class="btn-ghost">Ըստ քարի</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 3. TRUST BAR ═══ -->
+  <section class="trust-bar pad">
+    <div class="trust-grid" id="trust-grid">
+      <!-- Rendered by JS -->
+    </div>
+  </section>
+
+  <!-- ═══ 4. CATEGORIES ═══ -->
+  <section class="categories" data-reveal>
+    <div class="categories-grid" id="categories-grid">
+      <!-- Rendered by JS -->
+    </div>
+  </section>
+
+  <!-- ═══ 5. FEATURED PIECES (SLIDER) ═══ -->
+  <section class="products" data-reveal>
+    <div class="section-header">
+      <h2 class="section-title">Առկա տեսականի</h2>
+      <div class="slider-controls">
+        <button class="slider-arrow" id="prod-prev" aria-label="Նախորդ">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <button class="slider-arrow" id="prod-next" aria-label="Հաջորդ">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+        <a href="shop.html" class="btn-underline-dark">Բոլոր 41 զարդերը</a>
+      </div>
+    </div>
+    <div class="products-slider-wrap">
+      <div class="products-grid" id="products-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 6. SHOP BY STONE ═══ -->
+  <section class="stones" id="stones" data-reveal>
+    <div class="section-header">
+      <h2 class="section-title">Ըստ քարերի</h2>
+      <a href="shop.html" class="btn-underline-dark">Բոլոր քարերը</a>
+    </div>
+    <div class="stones-grid" id="stones-grid">
+      <!-- Rendered by JS -->
+    </div>
+  </section>
+
+  <!-- ═══ 7. THE MAKER ═══ -->
+  <section class="maker" id="maker" data-reveal>
+    <div class="maker-card">
+      <div class="maker-portrait">
+        <span class="placeholder-text">դիմանկար · վարպետը աշխատանոցում, Երևան</span>
+      </div>
+      <div class="maker-copy">
+        <h2>Մեկ վարպետի արհեստանոց՝ Արարատյան դաշտում</h2>
+        <p>Անվանումը ծագում է Ուրարտուից՝ թագավորությունից, որն այս հովիտներում մետաղ ու քար էր մշակում երեք հազար տարի առաջ։ Ամեն ինչ մինչ օրս գտնվում, հղկվում և տեղադրվում է միևնույն վարպետի կողմից․ ահա թե ինչու ոչ մի զարդ կրկնօրինակ չունի։</p>
+        <div class="maker-stats">
+          <div>
+            <div class="maker-stat-num">2019</div>
+            <div class="maker-stat-label">Առաջին վաճառված զարդը</div>
+          </div>
+          <div>
+            <div class="maker-stat-num">14</div>
+            <div class="maker-stat-label">Հավաքված շրջաններ</div>
+          </div>
+          <div>
+            <div class="maker-stat-num">1-ից 1</div>
+            <div class="maker-stat-label">Յուրաքանչյուր նմուշ</div>
+          </div>
+        </div>
+        <a href="#story" class="btn-underline-light">Կարդալ ամբողջ պատմությունը</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 8. TESTIMONIALS ═══ -->
+  <section class="testimonials" data-reveal>
+    <div class="testimonials-grid" id="quotes-grid">
+      <!-- Rendered by JS -->
+    </div>
+  </section>
+
+  <!-- ═══ 9. FIELD NOTES ═══ -->
+  <section class="field-notes" id="notes" data-reveal>
+    <div class="section-header">
+      <h2 class="section-title">Օրագիր</h2>
+      <a href="#journal" class="btn-underline-dark">Բոլոր նշումները</a>
+    </div>
+    <div class="notes-grid" id="notes-grid">
+      <!-- Rendered by JS -->
+    </div>
+  </section>
+
+  <!-- ═══ 10. NEWSLETTER ═══ -->
+  <section class="newsletter" data-reveal>
+    <div class="newsletter-inner">
+      <div>
+        <div class="newsletter-title">Նոր զարդեր՝ ամիսը մեկ անգամ</div>
+        <p class="newsletter-desc">Տեղեկացվում է նամակով՝ խանութում հայտնվելուց մոտ մեկ շաբաթ առաջ։ Եզակի նմուշները արագ են սպառվում։</p>
+      </div>
+      <div>
+        <div class="newsletter-form">
+          <input type="email" placeholder="ձեր@էլ.փոստը" id="newsletter-email">
+          <button type="button" id="newsletter-btn">Բաժանորդագրվել</button>
+        </div>
+        <div class="newsletter-status" id="newsletter-status">Ամենաշատը մեկ նամակ ամսական։</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 11. FOOTER ═══ -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="Images/Urartoo-Logo.webp" alt="Urartoo" class="footer-logo">
+        <p>Հայաստանի տարածքում հավաքված քարեր՝ հղկված և տեղադրված մեկ վարպետի կողմից Երևանում։</p>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Խանութ</div>
+        <a href="shop.html">Մատանիներ</a>
+        <a href="shop.html">Վզնոցներ</a>
+        <a href="shop.html">Ապարանջաններ</a>
+        <a href="shop.html">Ականջօղեր</a>
+        <a href="shop.html">Բոլոր զարդերը</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Բրենդը</div>
+        <a href="#maker">Վարպետը</a>
+        <a href="#stones">Քարերը</a>
+        <a href="services.html">Ծառայություններ</a>
+        <a href="journal.html">Օրագիր</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Սպասարկում</div>
+        <a href="services.html#shipping">Առաքում և վերադարձ</a>
+        <a href="services.html#care">Խնամք և չափսեր</a>
+        <a href="contact.html">Կապ</a>
+        <a href="#instagram">Instagram</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Urartoo · Երևան, Հայաստան</span>
+      <span class="footer-legal">
+        <a href="#terms">Պայմաններ</a>
+        <a href="#privacy">Գաղտնիություն</a>
+      </span>
+    </div>
+  </footer>
+
+<script src="script.js"></script>
+</body>
+</html>
