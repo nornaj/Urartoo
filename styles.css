@@ -473,6 +473,28 @@ body.nav-open {
   overflow: hidden;
 }
 
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  opacity: 0.45;
+}
+
+.hero-noise {
+  z-index: 1;
+}
+.hero-glow {
+  z-index: 1;
+}
+.hdr-hero {
+  z-index: 2;
+}
+.hero-inner {
+  z-index: 2;
+}
 .hero-noise {
   position: absolute;
   inset: 0;
