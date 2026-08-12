@@ -484,18 +484,6 @@ body.nav-open {
 }
 
 .hero-noise {
-  z-index: 1;
-}
-.hero-glow {
-  z-index: 1;
-}
-.hdr-hero {
-  z-index: 2;
-}
-.hero-inner {
-  z-index: 2;
-}
-.hero-noise {
   position: absolute;
   inset: 0;
   opacity: 0.03;
