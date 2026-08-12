@@ -1655,6 +1655,37 @@ body.nav-open {
   box-shadow: 0 0 0 2px var(--surface);
 }
 
+.nav-cart-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px;
+  position: relative;
+  transition: color 0.25s ease, transform 0.25s ease;
+}
+.nav-cart-icon:hover {
+  color: var(--amber) !important;
+  transform: translateY(-1px);
+}
+.nav-cart-icon .cart-icon-svg {
+  display: block;
+}
+.cart-badge-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  background: var(--amber);
+  color: var(--basalt);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 10px;
+  line-height: 1;
+}
+
 .account-section {
   padding: 40px var(--gutter) 80px;
   min-height: 70vh;

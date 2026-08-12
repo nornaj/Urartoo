@@ -339,10 +339,12 @@
     document.addEventListener('DOMContentLoaded', function () {
       initLoader();
       syncNavAccountIcons();
+      initGlobalCartDrawer();
     });
   } else {
     initLoader();
     syncNavAccountIcons();
+    initGlobalCartDrawer();
   }
 
   function syncNavAccountIcons() {
@@ -361,5 +363,97 @@
       }
     });
   }
+
+  // Global Cart Drawer Toggle Logic
+  function initGlobalCartDrawer() {
+    var overlay = document.getElementById('cart-overlay');
+    var drawer = document.getElementById('cart-drawer');
+    var closeBtn = document.getElementById('cart-close');
+
+    function openCart() {
+      if (drawer) drawer.classList.add('open');
+      if (overlay) overlay.classList.add('open');
+      renderCartDrawerItems();
+    }
+
+    function closeCart() {
+      if (drawer) drawer.classList.remove('open');
+      if (overlay) overlay.classList.remove('open');
+    }
+
+    document.addEventListener('click', function (e) {
+      var cartTrigger = e.target.closest('a[href="#cart"], .nav-cart-icon');
+      if (cartTrigger) {
+        e.preventDefault();
+        openCart();
+      }
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', closeCart);
+    if (overlay) overlay.addEventListener('click', closeCart);
+
+    syncCartBadge();
+  }
+
+  function syncCartBadge() {
+    var cart = [];
+    try {
+      cart = JSON.parse(localStorage.getItem('urartoo_cart_v1')) || [];
+    } catch (e) { cart = []; }
+
+    var totalQty = cart.reduce(function (sum, item) { return sum + (item.qty || 1); }, 0);
+    document.querySelectorAll('[data-cart-count]').forEach(function (badge) {
+      badge.textContent = totalQty;
+    });
+  }
+
+  function renderCartDrawerItems() {
+    var body = document.getElementById('cart-body');
+    var totalPriceEl = document.getElementById('cart-total-price');
+    if (!body) return;
+
+    var cart = [];
+    try {
+      cart = JSON.parse(localStorage.getItem('urartoo_cart_v1')) || [];
+    } catch (e) { cart = []; }
+
+    syncCartBadge();
+
+    if (cart.length === 0) {
+      body.innerHTML = '<div style="text-align:center; padding: 48px 16px; color: var(--tuff); font-size: 14.5px;">' +
+        '<p>Զամբյուղը դատարկ է։</p>' +
+        '<a href="shop.html" class="btn-primary" style="display:inline-block; margin-top:16px; padding:10px 20px; text-decoration:none; font-size:12px;">Ուսումնասիրել տեսականին</a>' +
+      '</div>';
+      if (totalPriceEl) totalPriceEl.textContent = '$0';
+      return;
+    }
+
+    var total = 0;
+    body.innerHTML = cart.map(function (item, index) {
+      var itemTotal = (item.price || 0) * (item.qty || 1);
+      total += itemTotal;
+
+      return '<div style="display:flex; gap:14px; align-items:center; border-bottom:1px solid var(--pumice); padding-bottom:14px;">' +
+        '<div style="width:60px; height:60px; background:var(--warm-light); flex-shrink:0; overflow:hidden;">' +
+          '<img src="' + (item.img || 'Images/bracelet.webp') + '" style="width:100%; height:100%; object-fit:cover;" alt="">' +
+        '</div>' +
+        '<div style="flex:1;">' +
+          '<div style="font-size:13.5px; font-weight:600; color:var(--obsidian); margin-bottom:4px;">' + item.name + '</div>' +
+          '<div style="font-size:12.5px; color:var(--amber); font-family:var(--mono);">' + (item.qty || 1) + ' × $' + item.price + '</div>' +
+        '</div>' +
+        '<button onclick="removeCartItem(' + index + ')" style="background:none; border:none; color:var(--tuff); font-size:18px; cursor:pointer;">×</button>' +
+      '</div>';
+    }).join('');
+
+    if (totalPriceEl) totalPriceEl.textContent = '$' + total;
+  }
+
+  window.removeCartItem = function (index) {
+    var cart = [];
+    try { cart = JSON.parse(localStorage.getItem('urartoo_cart_v1')) || []; } catch (e) {}
+    cart.splice(index, 1);
+    localStorage.setItem('urartoo_cart_v1', JSON.stringify(cart));
+    renderCartDrawerItems();
+  };
 
 })();
