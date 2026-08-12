@@ -34,11 +34,14 @@
 
     if (!listEl) return;
 
+    var gridEl = document.getElementById('cart-page-grid');
+
     if (cart.length === 0) {
       listEl.innerHTML = '';
       emptyEl.classList.remove('hidden');
       totalsCol.classList.add('hidden');
       if (tableHead) tableHead.classList.add('hidden');
+      if (gridEl) gridEl.classList.add('cart-is-empty');
       checkoutBtn.disabled = true;
       return;
     }
@@ -46,6 +49,7 @@
     emptyEl.classList.add('hidden');
     totalsCol.classList.remove('hidden');
     if (tableHead) tableHead.classList.remove('hidden');
+    if (gridEl) gridEl.classList.remove('cart-is-empty');
     checkoutBtn.disabled = false;
 
     var subtotal = 0;

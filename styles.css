@@ -2959,14 +2959,18 @@ body.nav-open {
 }
 
 /* Empty State */
+.cart-page-grid.cart-is-empty {
+  grid-template-columns: 1fr;
+}
 .cart-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
+  padding: 80px 20px;
   text-align: center;
   gap: 16px;
+  min-height: 40vh;
 }
 .cart-empty.hidden { display: none; }
 .cart-empty p {
