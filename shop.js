@@ -5,6 +5,9 @@
 (function () {
   'use strict';
 
+  const CART_KEY = 'urartoo_cart_v1';
+  const WISHLIST_KEY = 'urartoo_wishlist_v1';
+
   const STONE_DOTS = {
     'Նռնաքար': '#7B2D3B',
     'Օբսիդիան': '#17181A',
@@ -32,8 +35,33 @@
   let minPrice = 100;
   let maxPrice = 600;
   let activeSort = 'new';
-  const savedItems = {};
-  const addedItems = {};
+  // Initialize from localStorage
+  var savedItems = {};
+  var addedItems = {};
+
+  // Load wishlist state from localStorage
+  try {
+    var storedWishlist = JSON.parse(localStorage.getItem(WISHLIST_KEY)) || [];
+    storedWishlist.forEach(function (id) { savedItems[id] = true; });
+  } catch (e) {}
+
+  // Load cart state from localStorage
+  try {
+    var storedCart = JSON.parse(localStorage.getItem(CART_KEY)) || [];
+    storedCart.forEach(function (item) { addedItems[item.id] = true; });
+  } catch (e) {}
+
+  // Sync cart badge on load
+  syncCartBadge();
+
+  function syncCartBadge() {
+    var cart = [];
+    try { cart = JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch (e) {}
+    var totalQty = cart.reduce(function (sum, item) { return sum + (item.qty || 1); }, 0);
+    document.querySelectorAll('[data-cart-count]').forEach(function (badge) {
+      badge.textContent = totalQty;
+    });
+  }
 
   const gridEl = document.getElementById('shop-products-grid');
   const countEl = document.getElementById('results-count');
@@ -202,19 +230,44 @@
     });
   }
 
-  // Grid delegation
+  // Grid delegation — persist to localStorage
   gridEl.addEventListener('click', function (e) {
     var addBtn = e.target.closest('[data-add]');
     var saveBtn = e.target.closest('[data-save]');
 
     if (addBtn) {
       var id = Number(addBtn.dataset.add);
+      var product = allProducts.find(function (p) { return p.id === id; });
+      if (!product) return;
+
+      // Read current cart from localStorage
+      var cart = [];
+      try { cart = JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch (e) { cart = []; }
+
+      // Check if already in cart
+      var existingIdx = cart.findIndex(function (c) { return c.id === id; });
+      if (existingIdx > -1) {
+        cart[existingIdx].qty += 1;
+      } else {
+        cart.push({ id: product.id, name: product.name, price: product.price, img: product.img, qty: 1 });
+      }
+
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
       addedItems[id] = true;
+      syncCartBadge();
       filterAndSort();
     }
+
     if (saveBtn) {
       var id2 = Number(saveBtn.dataset.save);
       savedItems[id2] = !savedItems[id2];
+
+      // Rebuild wishlist array from savedItems and persist
+      var wishlistIds = [];
+      for (var key in savedItems) {
+        if (savedItems[key]) wishlistIds.push(Number(key));
+      }
+      localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlistIds));
       filterAndSort();
     }
   });

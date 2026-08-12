@@ -196,13 +196,13 @@
       return;
     }
 
-    const newUser = {
+    var newUser = {
       id: 'usr_' + Date.now(),
       name: name,
       email: email,
       phone: phone || '',
       password: password,
-      joined: '2026',
+      joined: String(new Date().getFullYear()),
       address: { city: '', street: '', zip: '' },
       orders: []
     };

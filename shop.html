@@ -200,6 +200,25 @@
     </div>
   </footer>
 
+  <!-- ═══ CART DRAWER OVERLAY ═══ -->
+  <div class="cart-overlay" id="cart-overlay"></div>
+  <aside class="cart-drawer" id="cart-drawer">
+    <div class="cart-header">
+      <h3>Զամբյուղ (<span data-cart-count>0</span>)</h3>
+      <button class="cart-close" id="cart-close" aria-label="Փակել">×</button>
+    </div>
+    <div class="cart-body" id="cart-body">
+      <!-- Rendered by JS -->
+    </div>
+    <div class="cart-footer" id="cart-footer">
+      <div class="cart-total-row">
+        <span>Ընդամենը:</span>
+        <span class="cart-total-price" id="cart-total-price">$0</span>
+      </div>
+      <button class="btn-primary cart-checkout-btn" onclick="alert('Շնորհակալություն։ Պատվերի ձևակերպումը շուտով պատրաստ կլինի։')">Ձևակերպել պատվերը</button>
+    </div>
+  </aside>
+
 <script src="script.js"></script>
 <script src="shop.js"></script>
 </body>
