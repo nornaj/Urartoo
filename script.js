@@ -161,7 +161,7 @@
 
       return '<div class="product-card' + (isSold ? ' sold' : '') + '" data-idx="' + i + '">' +
         '<div class="media">' +
-          '<a href="#piece-' + i + '" class="media-inner">' +
+          '<a href="product.html?id=' + (i + 1) + '" class="media-inner">' +
             '<img src="' + p.img + '" alt="' + p.name + '" loading="lazy">' +
           '</a>' +
           '<button class="heart' + (isSaved ? ' saved' : '') + '" data-save="' + i + '" aria-label="Պահպանել զարդը">' + heartSvg + '</button>' +

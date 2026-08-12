@@ -128,7 +128,7 @@
 
       return '<div class="product-card' + (isSold ? ' sold' : '') + '" data-id="' + p.id + '">' +
         '<div class="media">' +
-          '<a href="#piece-' + p.id + '" class="media-inner">' +
+          '<a href="product.html?id=' + p.id + '" class="media-inner">' +
             '<img src="' + p.img + '" alt="' + p.name + '" loading="lazy">' +
           '</a>' +
           '<button class="heart' + (isSaved ? ' saved' : '') + '" data-save="' + p.id + '" aria-label="Պահպանել զարդը">' + heartSvg + '</button>' +
