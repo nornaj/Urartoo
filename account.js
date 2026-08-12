@@ -315,13 +315,25 @@
     updateNavIconBadges(!!user);
 
     if (!user) {
-      // Show Auth Section
-      if (authSection) authSection.style.display = 'block';
-      if (dashboardSection) dashboardSection.classList.add('hidden');
+      // Show Auth Section, Hide Dashboard
+      if (authSection) {
+        authSection.classList.remove('hidden');
+        authSection.style.display = 'block';
+      }
+      if (dashboardSection) {
+        dashboardSection.classList.add('hidden');
+        dashboardSection.style.display = 'none';
+      }
     } else {
-      // Show Dashboard Section
-      if (authSection) authSection.style.display = 'none';
-      if (dashboardSection) dashboardSection.classList.remove('hidden');
+      // Hide Auth Section, Show Dashboard
+      if (authSection) {
+        authSection.classList.add('hidden');
+        authSection.style.display = 'none';
+      }
+      if (dashboardSection) {
+        dashboardSection.classList.remove('hidden');
+        dashboardSection.style.display = 'flex';
+      }
 
       renderUserBanner(user);
       renderOrdersPanel(user);
