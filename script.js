@@ -155,8 +155,8 @@
       var isSaved = !!saved[i];
 
       var heartSvg = '<svg width="15" height="15" viewBox="0 0 24 24" fill="' +
-        (isSaved ? '#7B2D3B' : 'none') + '" stroke="' +
-        (isSaved ? '#7B2D3B' : '#0C0E0D') + '" stroke-width="1.5">' +
+        (isSaved ? '#2D6B4F' : 'none') + '" stroke="' +
+        (isSaved ? '#2D6B4F' : '#0C0E0D') + '" stroke-width="1.5">' +
         '<path d="M12 20.5l-7.1-7a4.4 4.4 0 016.2-6.2l.9.9.9-.9a4.4 4.4 0 016.2 6.2z"/></svg>';
 
       return '<div class="product-card' + (isSold ? ' sold' : '') + '" data-idx="' + i + '">' +

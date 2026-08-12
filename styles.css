@@ -18,7 +18,7 @@
   --snow: #F5F2EE;
   --surface: #FAF8F5;
   --amber: #B8860B;
-  --garnet: #7B2D3B;
+  --garnet: #2D6B4F;
   --patina: #3D5C52;
 
   /* Legacy aliases for shop.html / contact.html */
@@ -558,7 +558,7 @@ body.nav-open {
   background: var(--garnet);
   color: var(--surface);
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(123, 45, 59, 0.25);
+  box-shadow: 0 8px 32px rgba(45, 107, 79, 0.25);
 }
 
 .btn-ghost {
