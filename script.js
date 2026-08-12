@@ -280,11 +280,19 @@
     var totalSlides = cards.length;
     var autoTimer = null;
 
-    // Build pagination dots
-    if (pagination) {
-      pagination.innerHTML = quotes.map(function (_, i) {
-        return '<button class="testi-dot' + (i === 0 ? ' active' : '') + '" data-dot="' + i + '"></button>';
-      }).join('');
+    // Build pagination dots based on visible count
+    function buildDots() {
+      if (!pagination) return;
+      var visible = getVisibleCount();
+      var maxIdx = Math.max(0, totalSlides - visible);
+      var dotCount = maxIdx + 1;
+      pagination.innerHTML = '';
+      for (var i = 0; i < dotCount; i++) {
+        var btn = document.createElement('button');
+        btn.className = 'testi-dot' + (i === currentSlide ? ' active' : '');
+        btn.setAttribute('data-dot', i);
+        pagination.appendChild(btn);
+      }
     }
 
     function getVisibleCount() {
@@ -365,7 +373,8 @@
     });
 
     // Recalc on resize
-    window.addEventListener('resize', function () { goToSlide(currentSlide); });
+    window.addEventListener('resize', function () { buildDots(); goToSlide(currentSlide); });
+    buildDots();
     goToSlide(0);
   }
 

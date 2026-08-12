@@ -1289,6 +1289,7 @@ body.nav-open {
 .testi-card {
   flex: 0 0 calc(100% - 0px);
   min-width: 0;
+  overflow: hidden;
 }
 @media (min-width: 640px) {
   .testi-card {
@@ -1310,6 +1311,7 @@ body.nav-open {
   flex-direction: column;
   gap: 20px;
   transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  overflow: hidden;
 }
 .testi-card-inner:hover {
   box-shadow: 0 8px 32px rgba(12, 14, 13, 0.06);
@@ -1328,6 +1330,8 @@ body.nav-open {
   color: var(--graphite);
   margin: 0;
   flex: 1;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .testi-who {
