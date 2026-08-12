@@ -162,11 +162,25 @@
     </div>
   </section>
 
-  <!-- ═══ 8. TESTIMONIALS ═══ -->
-  <section class="testimonials" data-reveal>
-    <div class="testimonials-grid" id="quotes-grid">
-      <!-- Rendered by JS -->
+  <!-- ═══ 8. TESTIMONIALS SLIDER ═══ -->
+  <section class="testimonials-section" data-reveal>
+    <div class="testimonials-header">
+      <h2 class="section-title">Կարծիքներ</h2>
+      <div class="testimonials-arrows">
+        <button class="testi-arrow testi-prev" id="testi-prev" aria-label="Previous">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <button class="testi-arrow testi-next" id="testi-next" aria-label="Next">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
     </div>
+    <div class="testi-slider-viewport">
+      <div class="testi-slider-track" id="quotes-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+    <div class="testi-pagination" id="testi-pagination"></div>
   </section>
 
   <!-- ═══ 9. FIELD NOTES ═══ -->

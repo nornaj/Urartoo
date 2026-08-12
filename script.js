@@ -250,15 +250,120 @@
     }).join('');
   }
 
-  /* ─── Testimonials ─────────────────────────────────────────────── */
+  /* ─── Testimonials Slider ─────────────────────────────────────── */
   var quotesGrid = document.getElementById('quotes-grid');
   if (quotesGrid) {
-    quotesGrid.innerHTML = quotes.map(function (q) {
-      return '<div>' +
-        '<p class="quote-text">«' + q.text + '»</p>' +
-        '<div class="quote-who">' + q.who + '</div>' +
+    // Render cards
+    quotesGrid.innerHTML = quotes.map(function (q, i) {
+      return '<div class="testi-card' + (i === 0 ? ' active' : '') + '" data-slide="' + i + '">' +
+        '<div class="testi-card-inner">' +
+          '<svg class="testi-quote-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="1.2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>' +
+          '<p class="testi-text">' + q.text + '</p>' +
+          '<div class="testi-who">' +
+            '<div class="testi-who-dot"></div>' +
+            '<span>' + q.who + '</span>' +
+          '</div>' +
+        '</div>' +
       '</div>';
     }).join('');
+
+    // Slider logic
+    var track = quotesGrid;
+    var cards = track.querySelectorAll('.testi-card');
+    var prevBtn2 = document.getElementById('testi-prev');
+    var nextBtn2 = document.getElementById('testi-next');
+    var pagination = document.getElementById('testi-pagination');
+    var currentSlide = 0;
+    var totalSlides = cards.length;
+    var autoTimer = null;
+
+    // Build pagination dots
+    if (pagination) {
+      pagination.innerHTML = quotes.map(function (_, i) {
+        return '<button class="testi-dot' + (i === 0 ? ' active' : '') + '" data-dot="' + i + '"></button>';
+      }).join('');
+    }
+
+    function getVisibleCount() {
+      if (window.innerWidth >= 1024) return 3;
+      if (window.innerWidth >= 640) return 2;
+      return 1;
+    }
+
+    function goToSlide(idx) {
+      var visible = getVisibleCount();
+      var maxIdx = Math.max(0, totalSlides - visible);
+      currentSlide = Math.max(0, Math.min(idx, maxIdx));
+
+      var cardEl = cards[0];
+      if (!cardEl) return;
+      var gap = 24;
+      var cardWidth = cardEl.offsetWidth + gap;
+      track.style.transform = 'translateX(' + (-currentSlide * cardWidth) + 'px)';
+
+      // Update dots
+      var dots = pagination ? pagination.querySelectorAll('.testi-dot') : [];
+      dots.forEach(function (d, i) {
+        d.classList.toggle('active', i === currentSlide);
+      });
+
+      // Update arrow states
+      if (prevBtn2) prevBtn2.classList.toggle('disabled', currentSlide === 0);
+      if (nextBtn2) nextBtn2.classList.toggle('disabled', currentSlide === maxIdx);
+    }
+
+    if (prevBtn2) prevBtn2.addEventListener('click', function () {
+      goToSlide(currentSlide - 1);
+      resetAuto();
+    });
+    if (nextBtn2) nextBtn2.addEventListener('click', function () {
+      goToSlide(currentSlide + 1);
+      resetAuto();
+    });
+
+    // Dot clicks
+    if (pagination) pagination.addEventListener('click', function (e) {
+      var dot = e.target.closest('[data-dot]');
+      if (dot) {
+        goToSlide(Number(dot.dataset.dot));
+        resetAuto();
+      }
+    });
+
+    // Auto-play
+    function startAuto() {
+      autoTimer = setInterval(function () {
+        var visible = getVisibleCount();
+        var maxIdx = Math.max(0, totalSlides - visible);
+        goToSlide(currentSlide >= maxIdx ? 0 : currentSlide + 1);
+      }, 5000);
+    }
+    function resetAuto() {
+      clearInterval(autoTimer);
+      startAuto();
+    }
+    startAuto();
+
+    // Touch/swipe
+    var startX = 0;
+    var dragging = false;
+    track.addEventListener('touchstart', function (e) {
+      startX = e.touches[0].clientX;
+      dragging = true;
+    }, { passive: true });
+    track.addEventListener('touchend', function (e) {
+      if (!dragging) return;
+      dragging = false;
+      var diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) {
+        goToSlide(diff > 0 ? currentSlide + 1 : currentSlide - 1);
+        resetAuto();
+      }
+    });
+
+    // Recalc on resize
+    window.addEventListener('resize', function () { goToSlide(currentSlide); });
+    goToSlide(0);
   }
 
   /* ─── Field Notes ──────────────────────────────────────────────── */
