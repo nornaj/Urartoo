@@ -95,12 +95,14 @@
       const expanded = btn.getAttribute('aria-expanded') === 'true';
       btn.setAttribute('aria-expanded', String(!expanded));
       nav.classList.toggle('open');
+      document.body.classList.toggle('nav-open', !expanded);
     });
 
     nav.querySelectorAll('a').forEach(function (a) {
       a.addEventListener('click', function () {
         btn.setAttribute('aria-expanded', 'false');
         nav.classList.remove('open');
+        document.body.classList.remove('nav-open');
       });
     });
   }
@@ -334,9 +336,30 @@
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initLoader);
+    document.addEventListener('DOMContentLoaded', function () {
+      initLoader();
+      syncNavAccountIcons();
+    });
   } else {
     initLoader();
+    syncNavAccountIcons();
+  }
+
+  function syncNavAccountIcons() {
+    var hasSession = false;
+    try {
+      hasSession = !!localStorage.getItem('urartoo_user_session_v1');
+    } catch (e) {}
+
+    document.querySelectorAll('.nav-account-icon').forEach(function (icon) {
+      if (hasSession) {
+        icon.classList.add('is-logged-in');
+        icon.setAttribute('title', 'Իմ հաշիվը (Մուտք գործված է)');
+      } else {
+        icon.classList.remove('is-logged-in');
+        icon.setAttribute('title', 'Իմ հաշիվը');
+      }
+    });
   }
 
 })();

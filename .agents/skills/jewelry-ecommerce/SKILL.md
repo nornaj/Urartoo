@@ -1,64 +1,63 @@
 ---
 name: jewelry-ecommerce
-description: Build and maintain a jewelry e-commerce website from scratch. Covers full architecture including admin panel (orders, inventory, brands, clients, activity logs, blog), Firebase/Sanity CMS integration, product data schema, storefront pages (home, shop, product detail, contact, checkout), filtering/sorting, cart, i18n translations, CSS design system, deployment on Vercel, and SEO. Use when building, modifying, or debugging the jewelry shop, admin dashboard, product management, order tracking, or any storefront feature.
+description: Build and maintain a jewelry e-commerce website from scratch. Covers full architecture (MPA & SPA support), admin panel (orders, inventory, brands, clients, activity logs, blog), Firebase/Sanity CMS integration, product data schema, storefront pages (home, shop, product detail, contact, checkout), filtering/sorting, cart & wishlist systems, i18n translations, CSS design system, deployment on Vercel, and SEO. Use when building, modifying, or debugging the jewelry shop, admin dashboard, product management, order tracking, or any storefront feature.
 ---
 
 # Jewelry E-Commerce Shop — Full Build Skill
 
-This skill provides the complete blueprint for building a jewelry e-commerce website from scratch. The architecture is modeled after a proven production system (NOVA Giftshop) but adapted specifically for **jewelry** (NOT fragrances). Every section below is a reference the agent MUST follow when building or modifying any part of this project.
+This skill provides the complete blueprint for building and maintaining a premium jewelry e-commerce website from scratch. The architecture supports both **Multi-Page Application (MPA)** structure (e.g. `index.html`, `shop.html`, `product.html`, `journal.html`, `services.html`, `contact.html`) and **Single-Page Application (SPA)** structure (with `#view-*` section routing). Every section below is an authoritative reference the agent MUST follow when building or modifying any part of this project.
 
-> **CRITICAL:** This is a jewelry-only shop. There are NO fragrances, NO scent families, NO perfume notes (top/heart/base), NO ingredients/INCI lists, NO bottle sizes (50ml/100ml/200ml). All fragrance-specific concepts must be replaced with jewelry equivalents.
+> **CRITICAL:** This is a jewelry-only shop. There are NO fragrances, NO scent families, NO perfume notes (top/heart/base), NO ingredients/INCI lists, NO bottle sizes (50ml/100ml/200ml). All fragrance-specific concepts must be replaced with jewelry equivalents (metals, stones, region/origin, ring/chain sizes).
 
 ---
 
 ## 1. Project Architecture Overview
 
 ### Tech Stack
-- **Frontend**: Vanilla HTML + CSS + JavaScript (no framework)
-- **CMS for Products & Images**: Sanity CMS (HTTP API, no SDK)
-- **Database for Orders/Users/Config**: Firebase Firestore
-- **Deployment**: Vercel (static site)
-- **Fonts**: Google Fonts (Armenian + Latin)
-- **Email**: EmailJS for contact forms
-- **Build**: Custom `build.js` for CSS/JS minification
+- **Frontend**: Vanilla HTML5 + CSS3 + Modern JavaScript (ES6+, modular / script-based)
+- **CMS for Products & Images**: Sanity CMS (HTTP API, no SDK dependencies)
+- **Database for Orders/Users/Config**: Firebase Firestore (`NovaDB` wrapper)
+- **Deployment**: Vercel (static site with header optimization & rewrite rules)
+- **Fonts**: Google Fonts (Armenian serif/sans + Latin fonts like Cormorant, Noto Serif Armenian, Noto Sans Armenian, Instrument Sans)
+- **Email**: EmailJS for contact forms and order receipts
+- **Build**: Custom `build.js` (Terser minification for production JS/CSS)
 
-### File Structure
+### File Structure (MPA / SPA Supported)
 ```
 project-root/
-├── index.html              # Main SPA — all routes: home, shop, about, checkout, admin, etc.
-├── product.html            # Standalone product detail page (SEO-friendly)
-├── styles.css              # Master stylesheet (~4000+ lines)
+├── index.html              # Homepage / SPA root (hero, category grid, featured pieces slider, stone showcase, maker section, trust bar)
+├── shop.html               # Dedicated Shop catalog page (filtering sidebar, price range sliders, stone/category chips, search)
+├── product.html            # Standalone product detail page (SEO-friendly gallery, size picker, FAQs accordion)
+├── journal.html            # Blog / Field notes listing & story pages
+├── services.html           # Bespoke / Custom order services page
+├── contact.html            # Contact & studio location page
+├── styles.css              # Master stylesheet (CSS variables, responsive design, dark/light warm luxury theme)
 ├── styles.min.css          # Minified production CSS
-├── app.js                  # Main application logic (~8000+ lines)
-├── app.min.js              # Minified production JS
-├── admin.js                # Admin panel logic (WooCommerceAdmin object)
-├── firebase-config.js      # Firebase init + NovaDB wrapper
-├── sanity-config.js        # Sanity CMS wrapper (NovaSanity)
-├── products.js             # Global taxonomy definitions (categories, materials, etc.)
+├── script.js               # Global site interactions (nav drawer, cart drawer toggle, header scroll, animations)
+├── shop.js                 # Interactive shop filtering, sorting, price filter, search, & cart grid logic
+├── admin.js                # WooCommerce-style admin panel logic (WooCommerceAdmin object)
+├── firebase-config.js      # Firebase init + NovaDB wrapper (Orders, users, audit logs, staff profiles)
+├── sanity-config.js        # Sanity CMS HTTP API wrapper (NovaSanity)
+├── products.js             # Global taxonomy definitions (categories, stones, regions, materials)
 ├── build.js                # Node.js minification script
 ├── vercel.json             # Vercel routing rewrites & cache headers
 ├── manifest.json           # PWA manifest
 ├── robots.txt              # Search engine directives
 ├── sitemap.xml             # XML sitemap
-├── assets/                 # Static images, logos, hero images
-├── .agents/                # Agent skills and rules
-└── nova-pipeline/          # Data processing scripts
+└── Images/                 # Static imagery, webp product pictures, logos, hero backgrounds
 ```
 
-### Routing (Single-Page Application)
-The `index.html` serves as a SPA with hash-based routing. All routes rewrite to `index.html` via `vercel.json`:
-- `/` or `/home` → Home view
-- `/shop` → Shop catalog view
-- `/about` → About/brand story view
-- `/contact` → Contact form view
-- `/checkout` → Cart & checkout view
-- `/admin` → Admin panel (login-gated)
-- `/wishlist` → Wishlist view
-- `/my-account` → User account view
-- `/blog` → Blog listing view
-- `/product` → **Separate** `product.html` (for SEO)
+### Routing & Navigation Modes
+1. **Multi-Page Application (MPA)**:
+   - `/` or `/index.html` → Homepage
+   - `/shop.html` or `/shop` → Shop catalog view
+   - `/product.html` or `/product?id=...` → Standalone product detail page
+   - `/journal.html` → Field notes / blog articles
+   - `/services.html` → Custom jewelry creation & resizing services
+   - `/contact.html` → Contact & studio inquiry form
 
-Each route shows/hides `<section class="route-view">` elements with `id="view-{name}"`.
+2. **Single-Page Application (SPA)**:
+   - Routing managed via `#view-{name}` hashes or URL rewrite paths. Each route toggles `<section class="route-view">` visibility.
 
 ---
 
@@ -138,8 +137,18 @@ const GLOBAL_ATTRIBUTES = {
     garnet: { id: "garnet", label: { en: "Garnet", am: "Նռնաքար", ru: "Гранат" }, color: "#7B1B23" },
     turquoise: { id: "turquoise", label: { en: "Turquoise", am: "Փիրուզ", ru: "Бирюза" }, color: "#2E8C8C" },
     jasper: { id: "jasper", label: { en: "Jasper", am: "Հասպիս", ru: "Яшма" }, color: "#A4442B" },
-    onyx: { id: "onyx", label: { en: "Onyx", am: "Եղնգաքար", ru: "Оникс" }, color: "#2A2723" },
-    agate: { id: "agate", label: { en: "Agate", am: "Ագաթ", ru: "Агат" }, color: "#C2A379" }
+    onyx: { id: "onyx", label: { en: "Onyx", am: "Եղնգաքար", ru: "Оникс" }, color: "#1B1D1C" },
+    agate: { id: "agate", label: { en: "Agate", am: "Ագաթ", ru: "Агат" }, color: "#C2A379" },
+    quartz: { id: "quartz", label: { en: "Quartz", am: "Քվարց", ru: "Кварц" }, color: "#6B5B4E" }
+  },
+  regions: {
+    vayots_dzor: { id: "vayots_dzor", label: { en: "Vayots Dzor", am: "Վայոց Ձոր", ru: "Вայոց Дзор" } },
+    gutansar: { id: "gutansar", label: { en: "Gutansar", am: "Գուտանասար", ru: "Гутанасар" } },
+    syunik: { id: "syunik", label: { en: "Syunik", am: "Սյունիք", ru: "Сюник" } },
+    areni: { id: "areni", label: { en: "Areni", am: "Արենի", ru: "Арени" } },
+    sevan: { id: "sevan", label: { en: "Sevan", am: "Սևան", ru: "Севан" } },
+    ararat: { id: "ararat", label: { en: "Ararat Plain", am: "Արարատյան դաշտ", ru: "Араратская долина" } },
+    aragats: { id: "aragats", label: { en: "Aragats", am: "Արագած", ru: "Арагац" } }
   },
   genders: {
     men: { id: "men", label: { en: "Men", am: "Տղամարդկանց", ru: "Мужчинам" } },
@@ -581,35 +590,90 @@ window.AppState = {
 7. Log "Admin login" to audit logs
 ```
 
-### Cart System
+### Cart & Wishlist System
 ```javascript
-// Add to cart
-function addToCart(productId, size, quantity) {
-  // Check stock, prevent duplicates, update UI
+// LocalStorage Persistence Keys
+const CART_STORAGE_KEY = 'urartoo_cart_v1';
+const WISHLIST_STORAGE_KEY = 'urartoo_wishlist_v1';
+
+// Cart management functions
+function getCart() {
+  try {
+    return JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || [];
+  } catch (e) {
+    return [];
+  }
 }
 
-// Cart stored in localStorage for persistence
-// Cart count badge updated via [data-cart-count] attribute
+function saveCart(cart) {
+  localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+  updateCartBadge();
+}
+
+function addToCart(productId, qty = 1, size = 'standard') {
+  const cart = getCart();
+  const existingIndex = cart.findIndex(item => item.id === productId && item.size === size);
+  if (existingIndex > -1) {
+    cart[existingIndex].qty += qty;
+  } else {
+    cart.push({ id: productId, qty: qty, size: size, addedAt: new Date().toISOString() });
+  }
+  saveCart(cart);
+}
+
+function updateCartBadge() {
+  const cart = getCart();
+  const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+  document.querySelectorAll('[data-cart-count]').forEach(el => {
+    el.textContent = totalItems;
+  });
+}
+
+// Wishlist toggle function
+function toggleWishlist(productId) {
+  let wishlist = JSON.parse(localStorage.getItem(WISHLIST_STORAGE_KEY)) || [];
+  const idx = wishlist.indexOf(productId);
+  if (idx > -1) {
+    wishlist.splice(idx, 1);
+  } else {
+    wishlist.push(productId);
+  }
+  localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(wishlist));
+  return wishlist.includes(productId);
+}
 ```
 
-### Shop Filtering System
+### Shop Filtering & Search System
 ```javascript
 const filterState = {
-  selectedCategories: [],   // e.g. ["Rings", "Necklaces"]
-  selectedStones: [],       // e.g. ["Obsidian", "Garnet"]
-  selectedMaterials: [],    // e.g. ["sterling_silver"]
+  selectedCategory: 'all',  // 'all' | 'Մատանիներ' | 'Վզնոցներ' | etc.
+  selectedStone: 'all',     // 'all' | 'Նռնաքար' | 'Օբսիդիան' | etc.
   searchQuery: '',
-  priceMin: 0,
-  priceMax: 1000,
-  sort: 'new'              // new | low | high | name
+  priceMin: 100,
+  priceMax: 600,
+  sort: 'new'              // 'new' | 'low' | 'high' | 'name'
 };
 
-function applyFilters() {
-  // Filter products array by all active filters
-  // Sort results
-  // Re-render product grid
-  // Update results count and active filter chips
-  // Show empty state if no results
+function filterAndSortProducts(products) {
+  return products.filter(p => {
+    if (filterState.selectedCategory !== 'all' && p.cat !== filterState.selectedCategory) return false;
+    if (filterState.selectedStone !== 'all' && p.stone !== filterState.selectedStone) return false;
+    if (p.price < filterState.priceMin || p.price > filterState.priceMax) return false;
+    if (filterState.searchQuery) {
+      const q = filterState.searchQuery.toLowerCase();
+      const match = p.name.toLowerCase().includes(q) ||
+                    p.stone.toLowerCase().includes(q) ||
+                    (p.region && p.region.toLowerCase().includes(q)) ||
+                    p.cat.toLowerCase().includes(q);
+      if (!match) return false;
+    }
+    return true;
+  }).sort((a, b) => {
+    if (filterState.sort === 'low') return a.price - b.price;
+    if (filterState.sort === 'high') return b.price - a.price;
+    if (filterState.sort === 'name') return a.name.localeCompare(b.name, 'hy');
+    return (b.id - a.id); // 'new' default
+  });
 }
 ```
 

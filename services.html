@@ -127,6 +127,42 @@
       color: var(--surface);
       transform: translateY(-2px);
     }
+
+    /* CTA Banner */
+    .services-cta-banner {
+      background: var(--basalt);
+      color: var(--bone);
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      padding: 32px 24px;
+    }
+    .services-cta-title {
+      font-family: Cormorant, serif;
+      font-size: 24px;
+      font-weight: 400;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+    .services-cta-desc {
+      font-size: 15px;
+      line-height: 1.7;
+      color: rgba(232,226,218,0.7);
+      margin: 0;
+      max-width: 56ch;
+    }
+    @media (min-width: 768px) {
+      .services-cta-banner {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 40px;
+        align-items: center;
+        padding: 44px 48px;
+      }
+      .services-cta-title {
+        font-size: 28px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -147,7 +183,9 @@
     </a>
     <div class="hdr-utils">
       <a href="#search" class="util-link nav-link">Փնտրել</a>
-      <a href="#account" class="util-link nav-link">Հաշիվ</a>
+      <a href="account.html" class="util-link nav-link nav-account-icon" aria-label="Իմ հաշիվը" title="Իմ հաշիվը">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="user-icon-svg"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
       <a href="#cart" class="util-link nav-link" id="cart-link-sticky">Զամբյուղ (<span data-cart-count>0</span>)</a>
     </div>
   </header>
@@ -168,7 +206,9 @@
     </a>
     <div class="hdr-utils">
       <a href="#search" class="util-link nav-link">Փնտրել</a>
-      <a href="#account" class="util-link nav-link">Հաշիվ</a>
+      <a href="account.html" class="util-link nav-link nav-account-icon" aria-label="Իմ հաշիվը" title="Իմ հաշիվը">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="user-icon-svg"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
       <a href="#cart" class="util-link nav-link" id="cart-link-hero">Զամբյուղ (<span data-cart-count>0</span>)</a>
     </div>
   </header>
@@ -293,10 +333,10 @@
 
   <!-- ═══ 5. CTA BANNER ═══ -->
   <section style="padding: 88px max(var(--gutter), calc((100% - var(--max)) / 2)) 88px;">
-    <div style="background: var(--basalt); color: var(--bone); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 40px; align-items: center; padding: 44px 48px;">
+    <div class="services-cta-banner">
       <div>
-        <div style="font-family: Cormorant, serif; font-size: 28px; font-weight: 400; line-height: 1.2; margin-bottom: 10px;">Վստահ չե՞ք, թե որ ծառայությունն է ձեզ անհրաժեշտ</div>
-        <p style="font-size: 15px; line-height: 1.7; color: rgba(232,226,218,0.7); margin: 0; max-width: 56ch;">Նկարագրեք զարդը կամ քարը, և ես կասեմ, թե ինչ է հնարավոր, որքան արժե և որքան ժամանակ կպահանջվի։</p>
+        <div class="services-cta-title">Վստահ չե՞ք, թե որ ծառայությունն է ձեզ անհրաժեշտ</div>
+        <p class="services-cta-desc">Նկարագրեք զարդը կամ քարը, և ես կասեմ, թե ինչ է հնարավոր, որքան արժե և որքան ժամանակ կպահանջվի։</p>
       </div>
       <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
         <a href="contact.html" class="btn-primary">Գրել վարպետին</a>

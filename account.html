@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Իմ հաշիվը — Urartoo</title>
+  <meta name="description" content="Մուտք գործեք կամ գրանցվեք Urartoo-ում՝ կառավարելու Ձեր պատվերները, պահպանված զարդերը և անձնական տվյալները։">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;0,600&family=Noto+Serif+Armenian:wght@300;400;500;600&family=Noto+Sans+Armenian:wght@300;400;500;600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ═══ 1. STICKY LIGHT HEADER ═══ -->
+  <header class="hdr-sticky" id="sticky-header">
+    <button class="burger" aria-label="Մենյու" aria-expanded="false" data-sticky-menu-toggle>
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" data-sticky-menu>
+      <a href="shop.html" class="nav-link">Խանութ</a>
+      <a href="journal.html" class="nav-link">Օրագիր</a>
+      <a href="services.html" class="nav-link">Ծառայություններ</a>
+      <a href="contact.html" class="nav-link">Կապ</a>
+    </nav>
+    <a href="index.html" class="logo">
+      <img src="Images/Urartoo-Logo.webp" alt="Urartoo">
+    </a>
+    <div class="hdr-utils">
+      <a href="shop.html" class="util-link nav-link">Փնտրել</a>
+      <a href="account.html" class="util-link nav-link nav-account-icon active" aria-label="Իմ հաշիվը" title="Իմ հաշիվը" style="color: var(--amber);">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="user-icon-svg"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <a href="#cart" class="util-link nav-link" id="cart-link-sticky">Զամբյուղ (<span data-cart-count>0</span>)</a>
+    </div>
+  </header>
+
+  <!-- ═══ 2. STATIC DARK HEADER AT TOP ═══ -->
+  <header class="hdr-static" id="top">
+    <button class="burger" aria-label="Մենյու" aria-expanded="false" data-hero-menu-toggle>
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" data-hero-menu>
+      <a href="shop.html" class="nav-link">Խանութ</a>
+      <a href="journal.html" class="nav-link">Օրագիր</a>
+      <a href="services.html" class="nav-link">Ծառայություններ</a>
+      <a href="contact.html" class="nav-link">Կապ</a>
+    </nav>
+    <a href="index.html" class="logo">
+      <img src="Images/Urartoo-Logo.webp" alt="Urartoo">
+    </a>
+    <div class="hdr-utils">
+      <a href="shop.html" class="util-link nav-link">Փնտրել</a>
+      <a href="account.html" class="util-link nav-link nav-account-icon active" aria-label="Իմ հաշիվը" title="Իմ հաշիվը" style="color: var(--amber);">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="user-icon-svg"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <a href="#cart" class="util-link nav-link" id="cart-link-hero">Զամբյուղ (<span data-cart-count>0</span>)</a>
+    </div>
+  </header>
+
+  <!-- ═══ 3. MY ACCOUNT MAIN CONTAINER ═══ -->
+  <main class="account-section" id="hero-section">
+    <div class="account-intro">
+      <h1 id="page-heading">Իմ հաշիվը</h1>
+      <p id="page-subheading">Կառավարեք Ձեր պատվերները, պահպանված զարդերը և անձնական տվյալները։</p>
+    </div>
+
+    <!-- ═══ AUTHENTICATION SECTION (WHEN LOGGED OUT) ═══ -->
+    <section id="auth-section" class="auth-card-wrap">
+      <div class="auth-tabs-header">
+        <button class="auth-tab-btn active" id="tab-btn-signin" onclick="switchAuthTab('signin')">Մուտք</button>
+        <button class="auth-tab-btn" id="tab-btn-register" onclick="switchAuthTab('register')">Գրանցում</button>
+      </div>
+
+      <div class="auth-card-body">
+        <!-- ALERT MESSAGES -->
+        <div id="auth-alert" class="acc-alert"></div>
+
+        <!-- 1. SIGN IN FORM -->
+        <form id="form-signin" class="auth-form" onsubmit="handleUserSignIn(event)">
+          <div class="form-group-acc">
+            <label for="signin-email">Էլ․ փոստ *</label>
+            <input type="email" id="signin-email" class="input-acc" required placeholder="anahit@example.com">
+          </div>
+          <div class="form-group-acc">
+            <label for="signin-password">Գաղտնաբառ *</label>
+            <input type="password" id="signin-password" class="input-acc" required placeholder="••••••••">
+          </div>
+          <div class="form-row-acc">
+            <label class="checkbox-acc">
+              <input type="checkbox" id="signin-remember" checked>
+              <span>Հիշել ինձ</span>
+            </label>
+            <a href="#forgot" onclick="event.preventDefault(); showForgotNotice();" style="color: var(--tuff); text-decoration: underline;">Մոռացե՞լ եք</a>
+          </div>
+          <button type="submit" class="btn-acc-submit">Մուտք գործել</button>
+
+          <div class="demo-login-box">
+            <button type="button" class="btn-demo-quick" id="btn-demo-login" onclick="fillDemoCredentials()">
+              ⚡ Դիտել դեմո հաշվով (Անահիտ Սարգսյան)
+            </button>
+          </div>
+        </form>
+
+        <!-- 2. REGISTER FORM -->
+        <form id="form-register" class="auth-form hidden" onsubmit="handleUserRegister(event)">
+          <div class="form-group-acc">
+            <label for="reg-name">Անուն Ազգանուն *</label>
+            <input type="text" id="reg-name" class="input-acc" required placeholder="Անահիտ Սարգսյան">
+          </div>
+          <div class="form-group-acc">
+            <label for="reg-email">Էլ․ փոստ *</label>
+            <input type="email" id="reg-email" class="input-acc" required placeholder="your.name@example.com">
+          </div>
+          <div class="form-group-acc">
+            <label for="reg-phone">Հեռախոսահամար</label>
+            <input type="tel" id="reg-phone" class="input-acc" placeholder="+374 91 000000">
+          </div>
+          <div class="form-group-acc">
+            <label for="reg-password">Գաղտնաբառ (նվազագույնը 6 նիշ) *</label>
+            <input type="password" id="reg-password" class="input-acc" required minlength="6" placeholder="••••••••">
+          </div>
+          <div class="form-group-acc">
+            <label for="reg-confirm">Կրկնել գաղտնաբառը *</label>
+            <input type="password" id="reg-confirm" class="input-acc" required minlength="6" placeholder="••••••••">
+          </div>
+          <div class="form-row-acc">
+            <label class="checkbox-acc">
+              <input type="checkbox" id="reg-terms" required>
+              <span>Համաձայն եմ օգտագործման պայմաններին</span>
+            </label>
+          </div>
+          <button type="submit" class="btn-acc-submit">Ստեղծել հաշիվ</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ═══ USER DASHBOARD SECTION (WHEN LOGGED IN) ═══ -->
+    <section id="dashboard-section" class="dashboard-wrap hidden">
+      <!-- User Banner -->
+      <div class="user-banner-card">
+        <div class="user-profile-meta">
+          <div class="user-avatar-circle" id="user-avatar-badge">ԱՍ</div>
+          <div class="user-info-text">
+            <h2 id="dash-user-name">Անահիտ Սարգսյան</h2>
+            <p id="dash-user-email">anahit@example.com</p>
+            <span class="user-member-tag" id="dash-user-joined">Անդամ 2026 թ․-ից</span>
+          </div>
+        </div>
+        <button class="btn-logout-acc" onclick="handleUserLogout()">Դուրս գալ</button>
+      </div>
+
+      <!-- Dashboard Tabs Navigation -->
+      <div class="dash-nav-bar">
+        <button class="dash-nav-btn active" data-dash-tab="orders" onclick="switchDashTab('orders')">📦 Պատվերներ (<span id="orders-count-badge">0</span>)</button>
+        <button class="dash-nav-btn" data-dash-tab="wishlist" onclick="switchDashTab('wishlist')">🖤 Պահպանվածներ (<span id="wishlist-count-badge">0</span>)</button>
+        <button class="dash-nav-btn" data-dash-tab="profile" onclick="switchDashTab('profile')">👤 Անձնական տվյալներ</button>
+        <button class="dash-nav-btn" data-dash-tab="addresses" onclick="switchDashTab('addresses')">📍 Առաքման հասցե</button>
+      </div>
+
+      <!-- PANEL 1: ORDERS HISTORY -->
+      <div id="dash-panel-orders" class="dash-panel active">
+        <div class="panel-card">
+          <h3 class="panel-card-title">Պատվերների պատմություն</h3>
+          <div id="orders-container"></div>
+        </div>
+      </div>
+
+      <!-- PANEL 2: WISHLIST / SAVED ITEMS -->
+      <div id="dash-panel-wishlist" class="dash-panel">
+        <div class="panel-card">
+          <h3 class="panel-card-title">Պահպանված զարդեր</h3>
+          <div id="wishlist-container"></div>
+        </div>
+      </div>
+
+      <!-- PANEL 3: PERSONAL PROFILE SETTINGS -->
+      <div id="dash-panel-profile" class="dash-panel">
+        <div class="panel-card">
+          <h3 class="panel-card-title">Անձնական տվյալների խմբագրում</h3>
+          <form id="form-update-profile" class="auth-form" style="max-width: 540px;" onsubmit="handleProfileUpdate(event)">
+            <div id="profile-alert" class="acc-alert"></div>
+            <div class="form-group-acc">
+              <label for="edit-name">Անուն Ազգանուն</label>
+              <input type="text" id="edit-name" class="input-acc" required>
+            </div>
+            <div class="form-group-acc">
+              <label for="edit-email">Էլ․ փոստ (չի փոխվում)</label>
+              <input type="email" id="edit-email" class="input-acc" readonly style="background: var(--sand); opacity: 0.8;">
+            </div>
+            <div class="form-group-acc">
+              <label for="edit-phone">Հեռախոսահամար</label>
+              <input type="tel" id="edit-phone" class="input-acc">
+            </div>
+            <button type="submit" class="btn-acc-submit" style="width: auto; align-self: flex-start; padding: 13px 28px;">Պահպանել փոփոխությունները</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- PANEL 4: SAVED ADDRESSES -->
+      <div id="dash-panel-addresses" class="dash-panel">
+        <div class="panel-card">
+          <h3 class="panel-card-title">Առաքման հասցե</h3>
+          <form id="form-update-address" class="auth-form" style="max-width: 540px;" onsubmit="handleAddressUpdate(event)">
+            <div id="address-alert" class="acc-alert"></div>
+            <div class="form-group-acc">
+              <label for="addr-city">Քաղաք / Բնակավայր</label>
+              <input type="text" id="addr-city" class="input-acc" placeholder="Երևան">
+            </div>
+            <div class="form-group-acc">
+              <label for="addr-street">Փողոց, Շենք, Բնակարան</label>
+              <input type="text" id="addr-street" class="input-acc" placeholder="Աբովյան փող․ 12, բն․ 4">
+            </div>
+            <div class="form-group-acc">
+              <label for="addr-zip">Փոստային ինդեքս</label>
+              <input type="text" id="addr-zip" class="input-acc" placeholder="0001">
+            </div>
+            <button type="submit" class="btn-acc-submit" style="width: auto; align-self: flex-start; padding: 13px 28px;">Պահպանել հասցեն</button>
+          </form>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="footer pad">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="Images/Urartoo-Logo.webp" alt="Urartoo" class="footer-logo">
+        <p>Հայաստանում ձեռքով հավաքված քարերով 1-ից 1 զարդեր 925 հարգի արծաթում։ Ոչ մի զարդ երբեք չի կրկնվում։</p>
+      </div>
+      <div class="footer-col">
+        <h4>Խանութ</h4>
+        <a href="shop.html">Բոլոր զարդերը</a>
+        <a href="shop.html">Մատանիներ</a>
+        <a href="shop.html">Վզնոցներ</a>
+        <a href="shop.html">Ապարանջաններ</a>
+      </div>
+      <div class="footer-col">
+        <h4>Տեղեկություն</h4>
+        <a href="journal.html">Օրագիր</a>
+        <a href="services.html">Ծառայություններ</a>
+        <a href="contact.html">Կապ</a>
+        <a href="account.html">Իմ հաշիվը</a>
+      </div>
+      <div class="footer-col">
+        <h4>Աշխատանոց</h4>
+        <p style="font-size: 13.5px; color: var(--tuff); line-height: 1.6;">Արարատյան դաշտ, Երևան<br>Երկ - Ուրբ: 10:00 - 19:00</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Urartoo. Բոլոր իրավունքները պաշտպանված են։</p>
+    </div>
+  </footer>
+
+  <!-- ═══ CART DRAWER OVERLAY ═══ -->
+  <div class="cart-overlay" id="cart-overlay"></div>
+  <aside class="cart-drawer" id="cart-drawer">
+    <div class="cart-header">
+      <h3>Զամբյուղ (<span data-cart-count>0</span>)</h3>
+      <button class="cart-close" id="cart-close" aria-label="Փակել">×</button>
+    </div>
+    <div class="cart-body" id="cart-body">
+      <!-- Rendered by JS -->
+    </div>
+    <div class="cart-footer" id="cart-footer">
+      <div class="cart-total-row">
+        <span>Ընդամենը:</span>
+        <span class="cart-total-price" id="cart-total-price">$0</span>
+      </div>
+      <button class="btn-primary cart-checkout-btn" onclick="alert('Շնորհակալություն։ Պատվերի ձևակերպումը շուտով պատրաստ կլինի։')">Ձևակերպել պատվերը</button>
+    </div>
+  </aside>
+
+  <script src="script.js"></script>
+  <script src="account.js"></script>
+</body>
+</html>
