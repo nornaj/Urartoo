@@ -2241,4 +2241,22 @@ body.nav-open {
   background: var(--amber);
 }
 
+/* Profile Panel 2-Column Side-by-Side Grid */
+.profile-grid-wrap {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 36px;
+}
+@media (min-width: 840px) {
+  .profile-grid-wrap {
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+  }
+}
+.profile-col {
+  display: flex;
+  flex-direction: column;
+}
+
+
 
