@@ -2506,6 +2506,18 @@ body.nav-open {
 .pdp-btn-wish:hover { border-color: var(--amber); }
 .pdp-btn-wish.pdp-wished { border-color: var(--garnet); background: rgba(45, 107, 79, 0.06); }
 
+/* FAQ Section (Full Width, below hero) */
+.pdp-faq-section {
+  margin-top: 56px;
+  padding-top: 40px;
+  border-top: 1px solid var(--pumice);
+}
+.pdp-faq-section .pdp-details {
+  max-width: 800px;
+  margin: 0 auto;
+  border-top: none;
+}
+
 /* Details Accordion */
 .pdp-details {
   border-top: 1px solid var(--pumice);
@@ -2514,7 +2526,7 @@ body.nav-open {
   border-bottom: 1px solid var(--pumice);
 }
 .pdp-detail-block summary {
-  padding: 18px 0;
+  padding: 20px 0;
   font-family: var(--font);
   font-size: 13px;
   font-weight: 600;
@@ -2526,23 +2538,48 @@ body.nav-open {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  user-select: none;
 }
 .pdp-detail-block summary::after {
   content: '+';
-  font-size: 18px;
-  font-weight: 400;
+  font-size: 20px;
+  font-weight: 300;
   color: var(--tuff);
-  transition: transform 0.3s ease;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-block;
 }
 .pdp-detail-block[open] summary::after {
   content: '\2212';
+  transform: rotate(180deg);
 }
 .pdp-detail-block summary::-webkit-details-marker { display: none; }
+
+/* Animated content wrapper */
+.pdp-detail-block .pdp-detail-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  opacity: 0;
+}
+.pdp-detail-block[open] .pdp-detail-content {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.pdp-detail-block .pdp-detail-inner {
+  overflow: hidden;
+}
+.pdp-detail-block .pdp-detail-inner p,
+.pdp-detail-block .pdp-detail-inner ul {
+  padding: 0 0 24px;
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--graphite);
+}
 .pdp-detail-block p,
 .pdp-detail-block ul {
-  padding: 0 0 20px;
-  font-size: 14px;
-  line-height: 1.7;
+  padding: 0 0 24px;
+  font-size: 14.5px;
+  line-height: 1.75;
   color: var(--graphite);
 }
 .pdp-care-list {
