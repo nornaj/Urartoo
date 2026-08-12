@@ -111,10 +111,10 @@
       document.querySelectorAll('[data-cart-count]').forEach(function (b) { b.textContent = totalQty; });
 
       // Visual feedback
-      cartBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> \u0531\u057E\u0565\u056C\u0561\u0581\u057E\u0561\u056E \u0567';
+      cartBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> \u0531\u057e\u0565\u056c\u0561\u0581\u057e\u0561\u056e \u0567';
       cartBtn.classList.add('pdp-btn-added');
       setTimeout(function () {
-        cartBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> \u0531\u057E\u0565\u056C\u0561\u0581\u0576\u0565\u056C \u0566\u0561\u0574\u0562\u0575\u0578\u0582\u0572';
+        cartBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> \u0531\u057e\u0565\u056c\u0561\u0581\u0576\u0565\u056c \u0566\u0561\u0574\u0562\u0575\u0578\u0582\u0572';
         cartBtn.classList.remove('pdp-btn-added');
       }, 1500);
     });
@@ -148,13 +148,19 @@
     updateWishBtn();
   });
 
-  // Related products (same category, exclude current)
+  // Related products (same category or stone, exclude current, always show 4)
   var related = allProducts.filter(function (p) {
     return p.id !== product.id && (p.cat === product.cat || p.stone === product.stone);
-  }).slice(0, 4);
+  });
 
-  if (related.length === 0) {
-    related = allProducts.filter(function (p) { return p.id !== product.id; }).slice(0, 4);
+  // Backfill with other products if fewer than 4
+  if (related.length < 4) {
+    var others = allProducts.filter(function (p) {
+      return p.id !== product.id && !related.some(function (r) { return r.id === p.id; });
+    });
+    related = related.concat(others).slice(0, 4);
+  } else {
+    related = related.slice(0, 4);
   }
 
   var relGrid = document.getElementById('pdp-related-grid');
