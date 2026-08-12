@@ -180,4 +180,58 @@
     }).join('');
   }
 
+  // === FAQ Accordion Animation ===
+  var faqBlocks = document.querySelectorAll('[data-faq]');
+  faqBlocks.forEach(function (block) {
+    var btn = block.querySelector('.pdp-faq-summary');
+    var body = block.querySelector('.pdp-faq-body');
+    if (!btn || !body) return;
+
+    // Initialize: if first one is open, set its max-height
+    if (btn.getAttribute('aria-expanded') === 'true') {
+      body.style.maxHeight = body.scrollHeight + 'px';
+      body.classList.add('open');
+    }
+
+    btn.addEventListener('click', function () {
+      var isOpen = btn.getAttribute('aria-expanded') === 'true';
+
+      if (isOpen) {
+        // Close: animate max-height to 0
+        body.style.maxHeight = body.scrollHeight + 'px';
+        // Force reflow
+        body.offsetHeight;
+        body.style.maxHeight = '0';
+        body.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      } else {
+        // Close all others first
+        faqBlocks.forEach(function (other) {
+          var otherBtn = other.querySelector('.pdp-faq-summary');
+          var otherBody = other.querySelector('.pdp-faq-body');
+          if (other !== block && otherBtn && otherBody && otherBtn.getAttribute('aria-expanded') === 'true') {
+            otherBody.style.maxHeight = otherBody.scrollHeight + 'px';
+            otherBody.offsetHeight;
+            otherBody.style.maxHeight = '0';
+            otherBody.classList.remove('open');
+            otherBtn.setAttribute('aria-expanded', 'false');
+          }
+        });
+
+        // Open this one
+        body.style.maxHeight = body.scrollHeight + 'px';
+        body.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+
+        // After transition, set auto so it adapts to content changes
+        body.addEventListener('transitionend', function handler() {
+          if (btn.getAttribute('aria-expanded') === 'true') {
+            body.style.maxHeight = 'none';
+          }
+          body.removeEventListener('transitionend', handler);
+        });
+      }
+    });
+  });
+
 })();

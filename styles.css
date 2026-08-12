@@ -2506,19 +2506,63 @@ body.nav-open {
 .pdp-btn-wish:hover { border-color: var(--amber); }
 .pdp-btn-wish.pdp-wished { border-color: var(--garnet); background: rgba(45, 107, 79, 0.06); }
 
-/* FAQ Section (Full Width, below hero) */
+/* FAQ Section (Full Width, Two-Column) */
 .pdp-faq-section {
-  margin-top: 56px;
-  padding-top: 40px;
+  margin-top: 64px;
+  padding-top: 48px;
   border-top: 1px solid var(--pumice);
 }
-.pdp-faq-section .pdp-details {
-  max-width: 800px;
-  margin: 0 auto;
-  border-top: none;
+.pdp-faq-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+}
+@media (min-width: 768px) {
+  .pdp-faq-grid {
+    grid-template-columns: 1fr 1.6fr;
+    gap: 56px;
+    align-items: start;
+  }
 }
 
-/* Details Accordion */
+/* Left: Title + CTA */
+.pdp-faq-intro {
+  position: sticky;
+  top: 100px;
+}
+.pdp-faq-title {
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 400;
+  color: var(--obsidian);
+  line-height: 1.25;
+  margin-bottom: 16px;
+}
+.pdp-faq-desc {
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--tuff);
+  margin-bottom: 24px;
+}
+.pdp-faq-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--amber);
+  text-decoration: none;
+  transition: gap 0.3s ease;
+}
+.pdp-faq-cta:hover { gap: 14px; }
+.pdp-faq-cta span { font-size: 16px; transition: transform 0.3s ease; }
+.pdp-faq-cta:hover span { transform: translateX(4px); }
+
+/* Right: FAQ Accordion */
+.pdp-faq-section .pdp-details {
+  border-top: none;
+}
 .pdp-details {
   border-top: 1px solid var(--pumice);
 }
@@ -2526,6 +2570,12 @@ body.nav-open {
   border-bottom: 1px solid var(--pumice);
 }
 .pdp-detail-block summary {
+  display: none;
+}
+
+/* Button-based FAQ summary */
+.pdp-faq-summary {
+  width: 100%;
   padding: 20px 0;
   font-family: var(--font);
   font-size: 13px;
@@ -2533,47 +2583,72 @@ body.nav-open {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--obsidian);
+  background: none;
+  border: none;
   cursor: pointer;
-  list-style: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  text-align: left;
   user-select: none;
+  transition: color 0.2s ease;
 }
-.pdp-detail-block summary::after {
-  content: '+';
-  font-size: 20px;
-  font-weight: 300;
-  color: var(--tuff);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  display: inline-block;
-}
-.pdp-detail-block[open] summary::after {
-  content: '\2212';
-  transform: rotate(180deg);
-}
-.pdp-detail-block summary::-webkit-details-marker { display: none; }
+.pdp-faq-summary:hover { color: var(--amber); }
 
-/* Animated content wrapper */
-.pdp-detail-block .pdp-detail-content {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+/* Animated +/- icon */
+.pdp-faq-icon {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.pdp-faq-icon::before,
+.pdp-faq-icon::after {
+  content: '';
+  position: absolute;
+  background: var(--tuff);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+.pdp-faq-icon::before {
+  /* horizontal line */
+  top: 50%;
+  left: 2px;
+  right: 2px;
+  height: 1.5px;
+  transform: translateY(-50%);
+}
+.pdp-faq-icon::after {
+  /* vertical line (rotates to 0 when open) */
+  left: 50%;
+  top: 2px;
+  bottom: 2px;
+  width: 1.5px;
+  transform: translateX(-50%);
+}
+.pdp-faq-summary[aria-expanded="true"] .pdp-faq-icon::after {
+  transform: translateX(-50%) rotate(90deg);
   opacity: 0;
 }
-.pdp-detail-block[open] .pdp-detail-content {
-  grid-template-rows: 1fr;
+
+/* FAQ body - animated with max-height */
+.pdp-faq-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+  opacity: 0;
+}
+.pdp-faq-body.open {
   opacity: 1;
 }
-.pdp-detail-block .pdp-detail-inner {
-  overflow: hidden;
+.pdp-faq-body-inner {
+  padding-bottom: 24px;
 }
-.pdp-detail-block .pdp-detail-inner p,
-.pdp-detail-block .pdp-detail-inner ul {
-  padding: 0 0 24px;
+.pdp-faq-body-inner p,
+.pdp-faq-body-inner ul {
   font-size: 14.5px;
   line-height: 1.75;
   color: var(--graphite);
+  margin: 0;
 }
 .pdp-detail-block p,
 .pdp-detail-block ul {

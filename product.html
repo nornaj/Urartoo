@@ -136,28 +136,50 @@
     </div>
 
 
-    <!-- FAQ / Details Section (Full Width) -->
+    <!-- FAQ / Details Section (Full Width, Two-Column) -->
     <section class="pdp-faq-section">
-        <!-- Details Accordion -->
-        <div class="pdp-details">
-          <details class="pdp-detail-block" open>
-            <summary>Նկարագրություն</summary>
-            <div class="pdp-detail-content"><div class="pdp-detail-inner"><p id="pdp-detail-desc"></p></div></div>
-          </details>
-          <details class="pdp-detail-block">
-            <summary>Խնամք և պահպանում</summary>
-            <div class="pdp-detail-content"><div class="pdp-detail-inner"><ul class="pdp-care-list">
-              <li>Պահեք չոր տեղում։ հեռու ինքնակողմ մաքրող կտորով։</li>
-              <li>Խուսափեք քիմիական նյութերի հետ շփման։</li>
-              <li>Արծաթը մաքրեք փափուկ կտորով։</li>
-            </ul></div></div>
-          </details>
-          <details class="pdp-detail-block">
-            <summary>Առաքում և վերադառը</summary>
-            <div class="pdp-detail-content"><div class="pdp-detail-inner"><p>Առաքումը կատարվում է 2 աշխատանքային օրվա ընթացքում։ Մանրամասները տեսեք <a href="services.html#shipping" style="color: var(--amber); text-decoration: underline;">այստեղ</a>։</p></div></div>
-          </details>
+      <div class="pdp-faq-grid">
+
+        <!-- Left: Title + CTA -->
+        <div class="pdp-faq-intro">
+          <h2 class="pdp-faq-title">Հաճախական տվյալ հարցեր</h2>
+          <p class="pdp-faq-desc">Ամեն ինչ պետք է իմանալ ձեռ զարդի մասին։ Եթե հարց ունեք։ գրեք մեզ։</p>
+          <a href="contact.html" class="pdp-faq-cta">Կապ մեզ հետ <span>&rarr;</span></a>
         </div>
 
+        <!-- Right: FAQ Accordion -->
+        <div class="pdp-details" id="pdp-faq-accordion">
+          <div class="pdp-detail-block" data-faq>
+            <button class="pdp-faq-summary" aria-expanded="true">Նկարագրություն<span class="pdp-faq-icon"></span></button>
+            <div class="pdp-faq-body open">
+              <div class="pdp-faq-body-inner">
+                <p id="pdp-detail-desc"></p>
+              </div>
+            </div>
+          </div>
+          <div class="pdp-detail-block" data-faq>
+            <button class="pdp-faq-summary" aria-expanded="false">Խնամք և պահպանում<span class="pdp-faq-icon"></span></button>
+            <div class="pdp-faq-body">
+              <div class="pdp-faq-body-inner">
+                <ul class="pdp-care-list">
+                  <li>Պահեք չոր տեղում։ հեռու ինքնակողմ մաքրող կտորով։</li>
+                  <li>Խուսափեք քիմիական նյութերի հետ շփման։</li>
+                  <li>Արծաթը մաքրեք փափուկ կտորով։</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="pdp-detail-block" data-faq>
+            <button class="pdp-faq-summary" aria-expanded="false">Առաքում և վերադառը<span class="pdp-faq-icon"></span></button>
+            <div class="pdp-faq-body">
+              <div class="pdp-faq-body-inner">
+                <p>Առաքումը կատարվում է 2–4 աշխատանքային օրվա ընթացքում։ Մանրամասները տեսեք <a href="services.html#shipping" style="color: var(--amber); text-decoration: underline;">այստեղ</a>։</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </section>
 
     <!-- Related Products -->
