@@ -469,7 +469,6 @@
       document.getElementById('pe-stone').value = 'Նռնաքար';
       document.getElementById('pe-region').value = 'Վայոց Ձոր';
       document.getElementById('pe-material').value = '925 արծաթ';
-      document.getElementById('pe-sold-toggle').checked = false;
 
       const imgPreview = document.getElementById('pe-img-preview');
       const imgPlaceholder = document.getElementById('pe-img-placeholder');
@@ -497,7 +496,6 @@
           document.getElementById('pe-stone').value = found.stone || 'Նռնաքար';
           document.getElementById('pe-region').value = found.region || found.stoneOrigin || 'Վայոց Ձոր';
           document.getElementById('pe-material').value = found.material || '925 արծաթ';
-          document.getElementById('pe-sold-toggle').checked = Boolean(found.sold || found.stock === 0);
 
           const src = found.img || found.image;
           if (src) {
@@ -568,8 +566,7 @@
       const saveBtn = document.getElementById('btn-pe-save');
       if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '⏳ Պահպանվում է...'; }
 
-      const isSoldToggle = document.getElementById('pe-sold-toggle').checked;
-      const finalIsSold = isSoldToggle || stockVal === 0;
+      const finalIsSold = stockVal === 0;
       const catVal = document.getElementById('pe-cat').value.trim() || 'Մատանիներ';
       const stoneVal = document.getElementById('pe-stone').value.trim() || 'Նռնաքար';
       const regionVal = document.getElementById('pe-region').value.trim() || 'Վայոց Ձոր';
