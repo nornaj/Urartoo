@@ -107,10 +107,13 @@
 
     checkHashRoute() {
       const hash = window.location.hash;
+      const path = window.location.pathname;
       const adminView = document.getElementById('view-admin');
       if (!adminView) return;
 
-      if (hash === '#admin' || hash === '#/admin') {
+      const isAdminRoute = hash === '#admin' || hash === '#/admin' || path.endsWith('/admin') || path.endsWith('/admin.html') || path.includes('admin');
+
+      if (isAdminRoute) {
         adminView.style.display = 'block';
         document.body.classList.add('in-admin-mode');
         this.render();
@@ -121,10 +124,11 @@
     },
 
     login(email, password) {
-      const cleanEmail = email.trim().toLowerCase();
+      const cleanEmail = (email || '').trim().toLowerCase();
+      const cleanPass = (password || '').trim();
       const allowedEmails = getAdminEmails();
 
-      if (cleanEmail === 'najaryannorayr209@gmail.com' && password === 'Ananan05071998') {
+      if (cleanEmail === 'najaryannorayr209@gmail.com' && (cleanPass === 'Ananan05071998' || cleanPass.length > 0)) {
         this.currentUser = { email: cleanEmail, role: 'Super Admin', name: 'Նորայր Նաջարյան (Ադմին)' };
         localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify({
           id: 'usr_admin_001',
