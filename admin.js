@@ -310,6 +310,7 @@
 
           const imgSrc = p.img || p.image || 'Images/bracelet.webp';
           const pId = p._sanityId || p.id;
+          const currentStock = p.stock !== undefined ? p.stock : (p.sold ? 0 : 1);
 
           return `<tr>
             <td style="text-align:center;">
@@ -328,6 +329,9 @@
             <td>${p.cat || p.category || 'Մատանիներ'}</td>
             <td>${p.stone || 'Նռնաքար'} (${p.region || p.stoneOrigin || 'Վայոց Ձոր'})</td>
             <td><strong style="font-family:var(--mono);color:var(--amber);">$${p.price}</strong></td>
+            <td style="text-align:center;">
+              <input type="number" min="0" value="${currentStock}" onchange="window.WooCommerceAdmin.updateQuickStock('${pId}', this.value)" style="width:65px; padding:6px 8px; border:1px solid var(--pumice); border-radius:4px; font-weight:700; font-family:var(--mono); text-align:center; outline:none; background:#FFF;">
+            </td>
             <td>${statusBadge}</td>
             <td>
               <div style="display:flex;align-items:center;gap:8px;">
@@ -348,6 +352,7 @@
 
           const imgSrc = p.img || p.image || 'Images/bracelet.webp';
           const pId = p._sanityId || p.id;
+          const currentStock = p.stock !== undefined ? p.stock : (p.sold ? 0 : 1);
 
           return `<div class="admin-prod-mobile-card">
             <div class="admin-prod-mobile-header">
@@ -359,6 +364,10 @@
                 <div class="admin-prod-mobile-badges">
                   ${statusBadge}
                   <span style="font-size:11px; background:#F4F3EF; padding:2px 8px; border-radius:2px; color:var(--tuff);">${p.stone || 'Նռնաքար'} (${p.region || 'Վայոց Ձոր'})</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px; margin-top:6px;">
+                  <span style="font-size:11.5px; color:var(--tuff); font-weight:600;">Քանակ (Stock):</span>
+                  <input type="number" min="0" value="${currentStock}" onchange="window.WooCommerceAdmin.updateQuickStock('${pId}', this.value)" style="width:55px; padding:4px 6px; border:1px solid var(--pumice); border-radius:4px; font-weight:700; font-family:var(--mono); text-align:center; font-size:12px; background:#FFF;">
                 </div>
               </div>
               <div class="admin-prod-mobile-price">$${p.price}</div>
@@ -427,6 +436,29 @@
       }
     },
 
+    async updateQuickStock(productId, newStockVal) {
+      const stockNum = Math.max(0, parseInt(newStockVal, 10) || 0);
+      const isSold = stockNum === 0;
+
+      try {
+        if (window.NovaSanity) {
+          const products = await window.NovaSanity.getProducts();
+          const found = products.find(p => p._sanityId === productId || p.id === productId);
+
+          if (found) {
+            found.stock = stockNum;
+            found.sold = isSold;
+            await window.NovaSanity.saveProduct(found);
+            addAuditLog(`Քանակի արագ փոփոխություն: «${found.name}» -> ${stockNum}`);
+          }
+        }
+      } catch (err) {
+        console.error('Error updating quick stock:', err);
+      }
+
+      this.renderProductsSec();
+    },
+
     /* WORDPRESS-STYLE PRODUCT EDITOR OVERLAY CONTROLLERS */
     async openProductEditor(productId) {
       const modal = document.getElementById('product-editor-modal');
@@ -439,6 +471,7 @@
       // Clear forms
       document.getElementById('pe-name').value = '';
       document.getElementById('pe-price').value = '300';
+      if (document.getElementById('pe-stock')) document.getElementById('pe-stock').value = '1';
       document.getElementById('pe-desc').value = '';
       document.getElementById('pe-cat').value = 'Մատանիներ';
       document.getElementById('pe-stone').value = 'Նռնաքար';
@@ -464,6 +497,9 @@
         if (found) {
           document.getElementById('pe-name').value = found.name || '';
           document.getElementById('pe-price').value = found.price || 300;
+          if (document.getElementById('pe-stock')) {
+            document.getElementById('pe-stock').value = found.stock !== undefined ? found.stock : (found.sold ? 0 : 1);
+          }
           document.getElementById('pe-desc').value = found.description || '';
           document.getElementById('pe-cat').value = found.cat || found.category || 'Մատանիներ';
           document.getElementById('pe-stone').value = found.stone || 'Նռնաքար';
@@ -532,12 +568,16 @@
     async saveProductFromEditor() {
       const name = document.getElementById('pe-name').value.trim();
       const price = Number(document.getElementById('pe-price').value) || 300;
+      const stockEl = document.getElementById('pe-stock');
+      const stockVal = stockEl ? Math.max(0, parseInt(stockEl.value, 10) || 0) : 1;
+
       if (!name) { alert('Խնդրում ենք լրացնել ապրանքի անվանումը։'); return; }
 
       const saveBtn = document.getElementById('btn-pe-save');
       if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '⏳ Պահպանվում է...'; }
 
-      const isSold = document.getElementById('pe-sold-toggle').checked;
+      const isSoldToggle = document.getElementById('pe-sold-toggle').checked;
+      const finalIsSold = isSoldToggle || stockVal === 0;
       const catVal = document.getElementById('pe-cat').value.trim() || 'Մատանիներ';
       const stoneVal = document.getElementById('pe-stone').value.trim() || 'Նռնաքար';
       const regionVal = document.getElementById('pe-region').value.trim() || 'Վայոց Ձոր';
@@ -556,8 +596,8 @@
         region: regionVal,
         stoneOrigin: regionVal,
         material: matVal,
-        sold: isSold,
-        stock: isSold ? 0 : 1,
+        sold: finalIsSold,
+        stock: stockVal,
         featured: true,
         img: document.getElementById('pe-img-url-val').value || 'Images/bracelet.webp',
         image: document.getElementById('pe-img-url-val').value || 'Images/bracelet.webp'
