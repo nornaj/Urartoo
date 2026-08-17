@@ -199,9 +199,11 @@
     /* TAB 2: INVENTORY & PRODUCTS MANAGER RENDERER */
     async renderProductsSec() {
       const tbody = document.getElementById('admin-products-tbody');
-      if (!tbody) return;
+      const mobileCardsContainer = document.getElementById('admin-products-mobile-cards');
+      if (!tbody && !mobileCardsContainer) return;
 
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--tuff);">Բեռնվում է Sanity-ից...</td></tr>';
+      if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--tuff);">Բեռնվում է Sanity-ից...</td></tr>';
+      if (mobileCardsContainer) mobileCardsContainer.innerHTML = '<div style="text-align:center;padding:32px;color:var(--tuff);">Բեռնվում է Sanity-ից...</div>';
 
       let products = [];
       if (window.NovaSanity) {
@@ -221,42 +223,78 @@
       });
 
       if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--tuff);">Ապրանքներ չեն գտնվել Sanity-ում</td></tr>';
+        if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--tuff);">Ապրանքներ չեն գտնվել Sanity-ում</td></tr>';
+        if (mobileCardsContainer) mobileCardsContainer.innerHTML = '<div style="text-align:center;padding:32px;color:var(--tuff);">Ապրանքներ չեն գտնվել Sanity-ում</div>';
         return;
       }
 
-      tbody.innerHTML = filtered.map(p => {
-        const isSold = p.sold || p.stock === 0;
-        const statusBadge = isSold
-          ? '<span class="admin-status-badge badge-failed">Վաճառված (Sold)</span>'
-          : '<span class="admin-status-badge badge-processing">Առկա (In Stock)</span>';
+      // Render Desktop Table Rows
+      if (tbody) {
+        tbody.innerHTML = filtered.map(p => {
+          const isSold = p.sold || p.stock === 0;
+          const statusBadge = isSold
+            ? '<span class="admin-status-badge badge-failed">Վաճառված (Sold)</span>'
+            : '<span class="admin-status-badge badge-processing">Առկա (In Stock)</span>';
 
-        const imgSrc = p.img || p.image || 'Images/bracelet.webp';
-        const pId = p._sanityId || p.id;
+          const imgSrc = p.img || p.image || 'Images/bracelet.webp';
+          const pId = p._sanityId || p.id;
 
-        return `<tr>
-          <td>
-            <div style="width:48px;height:48px;background:#FAF8F5;border-radius:4px;overflow:hidden;display:flex;align-items:center;justify-content:center;">
-              <img src="${imgSrc}" style="width:100%;height:100%;object-fit:cover;" alt="">
+          return `<tr>
+            <td>
+              <div style="width:48px;height:48px;background:#FAF8F5;border-radius:4px;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+                <img src="${imgSrc}" style="width:100%;height:100%;object-fit:cover;" alt="">
+              </div>
+            </td>
+            <td>
+              <strong>${p.name}</strong><br>
+              <small style="color:var(--tuff);">${p.material || '925 արծաթ'}</small>
+            </td>
+            <td><code style="font-family:var(--mono);">${p.sku || 'UR-100'}</code></td>
+            <td>${p.cat || p.category || 'Մատանիներ'}</td>
+            <td>${p.stone || 'Նռնաքար'} (${p.region || p.stoneOrigin || 'Վայոց Ձոր'})</td>
+            <td><strong style="font-family:var(--mono);color:var(--amber);">$${p.price}</strong></td>
+            <td>${statusBadge}</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <button class="filter-clear-btn" style="padding:6px 12px;font-size:12px;" onclick="window.WooCommerceAdmin.openProductEditor('${pId}')">Խմբագրել</button>
+                <button class="filter-clear-btn" style="color:red;border-color:red;padding:6px 12px;font-size:12px;" onclick="window.WooCommerceAdmin.deleteProduct('${pId}')">Ջնջել</button>
+              </div>
+            </td>
+          </tr>`;
+        }).join('');
+      }
+
+      // Render Mobile Product Inventory Cards
+      if (mobileCardsContainer) {
+        mobileCardsContainer.innerHTML = filtered.map(p => {
+          const isSold = p.sold || p.stock === 0;
+          const statusBadge = isSold
+            ? '<span class="admin-status-badge badge-failed" style="font-size:11px;">Վաճառված</span>'
+            : '<span class="admin-status-badge badge-processing" style="font-size:11px;">Առկա</span>';
+
+          const imgSrc = p.img || p.image || 'Images/bracelet.webp';
+          const pId = p._sanityId || p.id;
+
+          return `<div class="admin-prod-mobile-card">
+            <div class="admin-prod-mobile-header">
+              <img src="${imgSrc}" class="admin-prod-mobile-img" alt="${p.name}">
+              <div class="admin-prod-mobile-meta">
+                <div class="admin-prod-mobile-title">${p.name}</div>
+                <div style="font-size:12px; color:var(--tuff); font-family:var(--mono);">${p.sku || 'UR-100'} • ${p.cat || p.category || 'Մատանիներ'}</div>
+                <div class="admin-prod-mobile-badges">
+                  ${statusBadge}
+                  <span style="font-size:11px; background:#F4F3EF; padding:2px 8px; border-radius:2px; color:var(--tuff);">${p.stone || 'Նռնաքար'} (${p.region || 'Վայոց Ձոր'})</span>
+                </div>
+              </div>
+              <div class="admin-prod-mobile-price">$${p.price}</div>
             </div>
-          </td>
-          <td>
-            <strong>${p.name}</strong><br>
-            <small style="color:var(--tuff);">${p.material || '925 արծաթ'}</small>
-          </td>
-          <td><code style="font-family:var(--mono);">${p.sku || 'UR-100'}</code></td>
-          <td>${p.cat || p.category || 'Մատանիներ'}</td>
-          <td>${p.stone || 'Նռնաքար'} (${p.region || p.stoneOrigin || 'Վայոց Ձոր'})</td>
-          <td><strong style="font-family:var(--mono);color:var(--amber);">$${p.price}</strong></td>
-          <td>${statusBadge}</td>
-          <td>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <button class="filter-clear-btn" style="padding:6px 12px;font-size:12px;" onclick="window.WooCommerceAdmin.openProductEditor('${pId}')">Խմբագրել</button>
-              <button class="filter-clear-btn" style="color:red;border-color:red;padding:6px 12px;font-size:12px;" onclick="window.WooCommerceAdmin.deleteProduct('${pId}')">Ջնջել</button>
+            <div class="admin-prod-mobile-actions">
+              <button class="filter-clear-btn" onclick="window.WooCommerceAdmin.openProductEditor('${pId}')">✏️ Խմբագրել</button>
+              <button class="filter-clear-btn" style="color:red; border-color:red;" onclick="window.WooCommerceAdmin.deleteProduct('${pId}')">🗑 Ջնջել</button>
             </div>
-          </td>
-        </tr>`;
-      }).join('');
+          </div>`;
+        }).join('');
+      }
     },
 
     /* WORDPRESS-STYLE PRODUCT EDITOR OVERLAY CONTROLLERS */

@@ -3730,3 +3730,89 @@ body.in-admin-mode > *:not(#view-admin):not(#product-editor-modal) {
   }
 }
 
+/* ===================================================================
+   MOBILE INVENTORY PRODUCT CARDS (STRICT MOBILE-FIRST INVENTORY UX)
+   =================================================================== */
+.admin-mobile-cards-grid {
+  display: none;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .admin-table-wrap-desktop {
+    display: none !important;
+  }
+  .admin-mobile-cards-grid {
+    display: flex !important;
+  }
+}
+
+.admin-prod-mobile-card {
+  background: #FFFFFF;
+  border-radius: 6px;
+  border: 1px solid var(--pumice);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.admin-prod-mobile-header {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.admin-prod-mobile-img {
+  width: 72px;
+  height: 72px;
+  border-radius: 4px;
+  object-fit: cover;
+  background: #FAF8F5;
+  flex-shrink: 0;
+  border: 1px solid var(--pumice);
+}
+
+.admin-prod-mobile-meta {
+  flex: 1;
+}
+
+.admin-prod-mobile-title {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.admin-prod-mobile-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.admin-prod-mobile-price {
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--amber);
+}
+
+.admin-prod-mobile-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--pumice);
+}
+
+.admin-prod-mobile-actions button {
+  flex: 1;
+  padding: 10px 12px !important;
+  font-size: 13px !important;
+  text-align: center;
+}
+
