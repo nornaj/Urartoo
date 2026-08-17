@@ -38,10 +38,17 @@
       desc: '\u0546\u057C\u0576\u0561\u0584\u0561\u0580\u056B \u0565\u0580\u056F\u0578\u0582 \u056F\u057F\u0578\u0580\u056B\u0581\u0589 \u057F\u0565\u0572\u0561\u0564\u0580\u057E\u0561\u056E \u0561\u0580\u056E\u0561\u0569\u0565 \u0561\u057A\u0561\u0580\u0561\u0576\u057B\u0561\u0576\u056B \u0574\u0565\u057B\u0589 \u0540\u0561\u0575\u0561\u057D\u057F\u0561\u0576\u056B \u0561\u0574\u0565\u0576\u0561\u056D\u0578\u0580\u0568 \u0584\u0561\u0580\u0568\u0589' }
   ];
 
+  var currentCatalog = (window.NovaSanity && window.NovaSanity._ready)
+    ? window.NovaSanity.getProducts()
+    : allProducts;
+
   // Get product ID from URL
   var params = new URLSearchParams(window.location.search);
-  var productId = Number(params.get('id'));
-  var product = allProducts.find(function (p) { return p.id === productId; });
+  var rawId = params.get('id');
+  var productId = Number(rawId) || rawId;
+  var product = currentCatalog.find(function (p) {
+    return String(p.id) === String(rawId) || String(p._sanityId) === String(rawId) || p.id === productId;
+  });
 
   if (!product) {
     document.getElementById('pdp-content').innerHTML =

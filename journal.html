@@ -257,40 +257,46 @@
     </div>
   </aside>
 
+<script src="sanity-config.js"></script>
 <script src="script.js"></script>
 <script>
-  const posts = [
-    { id: 1, topic: 'Քարահավաք', date: 'Սեպտեմբեր 2025', read: '6 րոպե', title: 'Երեք օր հրաբխի վրա՝ մեկ լավ ապակու կտորի համար', excerpt: 'Գուտանասարի օբսիդիանը կոտրվում է տասից ինն անգամ սխալ։ Ահա թե ինչ տեսք ունի տասներորդը։' },
-    { id: 2, topic: 'Գեմոլոգիա', date: 'Հուլիս 2025', read: '4 րոպե', title: 'Ինչու է գետի նռնաքարը հղկվում այլ կերպ, քան հանքինը', excerpt: 'Գետի ջուրը դարերի ընթացքում արդեն իսկ հղկել է քարի թույլ կողմերը։ Մեզ մնում է գտնել երակը։' },
-    { id: 3, topic: 'Աշխատանոց', date: 'Մայիս 2025', read: '5 րոպե', title: 'Անհամաչափ քարի տեղադրումը արծաթում', excerpt: 'Երբ քարը բնական ձև ունի, շրջանակը պետք է կրկնի նրա հետագիծը, ոչ թե ստիպի դառնալ երկրաչափական։' },
-    { id: 4, topic: 'Ստուդիա', date: 'Ապրիլ 2025', read: '3 րոպե', title: '925 արծաթի մշակումը և հնեցումը', excerpt: 'Ինչպես է օքսիդացումը ընդգծում հայկական քարերի խորությունն ու բնական փայլը։' },
-    { id: 5, topic: 'Քարահավաք', date: 'Մարտ 2025', read: '7 րոպե', title: 'Սյունիքի հին պղնձի հանքերի փիրուզը', excerpt: 'Գարնանը, երբ ձյունը հալվում է, Սյունիքի հին ակոսներում հայտնվում են կապույտ երակներ։' },
-    { id: 6, topic: 'Գեմոլոգիա', date: 'Փետրվար 2025', read: '5 րոպե', title: 'Արենիի հասպիսի երկաթյա շերտերը', excerpt: 'Կարմիր և դեղնավուն շերտերով հասպիսը Հայաստանի ամենատաք քարերից մեկն է։' }
-  ];
-
   let currentTopic = 'all';
   const gridEl = document.getElementById('journal-grid');
   const countEl = document.getElementById('journal-count');
 
   function renderPosts() {
-    let filtered = posts.filter(p => currentTopic === 'all' || p.topic === currentTopic);
-    countEl.textContent = 'Ցուցադրված է ' + filtered.length + ' նշում';
-    gridEl.innerHTML = filtered.map(p => `
-      <a href="#note-${p.id}" class="note-card">
-        <div class="note-img">
-          <div class="note-img-inner">
-            <span class="placeholder-text" style="font-family:var(--mono);font-size:9.5px;line-height:1.8;color:rgba(12,14,13,0.3);max-width:180px;text-align:center;">
-              ${p.topic} · ${p.date}
-            </span>
+    const rawPosts = (window.NovaSanity && window.NovaSanity._ready)
+      ? window.NovaSanity.getJournalPosts()
+      : [
+          { id: 1, topic: 'Քարահավաք', date: 'Սեպտեմբեր 2025', readTime: '6 րոպե', title: 'Երեք օր հրաբխի վրա՝ մեկ լավ ապակու կտորի համար', excerpt: 'Գուտանասարի օբսիդիանը կոտրվում է տասից ինն անգամ սխալ։ Ահա թե ինչ տեսք ունի տասներորդը։' },
+          { id: 2, topic: 'Գեմոլոգիա', date: 'Հուլիս 2025', readTime: '4 րոպե', title: 'Ինչու է գետի նռնաքարը հղկվում այլ կերպ, քան հանքինը', excerpt: 'Գետի ջուրը դարերի ընթացքում արդեն իսկ հղկել է քարի թույլ կողմերը։ Մեզ մնում է գտնել երակը։' },
+          { id: 3, topic: 'Աշխատանոց', date: 'Մայիս 2025', readTime: '5 րոպե', title: 'Անհամաչափ քարի տեղադրումը արծաթում', excerpt: 'Երբ քարը բնական ձև ունի, շրջանակը պետք է կրկնի նրա հետագիծը, ոչ թե ստիպի դառնալ երկրաչափական։' },
+          { id: 4, topic: 'Ստուդիա', date: 'Ապրիլ 2025', readTime: '3 րոպե', title: '925 արծաթի մշակումը և հնեցումը', excerpt: 'Ինչպես է օքսիդացումը ընդգծում հայկական քարերի խորությունն ու բնական փայլը։' },
+          { id: 5, topic: 'Քարահավաք', date: 'Մարտ 2025', readTime: '7 րոպե', title: 'Սյունիքի հին պղնձի հանքերի փիրուզը', excerpt: 'Գարնանը, երբ ձյունը հալվում է, Սյունիքի հին ակոսներում հայտնվում են կապույտ երակներ։' },
+          { id: 6, topic: 'Գեմոլոգիա', date: 'Փետրվար 2025', readTime: '5 րոպե', title: 'Արենիի հասպիսի երկաթյա շերտերը', excerpt: 'Կարմիր և դեղնավուն շերտերով հասպիսը Հայաստանի ամենատաք քարերից մեկն է։' }
+        ];
+
+    let filtered = rawPosts.filter(p => currentTopic === 'all' || p.topic === currentTopic);
+    if (countEl) countEl.textContent = 'Ցուցադրված է ' + filtered.length + ' նշում';
+    if (gridEl) {
+      gridEl.innerHTML = filtered.map(p => `
+        <a href="#note-${p.id}" class="note-card">
+          <div class="note-img">
+            <div class="note-img-inner">
+              ${p.image ? `<img src="${p.image}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover;">` : `
+              <span class="placeholder-text" style="font-family:var(--mono);font-size:9.5px;line-height:1.8;color:rgba(12,14,13,0.3);max-width:180px;text-align:center;">
+                ${p.topic} · ${p.date}
+              </span>`}
+            </div>
           </div>
-        </div>
-        <div class="note-meta">
-          <span style="color:var(--patina);font-weight:500;">${p.topic}</span> · ${p.date} · ${p.read}
-        </div>
-        <div class="note-title">${p.title}</div>
-        <p style="font-size:14px;line-height:1.65;color:var(--graphite);margin:8px 0 0;">${p.excerpt}</p>
-      </a>
-    `).join('');
+          <div class="note-meta">
+            <span style="color:var(--patina);font-weight:500;">${p.topic}</span> · ${p.date} · ${p.readTime || p.read || ''}
+          </div>
+          <div class="note-title">${p.title}</div>
+          <p style="font-size:14px;line-height:1.65;color:var(--graphite);margin:8px 0 0;">${p.excerpt || ''}</p>
+        </a>
+      `).join('');
+    }
   }
 
   document.querySelectorAll('#journal-topic-btns .topic-btn').forEach(btn => {
@@ -312,7 +318,11 @@
     }
   });
 
-  renderPosts();
+  if (window.NovaSanity) {
+    window.NovaSanity.init().then(() => renderPosts());
+  } else {
+    renderPosts();
+  }
 </script>
 </body>
 </html>

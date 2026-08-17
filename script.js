@@ -151,50 +151,61 @@
     var grid = document.getElementById('products-grid');
     if (!grid) return;
 
-    grid.innerHTML = pieces.map(function (p, i) {
+    var currentPieces = (window.NovaSanity && window.NovaSanity._ready)
+      ? window.NovaSanity.getProducts()
+      : pieces;
+
+    if (!currentPieces || currentPieces.length === 0) {
+      grid.innerHTML = '<div style="padding:40px;text-align:center;color:var(--tuff);">Զարդեր չեն գտնվել</div>';
+      return;
+    }
+
+    grid.innerHTML = currentPieces.map(function (p, i) {
       var dot = STONE_DOTS[p.stone] || '#2C2F2E';
       var isSold = p.sold;
-      var isAdded = !!added[i];
-      var isSaved = !!saved[i];
+      var isAdded = !!added[p.id || i];
+      var isSaved = !!saved[p.id || i];
+      var formattedPrice = typeof p.price === 'number' ? ('$' + p.price) : p.price;
 
       var heartSvg = '<svg width="15" height="15" viewBox="0 0 24 24" fill="' +
         (isSaved ? '#2D6B4F' : 'none') + '" stroke="' +
         (isSaved ? '#2D6B4F' : '#0C0E0D') + '" stroke-width="1.5">' +
         '<path d="M12 20.5l-7.1-7a4.4 4.4 0 016.2-6.2l.9.9.9-.9a4.4 4.4 0 016.2 6.2z"/></svg>';
 
-      return '<div class="product-card' + (isSold ? ' sold' : '') + '" data-idx="' + i + '">' +
+      return '<div class="product-card' + (isSold ? ' sold' : '') + '" data-idx="' + (p.id || i) + '">' +
         '<div class="media">' +
-          '<a href="product.html?id=' + (i + 1) + '" class="media-inner">' +
-            '<img src="' + p.img + '" alt="' + p.name + '" loading="lazy">' +
+          '<a href="product.html?id=' + (p.id || (i + 1)) + '" class="media-inner">' +
+            '<img src="' + (p.img || p.image || 'Images/bracelet.webp') + '" alt="' + p.name + '" loading="lazy">' +
           '</a>' +
-          '<button class="heart' + (isSaved ? ' saved' : '') + '" data-save="' + i + '" aria-label="Պահպանել զարդը">' + heartSvg + '</button>' +
+          '<button class="heart' + (isSaved ? ' saved' : '') + '" data-save="' + (p.id || i) + '" aria-label="Պահպանել զարդը">' + heartSvg + '</button>' +
           (isSold
             ? '<span class="sold-badge">Վաճառված</span>'
-            : '<button class="add-btn' + (isAdded ? ' added' : '') + '" data-add="' + i + '">' +
+            : '<button class="add-btn' + (isAdded ? ' added' : '') + '" data-add="' + (p.id || i) + '">' +
                 (isAdded ? 'Ավելացված է' : 'Ավելացնել զամբյուղ') +
               '</button>'
           ) +
         '</div>' +
         '<div class="card-head">' +
           '<span class="card-name">' + p.name + '</span>' +
-          '<span class="card-price">' + p.price + '</span>' +
+          '<span class="card-price">' + formattedPrice + '</span>' +
         '</div>' +
         '<div class="card-meta">' +
           '<span class="stone-dot" style="background:' + dot + '"></span>' +
-          '<span class="card-stone">' + p.stone + ' · ' + p.region + '</span>' +
+          '<span class="card-stone">' + p.stone + ' · ' + (p.region || p.stoneOrigin || '') + '</span>' +
         '</div>' +
       '</div>';
     }).join('');
 
     // Event delegation
-    grid.addEventListener('click', function (e) {
+    grid.onclick = function (e) {
       var addBtn = e.target.closest('[data-add]');
       var saveBtn = e.target.closest('[data-save]');
 
       if (addBtn) {
-        var idx = Number(addBtn.dataset.add);
-        if (!pieces[idx].sold && !added[idx]) {
-          added[idx] = true;
+        var pid = addBtn.dataset.add;
+        var prod = currentPieces.find(function(item) { return String(item.id) === String(pid); }) || currentPieces[pid];
+        if (prod && !prod.sold && !added[pid]) {
+          added[pid] = true;
           cartCount++;
           updateCartDisplay();
           renderProducts();
@@ -202,14 +213,18 @@
       }
 
       if (saveBtn) {
-        var idx2 = Number(saveBtn.dataset.save);
-        saved[idx2] = !saved[idx2];
+        var pid2 = saveBtn.dataset.save;
+        saved[pid2] = !saved[pid2];
         renderProducts();
       }
-    });
+    };
   }
 
-  renderProducts();
+  if (window.NovaSanity) {
+    window.NovaSanity.init().then(function() { renderProducts(); });
+  } else {
+    renderProducts();
+  }
 
   /* ─── Product Slider Controls ──────────────────────────────────── */
   var prevBtn = document.getElementById('prod-prev');

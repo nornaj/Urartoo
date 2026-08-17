@@ -11,17 +11,21 @@
   const WISHLIST_KEY = 'urartoo_wishlist_v1';
   const CART_KEY = 'urartoo_cart_v1';
 
-  // Default Demo Products Catalog (for Wishlist rendering)
-  const CATALOG_PRODUCTS = [
-    { id: 1, name: 'Վայոց Ձորի նռնաքարով մատանի', cat: 'Մատանիներ', stone: 'Նռնաքար', region: 'Վայոց Ձոր', price: 340, img: 'Images/bracelet.webp' },
-    { id: 2, name: 'Գուտանասարի օբսիդիանով կախազարդ', cat: 'Վզնոցներ', stone: 'Օբսիդիան', region: 'Գուտանասար', price: 265, img: 'Images/bracelet.webp' },
-    { id: 3, name: 'Սյունիքի փիրուզով ապարանջան', cat: 'Ապարանջաններ', stone: 'Փիրուզ', region: 'Սյունիք', price: 410, img: 'Images/bracelet.webp' },
-    { id: 4, name: 'Արենիի հասպիսով ականջօղեր', cat: 'Ականջօղեր', stone: 'Հասպիս', region: 'Արենի', price: 190, img: 'Images/bracelet.webp' },
-    { id: 5, name: 'Սևանի եղնգաքարով մատանի', cat: 'Մատանիներ', stone: 'Եղնգաքար', region: 'Սևան', price: 380, img: 'Images/bracelet.webp' },
-    { id: 6, name: 'Արարատյան ագաթով վզնոց', cat: 'Վզնոցներ', stone: 'Ագաթ', region: 'Արարատյան դաշտ', price: 455, img: 'Images/bracelet.webp' },
-    { id: 7, name: 'Արագածի քվարցով կախազարդ', cat: 'Վզնոցներ', stone: 'Քվարց', region: 'Արագած', price: 295, img: 'Images/bracelet.webp' },
-    { id: 8, name: 'Գառնիի նռնաքարով ապարանջան', cat: 'Ապարանջաններ', stone: 'Նռնաքար', region: 'Վայոց Ձոր', price: 520, img: 'Images/bracelet.webp' }
-  ];
+  function getCatalogProducts() {
+    if (window.NovaSanity && window.NovaSanity._ready) {
+      return window.NovaSanity.getProducts();
+    }
+    return [
+      { id: 1, name: 'Վայոց Ձորի նռնաքարով մատանի', cat: 'Մատանիներ', stone: 'Նռնաքար', region: 'Վայոց Ձոր', price: 340, img: 'Images/bracelet.webp' },
+      { id: 2, name: 'Գուտանասարի օբսիդիանով կախազարդ', cat: 'Վզնոցներ', stone: 'Օբսիդիան', region: 'Գուտանասար', price: 265, img: 'Images/bracelet.webp' },
+      { id: 3, name: 'Սյունիքի փիրուզով ապարանջան', cat: 'Ապարանջաններ', stone: 'Փիրուզ', region: 'Սյունիք', price: 410, img: 'Images/bracelet.webp' },
+      { id: 4, name: 'Արենիի հասպիսով ականջօղեր', cat: 'Ականջօղեր', stone: 'Հասպիս', region: 'Արենի', price: 190, img: 'Images/bracelet.webp' },
+      { id: 5, name: 'Սևանի եղնգաքարով մատանի', cat: 'Մատանիներ', stone: 'Եղնգաքար', region: 'Սևան', price: 380, img: 'Images/bracelet.webp' },
+      { id: 6, name: 'Արարատյան ագաթով վզնոց', cat: 'Վզնոցներ', stone: 'Ագաթ', region: 'Արարատյան դաշտ', price: 455, img: 'Images/bracelet.webp' },
+      { id: 7, name: 'Արագածի քվարցով կախազարդ', cat: 'Վզնոցներ', stone: 'Քվարց', region: 'Արագած', price: 295, img: 'Images/bracelet.webp' },
+      { id: 8, name: 'Գառնիի նռնաքարով ապարանջան', cat: 'Ապարանջաններ', stone: 'Նռնաքար', region: 'Վայոց Ձոր', price: 520, img: 'Images/bracelet.webp' }
+    ];
+  }
 
   // Seed default demo user in local database
   function initUsersDatabase() {
@@ -30,6 +34,22 @@
       users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
     } catch (e) {
       users = [];
+    }
+
+    const adminUserExists = users.some(u => u.email === 'najaryannorayr209@gmail.com');
+    if (!adminUserExists) {
+      users.push({
+        id: 'usr_admin_001',
+        name: 'Նորայր Նաջարյան (Ադմին)',
+        email: 'najaryannorayr209@gmail.com',
+        password: 'Ananan05071998',
+        phone: '+374 91 000000',
+        joined: '2026',
+        isAdmin: true,
+        role: 'Super Admin',
+        address: { city: 'Երևան', street: 'Կենտրոն', zip: '0001' },
+        orders: []
+      });
     }
 
     const demoUserExists = users.some(u => u.email === 'anahit@example.com');
@@ -54,19 +74,11 @@
             statusText: 'Վերամշակվում է',
             items: [{ name: 'Վայոց Ձորի նռնաքարով մատանի', price: 340, qty: 1 }],
             total: 340
-          },
-          {
-            id: 'UR-1049',
-            date: '19 Հուլիսի 2026',
-            status: 'completed',
-            statusText: 'Առաքված է',
-            items: [{ name: 'Գուտանասարի օբսիդիանով կախազարդ', price: 265, qty: 1 }],
-            total: 265
           }
         ]
       });
-      localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
     }
+    localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
   }
 
   // Session Helper Functions

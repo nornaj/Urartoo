@@ -18,16 +18,21 @@
     'Քվարց': '#6B5B4E'
   };
 
-  const allProducts = [
-    { id: 1, name: 'Վայոց Ձորի նռնաքարով մատանի', cat: 'Մատանիներ', stone: 'Նռնաքար', region: 'Վայոց Ձոր', price: 340, img: 'Images/bracelet.webp', sold: false },
-    { id: 2, name: 'Գուտանասարի օբսիդիանով կախազարդ', cat: 'Վզնոցներ', stone: 'Օբսիդիան', region: 'Գուտանասար', price: 265, img: 'Images/bracelet.webp', sold: false },
-    { id: 3, name: 'Սյունիքի փիրուզով ապարանջան', cat: 'Ապարանջաններ', stone: 'Փիրուզ', region: 'Սյունիք', price: 410, img: 'Images/bracelet.webp', sold: false },
-    { id: 4, name: 'Արենիի հասպիսով ականջօղեր', cat: 'Ականջօղեր', stone: 'Հասպիս', region: 'Արենի', price: 190, img: 'Images/bracelet.webp', sold: true },
-    { id: 5, name: 'Սևանի եղնգաքարով մատանի', cat: 'Մատանիներ', stone: 'Եղնգաքար', region: 'Սևան', price: 380, img: 'Images/bracelet.webp', sold: false },
-    { id: 6, name: 'Արարատյան ագաթով վզնոց', cat: 'Վզնոցներ', stone: 'Ագաթ', region: 'Արարատյան դաշտ', price: 455, img: 'Images/bracelet.webp', sold: false },
-    { id: 7, name: 'Արագածի քվարցով կախազարդ', cat: 'Վզնոցներ', stone: 'Քվարց', region: 'Արագած', price: 295, img: 'Images/bracelet.webp', sold: false },
-    { id: 8, name: 'Գառնիի նռնաքարով ապարանջան', cat: 'Ապարանջաններ', stone: 'Նռնաքար', region: 'Վայոց Ձոր', price: 520, img: 'Images/bracelet.webp', sold: false }
-  ];
+  function getProductsList() {
+    if (window.NovaSanity && window.NovaSanity._ready) {
+      return window.NovaSanity.getProducts();
+    }
+    return [
+      { id: 1, name: 'Վայոց Ձորի նռնաքարով մատանի', cat: 'Մատանիներ', stone: 'Նռնաքար', region: 'Վայոց Ձոր', price: 340, img: 'Images/bracelet.webp', sold: false },
+      { id: 2, name: 'Գուտանասարի օբսիդիանով կախազարդ', cat: 'Վզնոցներ', stone: 'Օբսիդիան', region: 'Գուտանասար', price: 265, img: 'Images/bracelet.webp', sold: false },
+      { id: 3, name: 'Սյունիքի փիրուզով ապարանջան', cat: 'Ապարանջաններ', stone: 'Փիրուզ', region: 'Սյունիք', price: 410, img: 'Images/bracelet.webp', sold: false },
+      { id: 4, name: 'Արենիի հասպիսով ականջօղեր', cat: 'Ականջօղեր', stone: 'Հասպիս', region: 'Արենի', price: 190, img: 'Images/bracelet.webp', sold: true },
+      { id: 5, name: 'Սևանի եղնգաքարով մատանի', cat: 'Մատանիներ', stone: 'Եղնգաքար', region: 'Սևան', price: 380, img: 'Images/bracelet.webp', sold: false },
+      { id: 6, name: 'Արարատյան ագաթով վզնոց', cat: 'Վզնոցներ', stone: 'Ագաթ', region: 'Արարատյան դաշտ', price: 455, img: 'Images/bracelet.webp', sold: false },
+      { id: 7, name: 'Արագածի քվարցով կախազարդ', cat: 'Վզնոցներ', stone: 'Քվարց', region: 'Արագած', price: 295, img: 'Images/bracelet.webp', sold: false },
+      { id: 8, name: 'Գառնիի նռնաքարով ապարանջան', cat: 'Ապարանջաններ', stone: 'Նռնաքար', region: 'Վայոց Ձոր', price: 520, img: 'Images/bracelet.webp', sold: false }
+    ];
+  }
 
   let activeCat = 'all';
   let activeStone = 'all';
@@ -76,7 +81,8 @@
   if (!gridEl) return;
 
   function filterAndSort() {
-    let list = allProducts.filter(function (p) {
+    const productsList = getProductsList();
+    let list = productsList.filter(function (p) {
       if (activeCat !== 'all' && p.cat !== activeCat) return false;
       if (activeStone !== 'all' && p.stone !== activeStone) return false;
       if (p.price < minPrice || p.price > maxPrice) return false;
@@ -84,7 +90,7 @@
         var q = searchQuery.toLowerCase();
         var match = p.name.toLowerCase().includes(q) ||
                     p.stone.toLowerCase().includes(q) ||
-                    p.region.toLowerCase().includes(q) ||
+                    (p.region && p.region.toLowerCase().includes(q)) ||
                     p.cat.toLowerCase().includes(q);
         if (!match) return false;
       }
@@ -98,6 +104,9 @@
     } else if (activeSort === 'name') {
       list.sort((a, b) => a.name.localeCompare(b.name, 'hy'));
     }
+
+    renderGrid(list);
+  }
 
     renderGrid(list);
   }
