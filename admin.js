@@ -164,8 +164,16 @@
         }
       });
 
-      document.querySelectorAll('.admin-sec').forEach(el => {
-        el.style.display = (el.id === `admin-sec-${tabId}`) ? 'block' : 'none';
+      const tabs = ['orders', 'products', 'settings', 'clients', 'logs'];
+      tabs.forEach(t => {
+        const sec = document.getElementById(`admin-sec-${t}`);
+        if (sec) {
+          if (t === tabId) {
+            sec.style.setProperty('display', 'block', 'important');
+          } else {
+            sec.style.setProperty('display', 'none', 'important');
+          }
+        }
       });
 
       if (tabId === 'orders') this.renderOrdersSec();
@@ -208,8 +216,23 @@
       if (mobileCardsContainer) mobileCardsContainer.innerHTML = '<div style="text-align:center;padding:32px;color:var(--tuff);">Բեռնվում է Sanity-ից...</div>';
 
       let products = [];
-      if (window.NovaSanity) {
-        products = await window.NovaSanity.getProducts();
+      try {
+        if (window.NovaSanity) {
+          products = await window.NovaSanity.getProducts();
+        }
+      } catch (err) {
+        console.error('Error fetching Sanity products:', err);
+      }
+
+      if (!products || products.length === 0) {
+        products = (window.NovaSanity && window.NovaSanity.INITIAL_SEED_PRODUCTS)
+          ? window.NovaSanity.INITIAL_SEED_PRODUCTS
+          : [
+            { id: "ring-1", name: "Վայոց Ձորի նռնաքարով մատանի", sku: "UR-RING-GAR-01", category: "Մատանիներ", stone: "Նռնաքար", region: "Վայոց Ձոր", price: 340, sold: false, img: "Images/bracelet.webp" },
+            { id: "pendant-2", name: "Գուտանասարի օբսիդիանով կախազարդ", sku: "UR-PEND-OBS-02", category: "Վզնոցներ", stone: "Օբսիդիան", region: "Գուտանասար", price: 265, sold: false, img: "Images/bracelet.webp" },
+            { id: "bracelet-3", name: "Սյունիքի փիրուզով ապարանջան", sku: "UR-BRAC-TUR-03", category: "Ապարանջաններ", stone: "Փիրուզ", region: "Սյունիք", price: 410, sold: false, img: "Images/bracelet.webp" },
+            { id: "earring-4", name: "Արենիի հասպիսով ականջօղեր", sku: "UR-EAR-JAS-04", category: "Ականջօղեր", stone: "Հասպիս", region: "Արենի", price: 190, sold: true, img: "Images/bracelet.webp" }
+          ];
       }
 
       const searchVal = document.getElementById('admin-prod-search')?.value.toLowerCase().trim() || '';
