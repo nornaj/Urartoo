@@ -112,15 +112,11 @@
 
       if (hash === '#admin' || hash === '#/admin') {
         adminView.style.display = 'block';
-        document.querySelectorAll('body > *:not(#view-admin)').forEach(el => el.style.display = 'none');
+        document.body.classList.add('in-admin-mode');
         this.render();
       } else {
         adminView.style.display = 'none';
-        document.querySelectorAll('body > *:not(#view-admin)').forEach(el => {
-          if (el.id !== 'site-loader' && el.id !== 'cart-drawer' && el.id !== 'cart-overlay') {
-            el.style.display = '';
-          }
-        });
+        document.body.classList.remove('in-admin-mode');
       }
     },
 

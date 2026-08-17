@@ -3199,6 +3199,10 @@ body.nav-open {
   font-family: var(--font);
 }
 
+body.in-admin-mode > *:not(#view-admin):not(#product-editor-modal) {
+  display: none !important;
+}
+
 .admin-login-wrapper {
   min-height: 100vh;
   display: flex;
