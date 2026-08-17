@@ -622,4 +622,19 @@
     if (overlay) overlay.classList.remove('active');
   };
 
+  // Inject Admin Nav Link Globally across all storefront pages
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('nav.nav').forEach(function (nav) {
+      if (!nav.querySelector('.nav-link-admin')) {
+        var adminLink = document.createElement('a');
+        adminLink.href = 'admin.html';
+        adminLink.className = 'nav-link nav-link-admin';
+        adminLink.style.color = 'var(--gold, #C9A227)';
+        adminLink.style.fontWeight = '700';
+        adminLink.innerHTML = '⚡ ԱԴՄԻՆ';
+        nav.appendChild(adminLink);
+      }
+    });
+  });
+
 })();
