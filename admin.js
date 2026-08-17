@@ -80,62 +80,45 @@
   }
 
   window.switchAdminTab = function (tabName) {
-    const isProducts = (tabName === 'products' || tabName === 'inventory');
+    const validTabs = ['orders', 'products', 'clients', 'settings'];
+    const activeTab = validTabs.includes(tabName) ? tabName : 'orders';
 
-    const btnOrders = document.getElementById('tab-btn-orders');
-    const btnProducts = document.getElementById('tab-btn-products');
+    validTabs.forEach(t => {
+      const btn = document.getElementById(`tab-btn-${t}`);
+      const sec = document.getElementById(`admin-sec-${t}`);
+      const isActive = (t === activeTab);
 
-    if (btnOrders) {
-      if (isProducts) {
-        btnOrders.classList.remove('active');
-        btnOrders.style.color = 'rgba(255,255,255,0.75)';
-        btnOrders.style.background = 'none';
-        btnOrders.style.borderLeft = 'none';
-      } else {
-        btnOrders.classList.add('active');
-        btnOrders.style.color = 'var(--gold)';
-        btnOrders.style.background = 'rgba(255,255,255,0.05)';
-        btnOrders.style.borderLeft = '4px solid var(--gold)';
+      if (btn) {
+        if (isActive) {
+          btn.classList.add('active');
+          btn.style.color = 'var(--gold)';
+          btn.style.background = 'rgba(255,255,255,0.05)';
+          btn.style.borderLeft = '4px solid var(--gold)';
+        } else {
+          btn.classList.remove('active');
+          btn.style.color = 'rgba(255,255,255,0.75)';
+          btn.style.background = 'none';
+          btn.style.borderLeft = 'none';
+        }
       }
-    }
 
-    if (btnProducts) {
-      if (isProducts) {
-        btnProducts.classList.add('active');
-        btnProducts.style.color = 'var(--gold)';
-        btnProducts.style.background = 'rgba(255,255,255,0.05)';
-        btnProducts.style.borderLeft = '4px solid var(--gold)';
-      } else {
-        btnProducts.classList.remove('active');
-        btnProducts.style.color = 'rgba(255,255,255,0.75)';
-        btnProducts.style.background = 'none';
-        btnProducts.style.borderLeft = 'none';
+      if (sec) {
+        sec.style.setProperty('display', isActive ? 'block' : 'none', 'important');
       }
-    }
-
-    const secOrders = document.getElementById('admin-sec-orders');
-    const secProducts = document.getElementById('admin-sec-products');
-
-    if (secOrders) {
-      secOrders.style.setProperty('display', isProducts ? 'none' : 'block', 'important');
-    }
-    if (secProducts) {
-      secProducts.style.setProperty('display', isProducts ? 'block' : 'none', 'important');
-    }
+    });
 
     try {
       if (window.history && window.history.replaceState) {
-        window.history.replaceState(null, null, isProducts ? '#products' : '#orders');
+        window.history.replaceState(null, null, `#${activeTab}`);
       }
     } catch (e) {}
 
     if (window.WooCommerceAdmin) {
-      window.WooCommerceAdmin.activeTab = isProducts ? 'products' : 'orders';
-      if (isProducts) {
-        window.WooCommerceAdmin.renderProductsSec();
-      } else {
-        window.WooCommerceAdmin.renderOrdersSec();
-      }
+      window.WooCommerceAdmin.activeTab = activeTab;
+      if (activeTab === 'products') window.WooCommerceAdmin.renderProductsSec();
+      else if (activeTab === 'clients') window.WooCommerceAdmin.renderClientsSec();
+      else if (activeTab === 'settings') window.WooCommerceAdmin.renderSettingsSec();
+      else window.WooCommerceAdmin.renderOrdersSec();
     }
   };
 
@@ -941,6 +924,92 @@
       if (btn) { btn.disabled = false; btn.textContent = '⚡ Սինխրոնացնել Google Sheets'; }
       this.renderProductsSec();
       this.showToast('GOOGLE SHEETS SYNC COMPLETED.');
+    },
+
+    renderClientsSec() {
+      const tbody = document.getElementById('admin-clients-tbody');
+      const searchInput = document.getElementById('admin-client-search');
+      const searchQ = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+      const orders = getOrders();
+      const clientMap = new Map();
+
+      orders.forEach(o => {
+        const email = (o.email || 'customer@example.com').toLowerCase();
+        if (!clientMap.has(email)) {
+          clientMap.set(email, {
+            name: o.customer || 'Անանուն',
+            email: email,
+            ordersCount: 0,
+            totalSpent: 0,
+            lastOrderDate: o.date
+          });
+        }
+        const client = clientMap.get(email);
+        client.ordersCount += 1;
+        client.totalSpent += (Number(o.total) || 0);
+        if (new Date(o.date) > new Date(client.lastOrderDate)) {
+          client.lastOrderDate = o.date;
+        }
+      });
+
+      let clients = Array.from(clientMap.values());
+      if (searchQ) {
+        clients = clients.filter(c => c.name.toLowerCase().includes(searchQ) || c.email.toLowerCase().includes(searchQ));
+      }
+
+      // Update stat cards
+      const countEl = document.getElementById('admin-clients-count-val');
+      const activeEl = document.getElementById('admin-active-buyers-val');
+      const ltvEl = document.getElementById('admin-client-ltv-val');
+
+      if (countEl) countEl.textContent = clients.length;
+      if (activeEl) activeEl.textContent = clients.filter(c => c.ordersCount > 0).length;
+
+      const totalLtv = clients.reduce((sum, c) => sum + c.totalSpent, 0);
+      const avgLtv = clients.length > 0 ? Math.round(totalLtv / clients.length) : 0;
+      if (ltvEl) ltvEl.textContent = `$${avgLtv}`;
+
+      if (!tbody) return;
+
+      if (clients.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:32px; color:var(--tuff);">Հաճախորդներ չեն գտնվել։</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = clients.map(c => `
+        <tr>
+          <td style="font-weight:600; color:var(--green);">${c.name}</td>
+          <td style="color:var(--tuff); font-size:13px;">${c.email}</td>
+          <td><span style="background:#F0F7FF; color:#0066cc; padding:4px 10px; border-radius:12px; font-weight:700; font-size:12px;">${c.ordersCount} պատվեր</span></td>
+          <td style="font-weight:700; color:#2E8C8C;">$${c.totalSpent}</td>
+          <td style="font-size:12.5px; color:var(--tuff);">${c.lastOrderDate}</td>
+          <td><span style="background:#E6F4EA; color:#137333; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">Ակտիվ</span></td>
+        </tr>
+      `).join('');
+    },
+
+    renderSettingsSec() {
+      try {
+        const savedSett = JSON.parse(localStorage.getItem('urartoo_store_settings_v1'));
+        if (savedSett) {
+          if (savedSett.name && document.getElementById('sett-store-name')) document.getElementById('sett-store-name').value = savedSett.name;
+          if (savedSett.email && document.getElementById('sett-support-email')) document.getElementById('sett-support-email').value = savedSett.email;
+          if (savedSett.currency && document.getElementById('sett-currency')) document.getElementById('sett-currency').value = savedSett.currency;
+        }
+      } catch (e) {}
+    },
+
+    saveSettings(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const name = document.getElementById('sett-store-name') ? document.getElementById('sett-store-name').value : 'Urartoo Jewelry';
+      const email = document.getElementById('sett-support-email') ? document.getElementById('sett-support-email').value : 'najaryannorayr209@gmail.com';
+      const currency = document.getElementById('sett-currency') ? document.getElementById('sett-currency').value : 'USD';
+
+      const sett = { name, email, currency };
+      localStorage.setItem('urartoo_store_settings_v1', JSON.stringify(sett));
+      addAuditLog(`Թարմացվեցին խանութի կարգավորումները (${name}, ${currency})`);
+      this.showToast('STORE SETTINGS SAVED.');
     },
 
     handleAdminFormSubmit(e) {

@@ -43,6 +43,12 @@
             <button type="button" class="admin-nav-item" id="tab-btn-products" data-tab="products" onclick="window.switchAdminTab('products')" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:rgba(255,255,255,0.75); background:none; border:none; text-align:left; cursor:pointer; width:100%;">
               <span>💎</span> <span>Ապրանքացանկ</span>
             </button>
+            <button type="button" class="admin-nav-item" id="tab-btn-clients" data-tab="clients" onclick="window.switchAdminTab('clients')" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:rgba(255,255,255,0.75); background:none; border:none; text-align:left; cursor:pointer; width:100%;">
+              <span>👥</span> <span>Հաճախորդներ</span>
+            </button>
+            <button type="button" class="admin-nav-item" id="tab-btn-settings" data-tab="settings" onclick="window.switchAdminTab('settings')" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:rgba(255,255,255,0.75); background:none; border:none; text-align:left; cursor:pointer; width:100%;">
+              <span>⚙️</span> <span>Կարգավորումներ</span>
+            </button>
           </div>
         </aside>
 
@@ -88,13 +94,13 @@
                 <table class="admin-table">
                   <thead>
                     <tr>
-                      <th>Պատվեր #</th>
+                      <th>ID</th>
                       <th>Ամսաթիվ</th>
                       <th>Հաճախորդ</th>
-                      <th>Ապրանքներ</th>
-                      <th>Ընդամենը</th>
+                      <th>Գումար</th>
                       <th>Կարգավիճակ</th>
-                      <th>Գործողություններ</th>
+                      <th>Ապրանքներ</th>
+                      <th>Գործողություն</th>
                     </tr>
                   </thead>
                   <tbody id="admin-orders-tbody"></tbody>
@@ -103,40 +109,39 @@
             </div>
           </section>
 
-          <!-- SECTION 2: PRODUCTS MANAGER -->
+          <!-- SECTION 2: PRODUCT INVENTORY MANAGER -->
           <section id="admin-sec-products" class="admin-sec" style="display:none;">
             <div class="admin-card">
-              <div class="admin-card-header">
+              <div class="admin-card-header" style="flex-wrap:wrap; gap:16px;">
                 <div>
-                  <h3 class="admin-card-title">Ապրանքացանկ</h3>
-                  <p style="font-size:13px; color:var(--tuff); margin:4px 0 0;">Կառավարեք Ձեր զարդերի տեսականին, նկարները և 1-of-1 վաճառված կարգավիճակը։</p>
+                  <h3 class="admin-card-title" style="margin:0 0 6px;">Ապրանքացանկ</h3>
+                  <p style="margin:0; font-size:13px; color:var(--tuff);">Կառավարեք Ձեր զարդերի տեսականին, նկարները և 1-of-1 վաճառված կարգավիճակը։</p>
                 </div>
-                <div style="display:flex; gap:12px;">
-                  <button class="admin-btn" onclick="window.WooCommerceAdmin.openProductEditor(null)" style="padding:10px 20px; font-size:13px; background:var(--gold); color:var(--green); font-weight:700;">+ Ավելացնել Նոր Ապրանք</button>
-                </div>
+                <button type="button" class="btn-primary" onclick="window.WooCommerceAdmin.openProductEditor(null)" style="padding:10px 20px; font-size:13px; font-weight:700; white-space:nowrap;">+ ԱՎԵԼԱՑՆԵԼ ՆՈՐ ԱՊՐԱՆՔ</button>
               </div>
 
-              <div style="display:flex; gap:16px; margin-bottom:20px; flex-wrap:wrap; align-items:center;">
-                <input type="text" id="admin-prod-search" placeholder="Որոնել ըստ անվանման..." oninput="window.WooCommerceAdmin.renderProductsSec()" style="flex:1; min-width:220px; padding:10px 14px; border:1px solid var(--pumice); font-size:13.5px; outline:none;">
-                <select id="admin-prod-cat-filter" onchange="window.WooCommerceAdmin.renderProductsSec()" style="padding:10px 14px; border:1px solid var(--pumice); font-size:13.5px; outline:none;">
+              <!-- Filter Bar & Search -->
+              <div style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap;">
+                <input type="text" id="admin-prod-search" class="admin-input" placeholder="Որոնել ըստ անվանման..." oninput="window.WooCommerceAdmin.renderProductsSec()" style="max-width:320px;">
+                <select id="admin-prod-filter-cat" class="admin-input" onchange="window.WooCommerceAdmin.renderProductsSec()" style="max-width:200px;">
                   <option value="all">Բոլոր Տեսակները</option>
                   <option value="Մատանիներ">Մատանիներ</option>
                   <option value="Վզնոցներ">Վզնոցներ</option>
                   <option value="Ապարանջաններ">Ապարանջաններ</option>
                   <option value="Ականջօղեր">Ականջօղեր</option>
-                  <option value="Կախազարդեր">Կախազարդեր</option>
                 </select>
 
-                <!-- BULK ACTIONS CONTROL -->
+                <!-- Bulk Action Controls -->
                 <div style="display:flex; gap:8px; align-items:center;">
-                  <select id="admin-bulk-action-select" style="padding:10px 14px; border:1px solid var(--pumice); font-size:13.5px; outline:none; background:#FFF;">
+                  <select id="admin-bulk-action-select" class="admin-input" style="max-width:220px;">
                     <option value="">Խմբաքանակային գործողություն (Bulk Action)</option>
-                    <option value="delete">🗑 Ջնջել ընտրվածները (Bulk Delete)</option>
+                    <option value="delete">🗑 Ջնջել ընտրվածները</option>
                   </select>
-                  <button type="button" class="admin-btn" onclick="window.WooCommerceAdmin.executeBulkAction()" style="padding:10px 18px; font-size:13px; background:var(--green); color:#FFF; font-weight:700; width:auto;">Կատարել</button>
+                  <button type="button" class="btn-primary" onclick="window.WooCommerceAdmin.executeBulkAction()" style="padding:10px 16px; font-size:12.5px; background:var(--green); color:#FFF;">ԿԱՏԱՐԵԼ</button>
                 </div>
               </div>
 
+              <!-- Desktop Table -->
               <div class="admin-table-wrap-desktop" style="overflow-x:auto;">
                 <table class="admin-table">
                   <thead>
@@ -159,6 +164,101 @@
 
               <!-- Mobile Product Cards Grid -->
               <div id="admin-products-mobile-cards" class="admin-mobile-cards-grid"></div>
+            </div>
+          </section>
+
+          <!-- SECTION 3: CLIENTS & CUSTOMERS DIRECTORY -->
+          <section id="admin-sec-clients" class="admin-sec" style="display:none;">
+            <div class="admin-stats-grid">
+              <div class="admin-stat-card">
+                <div class="admin-stat-label">Գրանցված Հաճախորդներ</div>
+                <div class="admin-stat-val" id="admin-clients-count-val">0</div>
+              </div>
+              <div class="admin-stat-card">
+                <div class="admin-stat-label">Ակտիվ Գնորդներ</div>
+                <div class="admin-stat-val" id="admin-active-buyers-val">0</div>
+              </div>
+              <div class="admin-stat-card">
+                <div class="admin-stat-label">Միջին Հաճախորդի LTV</div>
+                <div class="admin-stat-val" id="admin-client-ltv-val">$0</div>
+              </div>
+            </div>
+
+            <div class="admin-card">
+              <div class="admin-card-header" style="flex-wrap:wrap; gap:16px;">
+                <div>
+                  <h3 class="admin-card-title" style="margin:0 0 6px;">Հաճախորդների Ցուցակ</h3>
+                  <p style="margin:0; font-size:13px; color:var(--tuff);">Դիտեք գրանցված գնորդների տվյալները, պատվերների պատմությունը և ընդհանուր ծախսերը։</p>
+                </div>
+                <input type="text" id="admin-client-search" class="admin-input" placeholder="Որոնել հաճախորդ..." oninput="window.WooCommerceAdmin.renderClientsSec()" style="max-width:280px;">
+              </div>
+
+              <div style="overflow-x:auto;">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Հաճախորդ</th>
+                      <th>Էլ․ Փոստ</th>
+                      <th>Պատվերներ</th>
+                      <th>Ընդհանուր Գումար (LTV)</th>
+                      <th>Վերջին Պատվեր</th>
+                      <th>Կարգավիճակ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-clients-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECTION 4: STORE SETTINGS & SYSTEM STATUS -->
+          <section id="admin-sec-settings" class="admin-sec" style="display:none;">
+            <div class="admin-stats-grid">
+              <div class="admin-stat-card" style="border-left:4px solid #2E8C8C;">
+                <div class="admin-stat-label">Sanity CMS Կարգավիճակ</div>
+                <div class="admin-stat-val" style="font-size:16px; color:#2E8C8C; display:flex; align-items:center; gap:8px;">
+                  <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#2E8C8C;"></span>
+                  <span>Միացված է (Production)</span>
+                </div>
+              </div>
+              <div class="admin-stat-card" style="border-left:4px solid #C2A379;">
+                <div class="admin-stat-label">Google Sheets / Drive</div>
+                <div class="admin-stat-val" style="font-size:16px; color:#C2A379;">Ավտո-Սինխրոն ⚡</div>
+              </div>
+              <div class="admin-stat-card" style="border-left:4px solid #7B2D3B;">
+                <div class="admin-stat-label">Արժույթ</div>
+                <div class="admin-stat-val" style="font-size:18px;">USD ($)</div>
+              </div>
+            </div>
+
+            <div class="admin-card" style="max-width:800px; margin-bottom:24px;">
+              <div class="admin-card-header">
+                <h3 class="admin-card-title">Խանութի Տվյալներ և Կարգավորումներ</h3>
+              </div>
+              <form id="admin-settings-form" onsubmit="window.WooCommerceAdmin.saveSettings(event)">
+                <div class="admin-form-group">
+                  <label for="sett-store-name">Խանութի Անվանում</label>
+                  <input type="text" id="sett-store-name" class="admin-input" value="Urartoo Jewelry">
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                  <div class="admin-form-group">
+                    <label for="sett-support-email">Ադմինիստրատորի Էլ․ Փոստ</label>
+                    <input type="email" id="sett-support-email" class="admin-input" value="najaryannorayr209@gmail.com">
+                  </div>
+                  <div class="admin-form-group">
+                    <label for="sett-currency">Հիմնական Արժույթ</label>
+                    <select id="sett-currency" class="admin-input">
+                      <option value="USD">USD ($)</option>
+                      <option value="AMD">AMD (֏)</option>
+                      <option value="EUR">EUR (€)</option>
+                    </select>
+                  </div>
+                </div>
+                <div style="margin-top:20px; display:flex; gap:12px;">
+                  <button type="submit" class="btn-primary" style="padding:12px 28px; font-weight:700;">💾 ՊԱՀՊԱՆԵԼ ԿԱՐԳԱՎՈՐՈՒՄՆԵՐԸ</button>
+                  <button type="button" class="admin-btn" id="btn-sync-google" onclick="window.WooCommerceAdmin.syncGoogleData()" style="padding:12px 20px; background:var(--gold); color:var(--green); font-weight:700;">⚡ Սինխրոնացնել Google Sheets</button>
+                </div>
+              </form>
             </div>
           </section>
         </main>

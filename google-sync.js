@@ -154,28 +154,42 @@
     },
 
     /**
-     * Fetches file list from Google Drive folder
+     * Fetches file list from Google Drive folder and maps clean title -> fileId
      */
-    async fetchDriveFolderImages() {
+    async fetchDriveFilesMap() {
       try {
         const folderUrl = `https://drive.google.com/embeddedfolderview?id=${GOOGLE_CONFIG.driveFolderId}`;
         const res = await fetch(folderUrl);
-        if (!res.ok) return [];
+        if (!res.ok) return new Map();
         const html = await res.text();
 
-        // Extract Google Drive File IDs and Title filenames
-        const matches = [];
-        const regex = /id=([a-zA-Z0-9_-]{25,})/g;
+        const fileMap = new Map();
+
+        // Match Google Drive folder entry format: id="entry-FILE_ID" ... class="flip-entry-title">TITLE</div>
+        const entryRegex = /id="entry-([a-zA-Z0-9_-]+)"[\s\S]*?class="flip-entry-title">([^<]+)<\/div>/g;
         let match;
-        while ((match = regex.exec(html)) !== null) {
-          if (match[1] && !matches.includes(match[1])) {
-            matches.push(match[1]);
+        while ((match = entryRegex.exec(html)) !== null) {
+          const fileId = match[1];
+          const rawTitle = match[2].trim();
+          const cleanTitle = rawTitle.replace(/\.(jpg|jpeg|png|webp|gif)$/i, '').trim().toLowerCase();
+          fileMap.set(cleanTitle, fileId);
+        }
+
+        // Fallback regex match: /file/d/FILE_ID/view ... title
+        const linkRegex = /\/file\/d\/([a-zA-Z0-9_-]+)\/view[\s\S]*?class="flip-entry-title">([^<]+)<\/div>/g;
+        while ((match = linkRegex.exec(html)) !== null) {
+          const fileId = match[1];
+          const rawTitle = match[2].trim();
+          const cleanTitle = rawTitle.replace(/\.(jpg|jpeg|png|webp|gif)$/i, '').trim().toLowerCase();
+          if (!fileMap.has(cleanTitle)) {
+            fileMap.set(cleanTitle, fileId);
           }
         }
-        return matches;
+
+        return fileMap;
       } catch (e) {
-        console.warn('Google Drive list error:', e);
-        return [];
+        console.warn('Google Drive file map error:', e);
+        return new Map();
       }
     },
 
@@ -193,7 +207,10 @@
         return { success: false, count: 0 };
       }
 
-      if (statusCallback) statusCallback(`Գտնվել է ${sheetRows.length} ապրանք Google Sheet-ում։ Սինխրոնացվում է Sanity-ի հետ...`);
+      if (statusCallback) statusCallback(`Գտնվել է ${sheetRows.length} ապրանք Google Sheet-ում։ Կարդացվում են Google Drive նկարները...`);
+      const driveFileMap = await this.fetchDriveFilesMap();
+
+      if (statusCallback) statusCallback(`Սինխրոնացվում է Sanity CMS-ի հետ...`);
 
       let syncedCount = 0;
 
@@ -226,22 +243,28 @@
           tags: ["Ձեռագործ", row.stone || "Զարդ"]
         };
 
-        // Construct direct Google Drive thumbnail image match URL
-        // Image filenames match Title in Drive folder
-        const driveImageDirectUrl = `https://drive.google.com/thumbnail?id=${GOOGLE_CONFIG.driveFolderId}&sz=w1600`;
+        // Match image from Google Drive folder by title
+        const cleanProductTitle = title.trim().toLowerCase();
+        const matchedFileId = driveFileMap.get(cleanProductTitle);
 
-        try {
-          // Compress to WebP < 200 KB @ 90% quality
-          const webpBlob = await processImageUrlToWebP(driveImageDirectUrl).catch(() => null);
-          if (webpBlob && window.NovaSanity) {
-            const sanityAssetUrl = await window.NovaSanity.uploadImage(webpBlob);
-            if (sanityAssetUrl) {
-              prodData.img = sanityAssetUrl;
-              prodData.image = sanityAssetUrl;
+        if (matchedFileId) {
+          const driveImageDirectUrl = `https://lh3.googleusercontent.com/d/${matchedFileId}`;
+          try {
+            const webpBlob = await processImageUrlToWebP(driveImageDirectUrl).catch(async () => {
+              return await processImageUrlToWebP(`https://drive.google.com/thumbnail?id=${matchedFileId}&sz=w1600`).catch(() => null);
+            });
+
+            if (webpBlob && window.NovaSanity) {
+              const sanityAssetUrl = await window.NovaSanity.uploadImage(webpBlob);
+              if (sanityAssetUrl) {
+                prodData.img = sanityAssetUrl;
+                prodData.image = sanityAssetUrl;
+                prodData.images = [sanityAssetUrl];
+              }
             }
+          } catch (e) {
+            console.warn(`Could not process drive image for ${title}:`, e);
           }
-        } catch (e) {
-          console.warn(`Could not process drive image for ${title}:`, e);
         }
 
         // Save document directly to Sanity CMS
