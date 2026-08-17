@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Urartoo — Ադմինիստրատորի Պանել</title>
+
+  <!-- Fonts & Core Styles -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Sans+Armenian:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="in-admin-mode" style="background:#FAF8F5; margin:0; padding:0; min-height:100vh;">
+
+  <!-- ═══ ADMIN PANEL VIEW ═══ -->
+  <div id="view-admin" class="admin-view" style="display:block;">
+    <!-- LOGIN GATEWAY -->
+    <div id="admin-login-wrapper" class="admin-login-wrapper">
+      <div class="admin-login-card">
+        <h2>Urartoo Admin</h2>
+        <p>Մուտք գործեք ադմինիստրատորի տվյալներով</p>
+        <form id="admin-login-form" onsubmit="event.preventDefault(); window.WooCommerceAdmin.handleAdminFormSubmit(event);">
+          <div class="admin-form-group">
+            <label for="admin-email-input">Էլ․ փոստ</label>
+            <input type="email" id="admin-email-input" class="admin-input" required placeholder="najaryannorayr209@gmail.com">
+          </div>
+          <div class="admin-form-group">
+            <label for="admin-pass-input">Գաղտնաբառ</label>
+            <input type="password" id="admin-pass-input" class="admin-input" required placeholder="••••••••">
+          </div>
+          <button type="submit" class="admin-btn">Մուտք Պանել</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="admin-dashboard-wrapper" class="admin-dashboard-wrapper" style="display:none;">
+      <header class="admin-dashboard-header">
+        <div class="admin-header-brand">
+          <a href="index.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff;">
+            <img src="Images/Urartoo-Logo.webp" alt="Urartoo" style="height:28px;filter:brightness(0) invert(1);">
+          </a>
+          <span class="admin-role-badge" id="admin-user-role-badge">Super Admin</span>
+        </div>
+        <div class="admin-header-actions">
+          <button id="btn-sync-google" class="admin-btn" onclick="window.WooCommerceAdmin.syncGoogleData()" style="padding:6px 14px; font-size:12px; border-radius:2px; background:var(--gold); color:var(--green); font-weight:700; width:auto; display:inline-flex; align-items:center; gap:6px;">⚡ Սինխրոնացնել Google Sheets</button>
+          <span id="admin-user-profile-name" style="color:rgba(255,255,255,0.9);font-weight:500;">najaryannorayr209@gmail.com</span>
+          <a href="index.html">Դիտել կայքը</a>
+          <a href="#" onclick="window.WooCommerceAdmin.logout(); return false;" style="color:var(--gold);">Դուրս գալ</a>
+        </div>
+      </header>
+
+      <div class="admin-layout" style="display:flex; min-height:calc(100vh - 65px); width:100%;">
+        <!-- ADMIN SIDEBAR -->
+        <aside class="admin-sidebar" style="width:240px; background:#191B1A; color:#C0C5C2; flex-shrink:0; padding:24px 0;">
+          <div class="admin-nav-group">
+            <div class="admin-nav-title" style="padding:0 24px 12px; font-size:10.5px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.35);">Մենյու</div>
+            <a href="#admin" class="admin-nav-item active" data-tab="orders" onclick="window.WooCommerceAdmin.switchTab('orders'); return false;" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:var(--gold); background:rgba(255,255,255,0.05); border-left:4px solid var(--gold); text-decoration:none;">
+              <span>📦</span> <span>Պատվերներ</span>
+            </a>
+            <a href="#admin" class="admin-nav-item" data-tab="products" onclick="window.WooCommerceAdmin.switchTab('products'); return false;" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:rgba(255,255,255,0.75); text-decoration:none;">
+              <span>💎</span> <span>Ապրանքացանկ</span>
+            </a>
+            <a href="#admin" class="admin-nav-item" data-tab="settings" onclick="window.WooCommerceAdmin.switchTab('settings'); return false;" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:rgba(255,255,255,0.75); text-decoration:none;">
+              <span>⚙️</span> <span>Կարգավորումներ</span>
+            </a>
+            <a href="#admin" class="admin-nav-item" data-tab="clients" onclick="window.WooCommerceAdmin.switchTab('clients'); return false;" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:rgba(255,255,255,0.75); text-decoration:none;">
+              <span>👤</span> <span>Հաճախորդներ</span>
+            </a>
+            <a href="#admin" class="admin-nav-item" data-tab="logs" onclick="window.WooCommerceAdmin.switchTab('logs'); return false;" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:rgba(255,255,255,0.75); text-decoration:none;">
+              <span>📜</span> <span>Գործողությունների Մատյան</span>
+            </a>
+          </div>
+        </aside>
+
+        <!-- MAIN DASHBOARD CONTENT AREA -->
+        <main class="admin-main-content" style="flex:1; padding:32px var(--gutter); background:#FAF8F5; overflow-y:auto;">
+
+          <!-- SECTION 1: ORDERS MANAGER -->
+          <section id="admin-sec-orders" class="admin-sec">
+            <div class="admin-stats-grid">
+              <div class="admin-stat-card">
+                <div class="admin-stat-label">Ընդհանուր Հասույթ</div>
+                <div class="admin-stat-val" id="admin-rev-val">$0</div>
+              </div>
+              <div class="admin-stat-card">
+                <div class="admin-stat-label">Պատվերների Քանակ</div>
+                <div class="admin-stat-val" id="admin-orders-count-val">0</div>
+              </div>
+              <div class="admin-stat-card">
+                <div class="admin-stat-label">Միջին Պատվեր (AOV)</div>
+                <div class="admin-stat-val" id="admin-aov-val">$0</div>
+              </div>
+              <div class="admin-stat-card">
+                <div class="admin-stat-label">Առկա Տեսականի</div>
+                <div class="admin-stat-val" id="admin-stock-count-val">0</div>
+              </div>
+            </div>
+
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <h3 class="admin-card-title">Վաճառքներ ըստ Զարդի Տեսակի</h3>
+              </div>
+              <div id="admin-category-chart" style="display:flex; flex-direction:column; gap:12px;"></div>
+            </div>
+
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <h3 class="admin-card-title">Պատվերների Ցուցակ</h3>
+                <div>
+                  <button class="filter-clear-btn" onclick="window.WooCommerceAdmin.renderOrdersSec()">🔄 Թարմացնել</button>
+                </div>
+              </div>
+              <div style="overflow-x:auto;">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Պատվեր #</th>
+                      <th>Ամսաթիվ</th>
+                      <th>Հաճախորդ</th>
+                      <th>Ապրանքներ</th>
+                      <th>Ընդամենը</th>
+                      <th>Կարգավիճակ</th>
+                      <th>Գործողություններ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-orders-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECTION 2: PRODUCTS MANAGER -->
+          <section id="admin-sec-products" class="admin-sec" style="display:none;">
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <div>
+                  <h3 class="admin-card-title">Ապրանքացանկ (Sanity CMS)</h3>
+                  <p style="font-size:13px; color:var(--tuff); margin:4px 0 0;">Կառավարեք Ձեր զարդերի տեսականին, նկարները և 1-of-1 վաճառված կարգավիճակը։</p>
+                </div>
+                <div style="display:flex; gap:12px;">
+                  <button class="admin-btn" onclick="window.WooCommerceAdmin.openProductEditor(null)" style="padding:10px 20px; font-size:13px; background:var(--gold); color:var(--green); font-weight:700;">+ Ավելացնել Նոր Ապրանք</button>
+                </div>
+              </div>
+
+              <div style="display:flex; gap:16px; margin-bottom:20px; flex-wrap:wrap;">
+                <input type="text" id="admin-prod-search" placeholder="Որոնել ըստ անվանման կամ SKU..." oninput="window.WooCommerceAdmin.renderProductsSec()" style="flex:1; min-width:240px; padding:10px 14px; border:1px solid var(--pumice); font-size:13.5px; outline:none;">
+                <select id="admin-prod-cat-filter" onchange="window.WooCommerceAdmin.renderProductsSec()" style="padding:10px 14px; border:1px solid var(--pumice); font-size:13.5px; outline:none;">
+                  <option value="all">Բոլոր Տեսակները</option>
+                  <option value="Մատանիներ">Մատանիներ</option>
+                  <option value="Վզնոցներ">Վզնոցներ</option>
+                  <option value="Ապարանջաններ">Ապարանջաններ</option>
+                  <option value="Ականջօղեր">Ականջօղեր</option>
+                  <option value="Կախազարդեր">Կախազարդեր</option>
+                </select>
+              </div>
+
+              <div style="overflow-x:auto;">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Նկար</th>
+                      <th>Անվանում</th>
+                      <th>SKU</th>
+                      <th>Տեսակ</th>
+                      <th>Քար / Տարածաշրջան</th>
+                      <th>Գին ($)</th>
+                      <th>Կարգավիճակ</th>
+                      <th>Գործողություններ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-products-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECTION 3: SETTINGS -->
+          <section id="admin-sec-settings" class="admin-sec" style="display:none;">
+            <div class="admin-card">
+              <h3 class="admin-card-title" style="margin-bottom:16px;">Ադմինիստրատորների Ցուցակ</h3>
+              <p style="font-size:13.5px; color:var(--tuff); margin-bottom:24px;">Այս էլ․ փոստերն ունեն լիարժեք մուտք դեպի Urartoo Ադմին Համակարգ։</p>
+              <div id="admin-whitelist-container"></div>
+            </div>
+          </section>
+
+          <!-- SECTION 4: CLIENTS -->
+          <section id="admin-sec-clients" class="admin-sec" style="display:none;">
+            <div class="admin-card">
+              <h3 class="admin-card-title" style="margin-bottom:16px;">Գրանցված Հաճախորդներ</h3>
+              <div style="overflow-x:auto;">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Անուն Ազգանուն</th>
+                      <th>Էլ․ փոստ</th>
+                      <th>Անդամագրման Ամսաթիվ</th>
+                      <th>Պատվերներ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-clients-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECTION 5: AUDIT LOGS -->
+          <section id="admin-sec-logs" class="admin-sec" style="display:none;">
+            <div class="admin-card">
+              <h3 class="admin-card-title" style="margin-bottom:16px;">Գործողությունների Մատյան (Audit Logs)</h3>
+              <div style="overflow-x:auto;">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Ամսաթիվ / Ժամ</th>
+                      <th>Օպերատոր</th>
+                      <th>Կատարված Գործողություն</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-logs-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ WORDPRESS-STYLE FULL-PAGE PRODUCT EDITOR MODAL OVERLAY ═══ -->
+  <div id="product-editor-modal" class="product-editor-page" style="display:none;">
+    <div class="pe-topbar">
+      <div style="display:flex; align-items:center; gap:16px;">
+        <button type="button" onclick="window.WooCommerceAdmin.closeProductEditor()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">✕</button>
+        <div class="pe-topbar-title" id="pe-modal-title">Խմբագրել Ապրանքը (Sanity CMS)</div>
+      </div>
+      <div style="display:flex; gap:12px;">
+        <button type="button" class="filter-clear-btn" style="color:red; border-color:red; display:none;" id="btn-pe-delete" onclick="window.WooCommerceAdmin.deleteProductFromEditor()">🗑 Ջնջել Sanity-ից</button>
+        <button type="button" class="admin-btn" id="btn-pe-save" onclick="window.WooCommerceAdmin.saveProductFromEditor()" style="padding:10px 24px; font-size:13.5px; background:var(--gold); color:var(--green); font-weight:700;">💾 Պահպանել Sanity-ում</button>
+      </div>
+    </div>
+
+    <div class="pe-content">
+      <div class="pe-main" style="flex:1;">
+        <div class="admin-card">
+          <div class="admin-form-group">
+            <label for="pe-name">Ապրանքի Անվանում (Title) *</label>
+            <input type="text" id="pe-name" class="admin-input" required placeholder="օր․ Վայոց Ձորի նռնաքարով մատանի">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="admin-form-group">
+              <label for="pe-sku">SKU Կոդ *</label>
+              <input type="text" id="pe-sku" class="admin-input" placeholder="UR-101">
+            </div>
+            <div class="admin-form-group">
+              <label for="pe-price">Գին ($ USD) *</label>
+              <input type="number" id="pe-price" class="admin-input" required placeholder="340">
+            </div>
+          </div>
+          <div class="admin-form-group">
+            <label for="pe-tagline">Կարճ նկարագրություն (Tagline)</label>
+            <input type="text" id="pe-tagline" class="admin-input" placeholder="օր․ 925 հարգի արծաթ, բնական նռնաքարով">
+          </div>
+          <div class="admin-form-group">
+            <label for="pe-desc">Լիարժեք նկարագրություն (Description)</label>
+            <textarea id="pe-desc" class="admin-input" rows="6" placeholder="Մանրամասն նկարագրություն զարդի և քարի ծագման մասին..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="pe-sidebar" style="width:340px;">
+        <div class="pe-metabox">
+          <h3>Ապրանքի Նկար (WebP Auto-Convert)</h3>
+          <div id="pe-img-preview-box" style="width:100%; height:200px; background:#FAF8F5; border:2px dashed var(--pumice); border-radius:4px; display:flex; align-items:center; justify-content:center; overflow:hidden; margin-bottom:12px; position:relative;">
+            <img id="pe-img-preview" src="" alt="" style="max-width:100%; max-height:100%; object-fit:contain; display:none;">
+            <span id="pe-img-placeholder" style="color:var(--tuff); font-size:13px;">Նկար ընտրված չէ</span>
+          </div>
+          <input type="file" id="pe-img-input" accept="image/*" onchange="window.WooCommerceAdmin.handleEditorImageUpload(event)" style="font-size:12px; width:100%;">
+          <input type="hidden" id="pe-img-url-val">
+        </div>
+
+        <div class="pe-metabox">
+          <h3>Հատկանիշներ</h3>
+          <div class="admin-form-group">
+            <label for="pe-cat">Զարդի Տեսակ (Category)</label>
+            <select id="pe-cat" class="admin-input">
+              <option value="Մատանիներ">Մատանիներ</option>
+              <option value="Վզնոցներ">Վզնոցներ</option>
+              <option value="Ապարանջաններ">Ապարանջաններ</option>
+              <option value="Ականջօղեր">Ականջօղեր</option>
+              <option value="Կախազարդեր">Կախազարդեր</option>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label for="pe-stone">Օգտագործված Քարը</label>
+            <select id="pe-stone" class="admin-input">
+              <option value="Նռնաքար">Նռնաքար</option>
+              <option value="Օբսիդիան">Օբսիդիան</option>
+              <option value="Փիրուզ">Փիրուզ</option>
+              <option value="Քվարց">Քվարց</option>
+              <option value="Ագաթ">Ագաթ</option>
+              <option value="Լազուրիտ">Լազուրիտ</option>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label for="pe-region">Քարի Տարածաշրջան</label>
+            <select id="pe-region" class="admin-input">
+              <option value="Վայոց Ձոր">Վայոց Ձոր</option>
+              <option value="Գեղարքունիք">Գեղարքունիք</option>
+              <option value="Սյունիք">Սյունիք</option>
+              <option value="Արագած">Արագած</option>
+              <option value="Տավուշ">Տավուշ</option>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label for="pe-material">Նյութ</label>
+            <select id="pe-material" class="admin-input">
+              <option value="925 արծաթ">925 արծաթ</option>
+              <option value="14K Ոսկի">14K Ոսկի</option>
+              <option value="18K Ոսկի">18K Ոսկի</option>
+            </select>
+          </div>
+          <div class="admin-form-group" style="margin-top:20px; padding-top:16px; border-top:1px solid var(--pumice);">
+            <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+              <input type="checkbox" id="pe-sold-toggle" style="width:18px; height:18px;">
+              <span style="font-weight:700; color:var(--amber);">🏷 1-of-1 Վաճառված է (Sold Out)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="sanity-config.js"></script>
+  <script src="google-sync.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

@@ -653,17 +653,29 @@
       if (btn) { btn.disabled = false; btn.textContent = '⚡ Սինխրոնացնել Google Sheets'; }
     },
 
+    handleAdminFormSubmit(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const emailEl = document.getElementById('admin-email-input');
+      const passEl = document.getElementById('admin-pass-input');
+      const email = emailEl ? emailEl.value : '';
+      const pass = passEl ? passEl.value : '';
+
+      if (!email || !pass) {
+        alert('Խնդրում ենք լրացնել էլ․ փոստը և գաղտնաբառը։');
+        return false;
+      }
+
+      if (!this.login(email, pass)) {
+        alert('Սխալ էլ․ փոստ կամ գաղտնաբառ։ Խնդրում ենք փորձել նորից։');
+        return false;
+      }
+      return false;
+    },
+
     bindEvents() {
       const form = document.getElementById('admin-login-form');
       if (form) {
-        form.onsubmit = (e) => {
-          e.preventDefault();
-          const email = document.getElementById('admin-email-input').value;
-          const pass = document.getElementById('admin-pass-input').value;
-          if (!this.login(email, pass)) {
-            alert('Սխալ էլ․ փոստ կամ գաղտնաբառ');
-          }
-        };
+        form.onsubmit = (e) => this.handleAdminFormSubmit(e);
       }
     }
   };
