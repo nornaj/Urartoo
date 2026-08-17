@@ -8,8 +8,20 @@
 (function (window) {
   'use strict';
 
-  const LOCAL_ORDERS_KEY = 'urartoo_admin_orders_v1';
-  const LOCAL_LOGS_KEY = 'urartoo_admin_logs_v1';
+  const LOCAL_ADMINS_KEY = 'urartoo_admin_emails_v1';
+  const LOCAL_SESSION_KEY = 'urartoo_user_session_v1';
+
+  function getAdminEmails() {
+    let emails = ['najaryannorayr209@gmail.com', 'admin@urartoo.am'];
+    try {
+      const stored = JSON.parse(localStorage.getItem(LOCAL_ADMINS_KEY));
+      if (stored && Array.isArray(stored)) {
+        stored.forEach(e => { if (e && !emails.includes(e.toLowerCase())) emails.push(e.toLowerCase()); });
+      }
+    } catch (e) {}
+    localStorage.setItem(LOCAL_ADMINS_KEY, JSON.stringify(emails));
+    return emails;
+  }
 
   function getOrders() {
     try {
@@ -75,8 +87,16 @@
       // Check existing session
       try {
         const session = JSON.parse(localStorage.getItem(LOCAL_SESSION_KEY));
-        if (session && (session.isAdmin || getAdminEmails().includes(session.email?.toLowerCase()))) {
-          this.currentUser = { email: session.email, role: session.role || 'Super Admin', name: session.name || session.email };
+        if (session && session.email) {
+          const cleanEmail = session.email.trim().toLowerCase();
+          const adminEmails = getAdminEmails();
+          if (session.isAdmin || adminEmails.includes(cleanEmail) || cleanEmail === 'najaryannorayr209@gmail.com') {
+            this.currentUser = {
+              email: session.email,
+              role: session.role || 'Super Admin',
+              name: session.name || session.email
+            };
+          }
         }
       } catch (e) {}
 
