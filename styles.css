@@ -3680,11 +3680,49 @@ body.nav-open {
     font-size: 12px !important;
     white-space: nowrap !important;
   }
+
+  /* Product Editor Mobile First Responsive Overlay */
+  .pe-topbar {
+    padding: 12px 16px !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+
+  .pe-topbar-title {
+    font-size: 17px !important;
+  }
+
+  .pe-content {
+    flex-direction: column !important;
+    padding: 16px 12px !important;
+    gap: 16px !important;
+  }
+
+  .pe-main, .pe-sidebar {
+    width: 100% !important;
+  }
+
+  .pe-metabox {
+    padding: 16px 14px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .admin-input, select.admin-input, textarea.admin-input {
+    font-size: 16px !important; /* Prevents auto-zoom on iOS mobile */
+    padding: 12px 14px !important;
+  }
 }
 
 @media (max-width: 480px) {
   .admin-stats-grid {
     grid-template-columns: 1fr !important;
+  }
+
+  #btn-pe-save, #btn-pe-delete {
+    width: 100% !important;
+    text-align: center !important;
+    justify-content: center !important;
   }
 }
 
