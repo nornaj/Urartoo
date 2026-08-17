@@ -137,6 +137,16 @@
     });
   }
 
+  /**
+   * Helper: Normalizes product titles for ultra-flexible Drive filename matching
+   */
+  function normalizeTitleKey(str) {
+    return String(str || '')
+      .replace(/\.(jpg|jpeg|png|webp|gif)$/i, '')
+      .replace(/[^a-zA-Z0-9\u0531-\u058F]/g, '')
+      .toLowerCase();
+  }
+
   const GoogleSync = {
     /**
      * Fetches products from Google Sheet CSV
@@ -154,7 +164,7 @@
     },
 
     /**
-     * Fetches file list from Google Drive folder and maps clean title -> fileId
+     * Fetches file list from Google Drive folder and maps normalized title -> fileId
      */
     async fetchDriveFilesMap() {
       try {
@@ -171,8 +181,8 @@
         while ((match = entryRegex.exec(html)) !== null) {
           const fileId = match[1];
           const rawTitle = match[2].trim();
-          const cleanTitle = rawTitle.replace(/\.(jpg|jpeg|png|webp|gif)$/i, '').trim().toLowerCase();
-          fileMap.set(cleanTitle, fileId);
+          const normKey = normalizeTitleKey(rawTitle);
+          fileMap.set(normKey, fileId);
         }
 
         // Fallback regex match: /file/d/FILE_ID/view ... title
@@ -180,12 +190,13 @@
         while ((match = linkRegex.exec(html)) !== null) {
           const fileId = match[1];
           const rawTitle = match[2].trim();
-          const cleanTitle = rawTitle.replace(/\.(jpg|jpeg|png|webp|gif)$/i, '').trim().toLowerCase();
-          if (!fileMap.has(cleanTitle)) {
-            fileMap.set(cleanTitle, fileId);
+          const normKey = normalizeTitleKey(rawTitle);
+          if (!fileMap.has(normKey)) {
+            fileMap.set(normKey, fileId);
           }
         }
 
+        console.log('Google Drive Parsed Files Map:', Array.from(fileMap.entries()));
         return fileMap;
       } catch (e) {
         console.warn('Google Drive file map error:', e);
@@ -240,30 +251,37 @@
           tagline: row.description || '',
           description: row.description || '',
           sizes: [{ label: "Standard", price: numericPrice }],
-          tags: ["Ձեռագործ", row.stone || "Զարդ"]
+          tags: ["Ձեռագործ", row.stone || "Զարդ"],
+          img: 'Images/bracelet.webp',
+          image: 'Images/bracelet.webp'
         };
 
         // Match image from Google Drive folder by title
-        const cleanProductTitle = title.trim().toLowerCase();
-        const matchedFileId = driveFileMap.get(cleanProductTitle);
+        const normProductKey = normalizeTitleKey(title);
+        const matchedFileId = driveFileMap.get(normProductKey);
 
         if (matchedFileId) {
-          const driveImageDirectUrl = `https://lh3.googleusercontent.com/d/${matchedFileId}`;
-          try {
-            const webpBlob = await processImageUrlToWebP(driveImageDirectUrl).catch(async () => {
-              return await processImageUrlToWebP(`https://drive.google.com/thumbnail?id=${matchedFileId}&sz=w1600`).catch(() => null);
-            });
+          const driveImageUrl = `https://lh3.googleusercontent.com/d/${matchedFileId}`;
+          prodData.img = driveImageUrl;
+          prodData.image = driveImageUrl;
+          prodData.images = [driveImageUrl];
 
-            if (webpBlob && window.NovaSanity) {
-              const sanityAssetUrl = await window.NovaSanity.uploadImage(webpBlob);
-              if (sanityAssetUrl) {
-                prodData.img = sanityAssetUrl;
-                prodData.image = sanityAssetUrl;
-                prodData.images = [sanityAssetUrl];
+          try {
+            // Upload image blob directly to Sanity CDN
+            const res = await fetch(driveImageUrl).catch(() => null);
+            if (res && res.ok) {
+              const blob = await res.blob();
+              if (blob && window.NovaSanity) {
+                const sanityAssetUrl = await window.NovaSanity.uploadImage(blob).catch(() => null);
+                if (sanityAssetUrl) {
+                  prodData.img = sanityAssetUrl;
+                  prodData.image = sanityAssetUrl;
+                  prodData.images = [sanityAssetUrl];
+                }
               }
             }
           } catch (e) {
-            console.warn(`Could not process drive image for ${title}:`, e);
+            console.warn(`Sanity upload fallback for ${title}:`, e);
           }
         }
 
