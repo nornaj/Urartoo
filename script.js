@@ -588,4 +588,38 @@
     renderCartDrawerItems();
   };
 
+  window.handleCartDrawerCheckout = function () {
+    var cart = [];
+    try { cart = JSON.parse(localStorage.getItem('urartoo_cart_v1')) || []; } catch (e) {}
+    if (cart.length === 0) {
+      alert('Ձեր զամբյուղը դատարկ է։');
+      return;
+    }
+
+    var session = null;
+    try { session = JSON.parse(localStorage.getItem('urartoo_user_session_v1')); } catch (e) {}
+
+    var customerName = session ? (session.name || session.email) : 'Գնորդ (Կայքից)';
+    var customerEmail = session ? session.email : 'guest@urartoo.am';
+    var subtotal = cart.reduce(function (s, i) { return s + (i.price * (i.qty || 1)); }, 0);
+
+    if (window.WooCommerceAdmin && typeof window.WooCommerceAdmin.addOrder === 'function') {
+      var newOrder = window.WooCommerceAdmin.addOrder(
+        { name: customerName, email: customerEmail },
+        cart,
+        subtotal
+      );
+      alert('Շնորհակալություն։ Ձեր պատվերը #' + newOrder.id + ' հաջողությամբ գրանցվել է ($' + subtotal + ')։');
+    } else {
+      alert('Շնորհակալություն։ Պատվերը գրանցված է։');
+    }
+
+    localStorage.setItem('urartoo_cart_v1', JSON.stringify([]));
+    renderCartDrawerItems();
+    var drawer = document.getElementById('cart-drawer');
+    var overlay = document.getElementById('cart-overlay');
+    if (drawer) drawer.classList.remove('active');
+    if (overlay) overlay.classList.remove('active');
+  };
+
 })();

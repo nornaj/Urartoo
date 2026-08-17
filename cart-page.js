@@ -119,7 +119,29 @@
   var checkoutBtn = document.getElementById('cart-checkout-btn');
   if (checkoutBtn) {
     checkoutBtn.addEventListener('click', function () {
-      alert('\u0547\u0576\u0578\u0580\u0570\u0561\u056F\u0561\u056C\u0578\u0582\u0569\u0575\u0578\u0582\u0576\u0589 \u054A\u0561\u057F\u057E\u0565\u0580\u056B \u0571\u0587\u0561\u056F\u0565\u0580\u057A\u0578\u0582\u0574\u0568 \u0577\u0578\u0582\u057F\u0578\u057E \u057A\u0561\u057F\u0580\u0561\u057D\u057F \u056F\u056C\u056B\u0576\u056B\u0589');
+      var cart = getCart();
+      if (cart.length === 0) return;
+
+      var session = null;
+      try { session = JSON.parse(localStorage.getItem('urartoo_user_session_v1')); } catch (e) {}
+
+      var customerName = session ? (session.name || session.email) : 'Գնորդ (Կայքից)';
+      var customerEmail = session ? session.email : 'guest@urartoo.am';
+      var subtotal = cart.reduce(function (s, i) { return s + (i.price * (i.qty || 1)); }, 0);
+
+      if (window.WooCommerceAdmin && typeof window.WooCommerceAdmin.addOrder === 'function') {
+        var newOrder = window.WooCommerceAdmin.addOrder(
+          { name: customerName, email: customerEmail },
+          cart,
+          subtotal
+        );
+        alert('Շնորհակալություն։ Ձեր պատվերը #' + newOrder.id + ' հաջողությամբ գրանցվել է ($' + subtotal + ')։');
+      } else {
+        alert('Շնորհակալություն։ Պատվերը գրանցված է։');
+      }
+
+      saveCart([]);
+      renderCart();
     });
   }
 

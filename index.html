@@ -265,7 +265,7 @@
         <span>Ընդամենը:</span>
         <span class="cart-total-price" id="cart-total-price">$0</span>
       </div>
-      <button class="btn-primary cart-checkout-btn" onclick="alert('Շնորհակալություն։ Պատվերի ձևակերպումը շուտով պատրաստ կլինի։')">Ձևակերպել պատվերը</button>
+      <button class="btn-primary cart-checkout-btn" onclick="window.handleCartDrawerCheckout()">Ձևակերպել պատվերը</button>
     </div>
   </aside>
 
@@ -307,13 +307,83 @@
         </div>
       </header>
 
-      <div class="admin-layout" style="padding:64px var(--gutter); min-height:calc(100vh - 65px); width:100%; box-sizing:border-box; display:flex; align-items:center; justify-content:center; background:#FAF8F5;">
-        <div style="text-align:center; width:100%;">
-          <div style="width:72px; height:72px; background:var(--green); color:var(--gold); border-radius:50%; display:inline-flex; align-items:center; justify-content:center; margin-bottom:24px; box-shadow:0 8px 24px rgba(11,59,48,0.15);">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <div class="admin-layout" style="display:flex; min-height:calc(100vh - 65px); width:100%;">
+        <!-- ADMIN SIDEBAR -->
+        <aside class="admin-sidebar" style="width:240px; background:#191B1A; color:#C0C5C2; flex-shrink:0; padding:24px 0;">
+          <div class="admin-nav-group">
+            <div class="admin-nav-title" style="padding:0 24px 12px; font-size:10.5px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.35);">Մենյու</div>
+            <a href="#admin" class="admin-nav-item active" data-tab="orders" onclick="window.WooCommerceAdmin.switchTab('orders'); return false;" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:var(--gold); background:rgba(255,255,255,0.05); border-left:4px solid var(--gold); text-decoration:none;">
+              <span>📦</span> <span>Պատվերներ</span>
+            </a>
           </div>
-          <h2 style="font-family:var(--font-serif); font-size:clamp(28px, 4vw, 42px); font-weight:400; color:var(--ink); margin:0;">Բարի գալուստ Urartoo Ադմին Համակարգ</h2>
-        </div>
+        </aside>
+
+        <!-- MAIN DASHBOARD CONTENT AREA -->
+        <main class="admin-main-content" style="flex:1; padding:32px var(--gutter); background:#FAF8F5; overflow-y:auto;">
+
+          <!-- SECTION: ORDERS MANAGER (TAB 1) -->
+          <section id="admin-sec-orders" class="admin-sec">
+            <!-- 4 METRIC STAT CARDS -->
+            <div class="admin-stats-grid">
+              <div class="admin-stat-card">
+                <div class="admin-stat-label">Ընդհանուր Հասույթ</div>
+                <div class="admin-stat-val" id="admin-rev-val">$0</div>
+              </div>
+              <div class="admin-stat-card">
+                <div class="admin-stat-label">Պատվերների Քանակ</div>
+                <div class="admin-stat-val" id="admin-orders-count-val">0</div>
+              </div>
+              <div class="admin-stat-card">
+                <div class="admin-stat-label">Միջին Պատվեր (AOV)</div>
+                <div class="admin-stat-val" id="admin-aov-val">$0</div>
+              </div>
+              <div class="admin-stat-card">
+                <div class="admin-stat-label">Առկա Տեսականի</div>
+                <div class="admin-stat-val" id="admin-stock-count-val">0</div>
+              </div>
+            </div>
+
+            <!-- SALES DISTRIBUTION CARD -->
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <h3 class="admin-card-title">Վաճառքներ ըստ Զարդի Տեսակի</h3>
+              </div>
+              <div id="admin-category-chart" style="display:flex; flex-direction:column; gap:12px;">
+                <!-- Dynamically rendered bars -->
+              </div>
+            </div>
+
+            <!-- LIVE ORDERS TABLE -->
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <h3 class="admin-card-title">Պատվերների Ցուցակ</h3>
+                <div>
+                  <button class="filter-clear-btn" onclick="window.WooCommerceAdmin.renderOrdersSec()">🔄 Թարմացնել</button>
+                </div>
+              </div>
+
+              <div style="overflow-x:auto;">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Պատվեր #</th>
+                      <th>Ամսաթիվ</th>
+                      <th>Հաճախորդ</th>
+                      <th>Ապրանքներ</th>
+                      <th>Ընդամենը</th>
+                      <th>Կարգավիճակ</th>
+                      <th>Գործողություններ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-orders-tbody">
+                    <!-- Rendered by admin.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+        </main>
       </div>
     </div>
   </div>
