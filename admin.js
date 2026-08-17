@@ -391,20 +391,12 @@
       const selectEl = document.getElementById('admin-bulk-action-select');
       const action = selectEl ? selectEl.value : '';
 
-      if (!action) {
-        alert('Խնդրում ենք ընտրել գործողություն (օր․ 🗑 Ջնջել ընտրվածները)։');
-        return;
-      }
+      if (!action) return;
 
       const selectedIds = this.getSelectedProductIds();
-      if (selectedIds.length === 0) {
-        alert('Խնդրում ենք ընտրել առնվազն մեկ ապրանք՝ վանդակը (checkbox) նշելով։');
-        return;
-      }
+      if (selectedIds.length === 0) return;
 
       if (action === 'delete') {
-        if (!confirm(`Վստա՞հ եք, որ ցանկանում եք ՀԱՎԵՐԺ ՋՆՋԵԼ ընտրված ${selectedIds.length} ապրանք(ները) Sanity CMS-ից։`)) return;
-
         let deletedCount = 0;
         for (const id of selectedIds) {
           try {
@@ -424,7 +416,6 @@
         if (selectAll) selectAll.checked = false;
 
         this.renderProductsSec();
-        alert(`Ընտրված ${deletedCount} ապրանք(ները) հաջողությամբ ջնջվեցին։`);
       }
     },
 
@@ -622,12 +613,16 @@
     },
 
     async saveProductFromEditor() {
-      const name = document.getElementById('pe-name').value.trim();
+      const nameInput = document.getElementById('pe-name');
+      const name = nameInput ? nameInput.value.trim() : '';
       const price = Number(document.getElementById('pe-price').value) || 300;
       const stockEl = document.getElementById('pe-stock');
       const stockVal = stockEl ? Math.max(0, parseInt(stockEl.value, 10) || 0) : 1;
 
-      if (!name) { alert('Խնդրում ենք լրացնել ապրանքի անվանումը։'); return; }
+      if (!name) {
+        if (nameInput) nameInput.focus();
+        return;
+      }
 
       const saveBtn = document.getElementById('btn-pe-save');
       if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '⏳ Պահպանվում է...'; }
@@ -668,16 +663,13 @@
       if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '💾 ՊԱՀՊԱՆԵԼ'; }
       this.closeProductEditor();
       this.renderProductsSec();
-      alert(`Ապրանքը «${name}» հաջողությամբ պահպանվեց։`);
     },
 
     async deleteProduct(productId) {
-      if (!confirm('Վստա՞հ եք, որ ցանկանում եք ՀԱՎԵՐԺ ՋՆՋԵԼ այս ապրանքը Sanity CMS-ից։')) return;
       if (window.NovaSanity) {
         await window.NovaSanity.deleteProduct(productId);
         addAuditLog(`Ջնջվեց ապրանք Sanity-ից ID: ${productId}`);
         this.renderProductsSec();
-        alert('Ապրանքը հավերժ ջնջվեց Sanity CMS-ից։');
       }
     },
 
@@ -846,7 +838,6 @@
     },
 
     deleteOrder(orderId) {
-      if (!confirm(`Վստա՞հ եք, որ ցանկանում եք ջնջել #${orderId} պատվերը։`)) return;
       let orders = getOrders();
       orders = orders.filter(o => o.id !== orderId);
       saveOrders(orders);
@@ -885,16 +876,12 @@
       if (btn) { btn.disabled = true; btn.textContent = '⏳ Սինխրոնացվում է...'; }
 
       if (window.GoogleSync) {
-        const result = await window.GoogleSync.runFullSync((msg) => {
+        await window.GoogleSync.runFullSync((msg) => {
           console.log('Google Sync Status:', msg);
         });
-        if (result.success) {
-          alert(`Google Sheets & Drive-ից հաջողությամբ սինխրոնացվել է ${result.count} ապրանք Sanity-ում։`);
-        } else {
-          alert('Սինխրոնացման ավարտ։ Ապրանքներ չեն գտնվել Google Sheet-ում։');
-        }
       }
       if (btn) { btn.disabled = false; btn.textContent = '⚡ Սինխրոնացնել Google Sheets'; }
+      this.renderProductsSec();
     },
 
     handleAdminFormSubmit(e) {
@@ -905,12 +892,12 @@
       const pass = passEl ? passEl.value : '';
 
       if (!email || !pass) {
-        alert('Խնդրում ենք լրացնել էլ․ փոստը և գաղտնաբառը։');
+        if (emailEl) emailEl.focus();
         return false;
       }
 
       if (!this.login(email, pass)) {
-        alert('Սխալ էլ․ փոստ կամ գաղտնաբառ։ Խնդրում ենք փորձել նորից։');
+        if (passEl) passEl.focus();
         return false;
       }
       return false;
