@@ -150,6 +150,7 @@
 
     switchTab(tabId) {
       this.activeTab = tabId;
+
       document.querySelectorAll('.admin-nav-item').forEach(el => {
         if (el.dataset.tab === tabId) {
           el.classList.add('active');
@@ -169,9 +170,9 @@
         const sec = document.getElementById(`admin-sec-${t}`);
         if (sec) {
           if (t === tabId) {
-            sec.style.setProperty('display', 'block', 'important');
+            sec.setAttribute('style', 'display: block !important; visibility: visible !important; opacity: 1 !important;');
           } else {
-            sec.style.setProperty('display', 'none', 'important');
+            sec.setAttribute('style', 'display: none !important;');
           }
         }
       });
@@ -212,28 +213,34 @@
       const mobileCardsContainer = document.getElementById('admin-products-mobile-cards');
       if (!tbody && !mobileCardsContainer) return;
 
-      if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--tuff);">Բեռնվում է Sanity-ից...</td></tr>';
-      if (mobileCardsContainer) mobileCardsContainer.innerHTML = '<div style="text-align:center;padding:32px;color:var(--tuff);">Բեռնվում է Sanity-ից...</div>';
+      const seedProducts = (window.NovaSanity && window.NovaSanity.INITIAL_SEED_PRODUCTS)
+        ? window.NovaSanity.INITIAL_SEED_PRODUCTS
+        : [
+          { id: "ring-1", name: "Վայոց Ձորի նռնաքարով մատանի", sku: "UR-RING-GAR-01", category: "Մատանիներ", stone: "Նռնաքար", region: "Վայոց Ձոր", price: 340, sold: false, img: "Images/bracelet.webp" },
+          { id: "pendant-2", name: "Գուտանասարի օբսիդիանով կախազարդ", sku: "UR-PEND-OBS-02", category: "Վզնոցներ", stone: "Օբսիդիան", region: "Գուտանասար", price: 265, sold: false, img: "Images/bracelet.webp" },
+          { id: "bracelet-3", name: "Սյունիքի փիրուզով ապարանջան", sku: "UR-BRAC-TUR-03", category: "Ապարանջաններ", stone: "Փիրուզ", region: "Սյունիք", price: 410, sold: false, img: "Images/bracelet.webp" },
+          { id: "earring-4", name: "Արենիի հասպիսով ականջօղեր", sku: "UR-EAR-JAS-04", category: "Ականջօղեր", stone: "Հասպիս", region: "Արենի", price: 190, sold: true, img: "Images/bracelet.webp" }
+        ];
 
-      let products = [];
+      // Render seed products immediately (0ms delay!)
+      this.populateProductsHTML(seedProducts);
+
       try {
         if (window.NovaSanity) {
-          products = await window.NovaSanity.getProducts();
+          const liveProducts = await window.NovaSanity.getProducts();
+          if (liveProducts && liveProducts.length > 0) {
+            this.populateProductsHTML(liveProducts);
+          }
         }
       } catch (err) {
         console.error('Error fetching Sanity products:', err);
       }
+    },
 
-      if (!products || products.length === 0) {
-        products = (window.NovaSanity && window.NovaSanity.INITIAL_SEED_PRODUCTS)
-          ? window.NovaSanity.INITIAL_SEED_PRODUCTS
-          : [
-            { id: "ring-1", name: "Վայոց Ձորի նռնաքարով մատանի", sku: "UR-RING-GAR-01", category: "Մատանիներ", stone: "Նռնաքար", region: "Վայոց Ձոր", price: 340, sold: false, img: "Images/bracelet.webp" },
-            { id: "pendant-2", name: "Գուտանասարի օբսիդիանով կախազարդ", sku: "UR-PEND-OBS-02", category: "Վզնոցներ", stone: "Օբսիդիան", region: "Գուտանասար", price: 265, sold: false, img: "Images/bracelet.webp" },
-            { id: "bracelet-3", name: "Սյունիքի փիրուզով ապարանջան", sku: "UR-BRAC-TUR-03", category: "Ապարանջաններ", stone: "Փիրուզ", region: "Սյունիք", price: 410, sold: false, img: "Images/bracelet.webp" },
-            { id: "earring-4", name: "Արենիի հասպիսով ականջօղեր", sku: "UR-EAR-JAS-04", category: "Ականջօղեր", stone: "Հասպիս", region: "Արենի", price: 190, sold: true, img: "Images/bracelet.webp" }
-          ];
-      }
+    populateProductsHTML(products) {
+      const tbody = document.getElementById('admin-products-tbody');
+      const mobileCardsContainer = document.getElementById('admin-products-mobile-cards');
+      if (!tbody && !mobileCardsContainer) return;
 
       const searchVal = document.getElementById('admin-prod-search')?.value.toLowerCase().trim() || '';
       const catVal = document.getElementById('admin-prod-cat-filter')?.value || 'all';
@@ -248,12 +255,11 @@
       });
 
       if (filtered.length === 0) {
-        if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--tuff);">Ապրանքներ չեն գտնվել Sanity-ում</td></tr>';
-        if (mobileCardsContainer) mobileCardsContainer.innerHTML = '<div style="text-align:center;padding:32px;color:var(--tuff);">Ապրանքներ չեն գտնվել Sanity-ում</div>';
+        if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--tuff);">Ապրանքներ չեն գտնվել</td></tr>';
+        if (mobileCardsContainer) mobileCardsContainer.innerHTML = '<div style="text-align:center;padding:32px;color:var(--tuff);">Ապրանքներ չեն գտնվել</div>';
         return;
       }
 
-      // Render Desktop Table Rows
       if (tbody) {
         tbody.innerHTML = filtered.map(p => {
           const isSold = p.sold || p.stock === 0;
@@ -289,7 +295,6 @@
         }).join('');
       }
 
-      // Render Mobile Product Inventory Cards
       if (mobileCardsContainer) {
         mobileCardsContainer.innerHTML = filtered.map(p => {
           const isSold = p.sold || p.stock === 0;
@@ -717,10 +722,17 @@
     },
 
     bindEvents() {
-      const form = document.getElementById('admin-login-form');
-      if (form) {
-        form.onsubmit = (e) => this.handleAdminFormSubmit(e);
-      }
+      // Global click delegation for all nav items across desktop and mobile
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.admin-nav-item');
+        if (btn) {
+          const tab = btn.dataset.tab;
+          if (tab) {
+            e.preventDefault();
+            this.switchTab(tab);
+          }
+        }
+      });
     }
   };
 

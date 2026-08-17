@@ -3376,6 +3376,10 @@ body.in-admin-mode > *:not(#view-admin):not(#product-editor-modal) {
   text-decoration: none;
 }
 
+.admin-nav-item * {
+  pointer-events: none !important;
+}
+
 .admin-nav-item:hover {
   background: rgba(255,255,255,0.05);
   color: #FFFFFF;
