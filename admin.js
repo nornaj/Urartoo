@@ -396,8 +396,7 @@
       imgUrlVal.value = '';
 
       if (productId) {
-        if (modalTitle) modalTitle.textContent = 'Խմբագրել Ապրանքը (Sanity CMS)';
-        if (deleteBtn) deleteBtn.style.display = 'inline-block';
+        if (modalTitle) modalTitle.textContent = 'Խմբագրել Ապրանքը';
 
         let products = [];
         if (window.NovaSanity) products = await window.NovaSanity.getProducts();
@@ -422,8 +421,7 @@
           }
         }
       } else {
-        if (modalTitle) modalTitle.textContent = 'Ավելացնել Նոր Ապրանք Sanity-ում';
-        if (deleteBtn) deleteBtn.style.display = 'none';
+        if (modalTitle) modalTitle.textContent = 'Ավելացնել Նոր Ապրանք';
       }
 
       modal.style.display = 'flex';
@@ -443,7 +441,7 @@
       const imgPlaceholder = document.getElementById('pe-img-placeholder');
       const imgUrlVal = document.getElementById('pe-img-url-val');
 
-      if (imgPlaceholder) imgPlaceholder.textContent = '⏳ Սեղմվում է WebP <200KB և բեռնվում Sanity Asset...';
+      if (imgPlaceholder) imgPlaceholder.textContent = '⏳ Սեղմվում է WebP <200KB...';
 
       try {
         if (window.NovaSanity) {
@@ -453,7 +451,7 @@
             imgPreview.style.display = 'block';
             if (imgPlaceholder) imgPlaceholder.style.display = 'none';
             imgUrlVal.value = uploadedAssetUrl;
-            alert('Նկարը հաջողությամբ վերածվեց WebP-ի և բեռնվեց Sanity Asset CDN-ում։');
+            alert('Նկարը հաջողությամբ վերածվեց WebP-ի և բեռնվեց CDN-ում։');
             return;
           }
         }
@@ -508,13 +506,13 @@
 
       if (window.NovaSanity) {
         await window.NovaSanity.saveProduct(prodData);
-        addAuditLog(`Պահպանվեց ապրանք Sanity-ում: «${name}» ($${price})`);
+        addAuditLog(`Պահպանվեց ապրանք: «${name}» ($${price})`);
       }
 
-      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '💾 Պահպանել Sanity-ում'; }
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '💾 ՊԱՀՊԱՆԵ🇱'; }
       this.closeProductEditor();
       this.renderProductsSec();
-      alert(`Ապրանքը «${name}» հաջողությամբ պահպանվեց Sanity CMS-ում։`);
+      alert(`Ապրանքը «${name}» հաջողությամբ պահպանվեց։`);
     },
 
     async deleteProduct(productId) {
