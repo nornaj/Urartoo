@@ -99,6 +99,17 @@
         }
       } catch (e) {}
 
+      const initHash = (window.location.hash || '').replace('#', '').replace('/', '').trim().toLowerCase();
+      if (initHash === 'products' || initHash === 'inventory') {
+        this.activeTab = 'products';
+      } else if (initHash === 'settings') {
+        this.activeTab = 'settings';
+      } else if (initHash === 'clients') {
+        this.activeTab = 'clients';
+      } else if (initHash === 'logs') {
+        this.activeTab = 'logs';
+      }
+
       this.checkHashRoute();
       window.addEventListener('hashchange', () => this.checkHashRoute());
       this.bindEvents();
@@ -106,7 +117,7 @@
 
     checkHashRoute() {
       const rawHash = window.location.hash || '';
-      const hash = rawHash.replace('#', '').replace('/', '');
+      const hash = rawHash.replace('#', '').replace('/', '').trim().toLowerCase();
       const path = window.location.pathname;
       const adminView = document.getElementById('view-admin');
       if (!adminView) return;
@@ -116,11 +127,19 @@
       if (isAdminRoute) {
         adminView.style.display = 'block';
         document.body.classList.add('in-admin-mode');
-        if (hash === 'products' || hash === 'inventory') this.activeTab = 'products';
-        else if (hash === 'settings') this.activeTab = 'settings';
-        else if (hash === 'clients') this.activeTab = 'clients';
-        else if (hash === 'logs') this.activeTab = 'logs';
-        else if (hash === 'orders') this.activeTab = 'orders';
+
+        if (hash === 'products' || hash === 'inventory') {
+          this.activeTab = 'products';
+        } else if (hash === 'settings') {
+          this.activeTab = 'settings';
+        } else if (hash === 'clients') {
+          this.activeTab = 'clients';
+        } else if (hash === 'logs') {
+          this.activeTab = 'logs';
+        } else if (hash === 'orders') {
+          this.activeTab = 'orders';
+        }
+
         this.render();
       } else {
         adminView.style.display = 'none';
@@ -149,7 +168,14 @@
     },
 
     switchTab(tabId) {
+      if (!tabId) return;
       this.activeTab = tabId;
+
+      try {
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState(null, null, `#${tabId}`);
+        }
+      } catch (e) {}
 
       document.querySelectorAll('.admin-nav-item').forEach(el => {
         if (el.dataset.tab === tabId) {
@@ -170,7 +196,7 @@
         const sec = document.getElementById(`admin-sec-${t}`);
         if (sec) {
           if (t === tabId) {
-            sec.setAttribute('style', 'display: block !important; visibility: visible !important; opacity: 1 !important;');
+            sec.setAttribute('style', 'display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; overflow: visible !important;');
           } else {
             sec.setAttribute('style', 'display: none !important;');
           }
