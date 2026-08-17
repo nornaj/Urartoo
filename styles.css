@@ -3289,13 +3289,14 @@ body.in-admin-mode > *:not(#view-admin):not(#product-editor-modal) {
 
 /* Dashboard Header & Layout */
 .admin-dashboard-header {
-  background: var(--green);
+  background: #191B1A;
   color: #FFFFFF;
   padding: 16px var(--gutter);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .admin-header-brand {
