@@ -380,6 +380,54 @@
       });
     },
 
+    /* CUSTOM BOTTOM-LEFT TOAST NOTIFICATION SYSTEM */
+    showToast(msg) {
+      if (!msg) return;
+      let container = document.getElementById('admin-toast-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'admin-toast-container';
+        container.style.cssText = 'position:fixed; bottom:24px; left:24px; z-index:10000; display:flex; flex-direction:column; gap:10px; pointer-events:none;';
+        document.body.appendChild(container);
+      }
+
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        background: #111111;
+        color: #FFFFFF;
+        font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        padding: 14px 22px;
+        border-left: 3px solid #C2A379;
+        border-radius: 2px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+        opacity: 0;
+        transform: translateY(12px);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: auto;
+        max-width: 420px;
+        line-height: 1.4;
+      `;
+      toast.textContent = msg;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+      });
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(12px)';
+        setTimeout(() => {
+          if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 350);
+      }, 3500);
+    },
+
     getSelectedProductIds() {
       const checkboxes = document.querySelectorAll('.admin-prod-checkbox:checked');
       const ids = new Set();
@@ -416,6 +464,7 @@
         if (selectAll) selectAll.checked = false;
 
         this.renderProductsSec();
+        this.showToast(`${deletedCount} PRODUCTS HAVE BEEN DELETED.`);
       }
     },
 
@@ -433,6 +482,7 @@
             found.sold = isSold;
             await window.NovaSanity.saveProduct(found);
             addAuditLog(`Քանակի արագ փոփոխություն: «${found.name}» -> ${stockNum}`);
+            this.showToast(`"${found.name}" STOCK UPDATED TO ${stockNum}.`);
           }
         }
       } catch (err) {
@@ -663,14 +713,21 @@
       if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '💾 ՊԱՀՊԱՆԵԼ'; }
       this.closeProductEditor();
       this.renderProductsSec();
+      this.showToast(`"${name.toUpperCase()}" HAS BEEN SAVED.`);
     },
 
     async deleteProduct(productId) {
+      let prodName = 'PRODUCT';
       if (window.NovaSanity) {
+        const products = await window.NovaSanity.getProducts();
+        const found = products.find(p => p._sanityId === productId || p.id === productId);
+        if (found) prodName = found.name;
+
         await window.NovaSanity.deleteProduct(productId);
         addAuditLog(`Ջնջվեց ապրանք Sanity-ից ID: ${productId}`);
         this.renderProductsSec();
       }
+      this.showToast(`"${prodName.toUpperCase()}" HAS BEEN DELETED.`);
     },
 
     async deleteProductFromEditor() {
@@ -843,6 +900,7 @@
       saveOrders(orders);
       addAuditLog(`Ջնջվել է պատվեր #${orderId}`);
       this.renderOrdersSec();
+      this.showToast(`ORDER #${orderId} HAS BEEN DELETED.`);
     },
 
     /**
@@ -882,6 +940,7 @@
       }
       if (btn) { btn.disabled = false; btn.textContent = '⚡ Սինխրոնացնել Google Sheets'; }
       this.renderProductsSec();
+      this.showToast('GOOGLE SHEETS SYNC COMPLETED.');
     },
 
     handleAdminFormSubmit(e) {
