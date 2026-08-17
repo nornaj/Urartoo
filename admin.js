@@ -187,6 +187,10 @@
       });
 
       if (tabId === 'orders') this.renderOrdersSec();
+      if (tabId === 'products') this.renderProductsSec();
+      if (tabId === 'settings') this.renderSettingsSec();
+      if (tabId === 'clients') this.renderClientsSec();
+      if (tabId === 'logs') this.renderLogsSec();
     },
 
     render() {
@@ -205,9 +209,292 @@
         const emailEl = document.getElementById('admin-user-profile-name');
         if (emailEl) emailEl.textContent = this.currentUser.email;
 
-        this.renderOrdersSec();
+        if (this.activeTab === 'orders') this.renderOrdersSec();
+        if (this.activeTab === 'products') this.renderProductsSec();
+        if (this.activeTab === 'settings') this.renderSettingsSec();
+        if (this.activeTab === 'clients') this.renderClientsSec();
+        if (this.activeTab === 'logs') this.renderLogsSec();
       }
     },
+
+    currentEditingProductId: null,
+
+    /* TAB 2: INVENTORY & PRODUCTS MANAGER RENDERER */
+    async renderProductsSec() {
+      const tbody = document.getElementById('admin-products-tbody');
+      if (!tbody) return;
+
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--tuff);">Բեռնվում է Sanity-ից...</td></tr>';
+
+      let products = [];
+      if (window.NovaSanity) {
+        products = await window.NovaSanity.getProducts();
+      }
+
+      const searchVal = document.getElementById('admin-prod-search')?.value.toLowerCase().trim() || '';
+      const catVal = document.getElementById('admin-prod-cat-filter')?.value || 'all';
+
+      let filtered = products.filter(p => {
+        const matchesSearch = !searchVal ||
+          (p.name && p.name.toLowerCase().includes(searchVal)) ||
+          (p.sku && p.sku.toLowerCase().includes(searchVal)) ||
+          (p.stone && p.stone.toLowerCase().includes(searchVal));
+        const matchesCat = catVal === 'all' || (p.cat === catVal || p.category === catVal);
+        return matchesSearch && matchesCat;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--tuff);">Ապրանքներ չեն գտնվել Sanity-ում</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(p => {
+        const isSold = p.sold || p.stock === 0;
+        const statusBadge = isSold
+          ? '<span class="admin-status-badge badge-failed">Վաճառված (Sold)</span>'
+          : '<span class="admin-status-badge badge-processing">Առկա (In Stock)</span>';
+
+        const imgSrc = p.img || p.image || 'Images/bracelet.webp';
+        const pId = p._sanityId || p.id;
+
+        return `<tr>
+          <td>
+            <div style="width:48px;height:48px;background:#FAF8F5;border-radius:4px;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+              <img src="${imgSrc}" style="width:100%;height:100%;object-fit:cover;" alt="">
+            </div>
+          </td>
+          <td>
+            <strong>${p.name}</strong><br>
+            <small style="color:var(--tuff);">${p.material || '925 արծաթ'}</small>
+          </td>
+          <td><code style="font-family:var(--mono);">${p.sku || 'UR-100'}</code></td>
+          <td>${p.cat || p.category || 'Մատանիներ'}</td>
+          <td>${p.stone || 'Նռնաքար'} (${p.region || p.stoneOrigin || 'Վայոց Ձոր'})</td>
+          <td><strong style="font-family:var(--mono);color:var(--amber);">$${p.price}</strong></td>
+          <td>${statusBadge}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <button class="filter-clear-btn" style="padding:6px 12px;font-size:12px;" onclick="window.WooCommerceAdmin.openProductEditor('${pId}')">Խմբագրել</button>
+              <button class="filter-clear-btn" style="color:red;border-color:red;padding:6px 12px;font-size:12px;" onclick="window.WooCommerceAdmin.deleteProduct('${pId}')">Ջնջել</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+    },
+
+    /* WORDPRESS-STYLE PRODUCT EDITOR OVERLAY CONTROLLERS */
+    async openProductEditor(productId) {
+      const modal = document.getElementById('product-editor-modal');
+      if (!modal) return;
+
+      this.currentEditingProductId = productId;
+      const modalTitle = document.getElementById('pe-modal-title');
+      const deleteBtn = document.getElementById('btn-pe-delete');
+
+      // Clear forms
+      document.getElementById('pe-name').value = '';
+      document.getElementById('pe-sku').value = `UR-${Math.floor(100 + Math.random() * 900)}`;
+      document.getElementById('pe-price').value = '300';
+      document.getElementById('pe-tagline').value = '';
+      document.getElementById('pe-desc').value = '';
+      document.getElementById('pe-cat').value = 'Մատանիներ';
+      document.getElementById('pe-stone').value = 'Նռնաքար';
+      document.getElementById('pe-region').value = 'Վայոց Ձոր';
+      document.getElementById('pe-material').value = '925 արծաթ';
+      document.getElementById('pe-sold-toggle').checked = false;
+
+      const imgPreview = document.getElementById('pe-img-preview');
+      const imgPlaceholder = document.getElementById('pe-img-placeholder');
+      const imgUrlVal = document.getElementById('pe-img-url-val');
+
+      imgPreview.style.display = 'none';
+      imgPlaceholder.style.display = 'block';
+      imgUrlVal.value = '';
+
+      if (productId) {
+        if (modalTitle) modalTitle.textContent = 'Խմբագրել Ապրանքը (Sanity CMS)';
+        if (deleteBtn) deleteBtn.style.display = 'inline-block';
+
+        let products = [];
+        if (window.NovaSanity) products = await window.NovaSanity.getProducts();
+        const found = products.find(p => p._sanityId === productId || p.id === productId);
+
+        if (found) {
+          document.getElementById('pe-name').value = found.name || '';
+          document.getElementById('pe-sku').value = found.sku || '';
+          document.getElementById('pe-price').value = found.price || 300;
+          document.getElementById('pe-tagline').value = found.tagline || '';
+          document.getElementById('pe-desc').value = found.description || '';
+          document.getElementById('pe-cat').value = found.cat || found.category || 'Մատանիներ';
+          document.getElementById('pe-stone').value = found.stone || 'Նռնաքար';
+          document.getElementById('pe-region').value = found.region || found.stoneOrigin || 'Վայոց Ձոր';
+          document.getElementById('pe-material').value = found.material || '925 արծաթ';
+          document.getElementById('pe-sold-toggle').checked = Boolean(found.sold || found.stock === 0);
+
+          const src = found.img || found.image;
+          if (src) {
+            imgPreview.src = src;
+            imgPreview.style.display = 'block';
+            imgPlaceholder.style.display = 'none';
+            imgUrlVal.value = src;
+          }
+        }
+      } else {
+        if (modalTitle) modalTitle.textContent = 'Ավելացնել Նոր Ապրանք Sanity-ում';
+        if (deleteBtn) deleteBtn.style.display = 'none';
+      }
+
+      modal.style.display = 'flex';
+    },
+
+    closeProductEditor() {
+      const modal = document.getElementById('product-editor-modal');
+      if (modal) modal.style.display = 'none';
+      this.currentEditingProductId = null;
+    },
+
+    async handleEditorImageUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const imgPreview = document.getElementById('pe-img-preview');
+      const imgPlaceholder = document.getElementById('pe-img-placeholder');
+      const imgUrlVal = document.getElementById('pe-img-url-val');
+
+      if (imgPlaceholder) imgPlaceholder.textContent = '⏳ Սեղմվում է WebP <200KB և բեռնվում Sanity Asset...';
+
+      try {
+        if (window.NovaSanity) {
+          const uploadedAssetUrl = await window.NovaSanity.uploadImage(file);
+          if (uploadedAssetUrl) {
+            imgPreview.src = uploadedAssetUrl;
+            imgPreview.style.display = 'block';
+            if (imgPlaceholder) imgPlaceholder.style.display = 'none';
+            imgUrlVal.value = uploadedAssetUrl;
+            alert('Նկարը հաջողությամբ վերածվեց WebP-ի և բեռնվեց Sanity Asset CDN-ում։');
+            return;
+          }
+        }
+      } catch (err) {
+        console.error('Image upload failed:', err);
+      }
+
+      // Local preview fallback
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        imgPreview.src = evt.target.result;
+        imgPreview.style.display = 'block';
+        if (imgPlaceholder) imgPlaceholder.style.display = 'none';
+        imgUrlVal.value = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    },
+
+    async saveProductFromEditor() {
+      const name = document.getElementById('pe-name').value.trim();
+      const price = Number(document.getElementById('pe-price').value) || 300;
+      if (!name) { alert('Խնդրում ենք լրացնել ապրանքի անվանումը։'); return; }
+
+      const saveBtn = document.getElementById('btn-pe-save');
+      if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '⏳ Պահպանվում է...'; }
+
+      const isSold = document.getElementById('pe-sold-toggle').checked;
+      const prodData = {
+        id: this.currentEditingProductId || `product-custom-${Date.now()}`,
+        _sanityId: this.currentEditingProductId,
+        name: name,
+        sku: document.getElementById('pe-sku').value.trim() || 'UR-100',
+        price: price,
+        tagline: document.getElementById('pe-tagline').value.trim(),
+        description: document.getElementById('pe-desc').value.trim(),
+        cat: document.getElementById('pe-cat').value,
+        category: document.getElementById('pe-cat').value,
+        stone: document.getElementById('pe-stone').value,
+        region: document.getElementById('pe-region').value,
+        stoneOrigin: document.getElementById('pe-region').value,
+        material: document.getElementById('pe-material').value,
+        sold: isSold,
+        stock: isSold ? 0 : 1,
+        featured: true,
+        img: document.getElementById('pe-img-url-val').value || 'Images/bracelet.webp',
+        image: document.getElementById('pe-img-url-val').value || 'Images/bracelet.webp'
+      };
+
+      if (window.NovaSanity) {
+        await window.NovaSanity.saveProduct(prodData);
+        addAuditLog(`Պահպանվեց ապրանք Sanity-ում: «${name}» ($${price})`);
+      }
+
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '💾 Պահպանել Sanity-ում'; }
+      this.closeProductEditor();
+      this.renderProductsSec();
+      alert(`Ապրանքը «${name}» հաջողությամբ պահպանվեց Sanity CMS-ում։`);
+    },
+
+    async deleteProduct(productId) {
+      if (!confirm('Վստա՞հ եք, որ ցանկանում եք ՀԱՎԵՐԺ ՋՆՋԵԼ այս ապրանքը Sanity CMS-ից։')) return;
+      if (window.NovaSanity) {
+        await window.NovaSanity.deleteProduct(productId);
+        addAuditLog(`Ջնջվեց ապրանք Sanity-ից ID: ${productId}`);
+        this.renderProductsSec();
+        alert('Ապրանքը հավերժ ջնջվեց Sanity CMS-ից։');
+      }
+    },
+
+    async deleteProductFromEditor() {
+      if (!this.currentEditingProductId) return;
+      await this.deleteProduct(this.currentEditingProductId);
+      this.closeProductEditor();
+    },
+
+    /* TAB 3: SETTINGS RENDERER */
+    renderSettingsSec() {
+      const container = document.getElementById('admin-whitelist-container');
+      if (!container) return;
+      const emails = getAdminEmails();
+      container.innerHTML = `<ul style="list-style:none;padding:0;margin:0;">
+        ${emails.map(e => `<li style="padding:12px 16px;border-bottom:1px solid var(--pumice);display:flex;justify-content:space-between;align-items:center;">
+          <span><strong>${e}</strong></span>
+          <span class="admin-status-badge badge-processing">Ակտիվ Ադմին</span>
+        </li>`).join('')}
+      </ul>`;
+    },
+
+    /* TAB 4: CLIENTS RENDERER */
+    renderClientsSec() {
+      const tbody = document.getElementById('admin-clients-tbody');
+      if (!tbody) return;
+      let users = [];
+      try { users = JSON.parse(localStorage.getItem('urartoo_users_db_v1')) || []; } catch (e) {}
+      if (users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--tuff);">Գրանցված հաճախորդներ չկան</td></tr>';
+        return;
+      }
+      tbody.innerHTML = users.map(u => `<tr>
+        <td><code style="font-family:var(--mono);">${u.id || 'usr-1'}</code></td>
+        <td><strong>${u.name}</strong></td>
+        <td>${u.email}</td>
+        <td>${u.joined || '2026'}</td>
+        <td><strong style="color:var(--amber);">${(u.orders || []).length} պատվեր</strong></td>
+      </tr>`).join('');
+    },
+
+    /* TAB 5: AUDIT LOGS RENDERER */
+    renderLogsSec() {
+      const tbody = document.getElementById('admin-logs-tbody');
+      if (!tbody) return;
+      let logs = [];
+      try { logs = JSON.parse(localStorage.getItem(LOCAL_LOGS_KEY)) || []; } catch (e) {}
+      if (logs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:32px;color:var(--tuff);">Գործողությունների մատյանը դատարկ է</td></tr>';
+        return;
+      }
+      tbody.innerHTML = logs.map(l => `<tr>
+        <td style="font-size:12.5px;color:var(--tuff);">${l.timestamp}</td>
+        <td><strong>${l.operator}</strong></td>
+        <td>${l.action}</td>
+      </tr>`).join('');
+    }
 
     /* TAB 1: ORDERS MANAGER RENDERER */
     renderOrdersSec() {

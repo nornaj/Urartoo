@@ -315,13 +315,25 @@
             <a href="#admin" class="admin-nav-item active" data-tab="orders" onclick="window.WooCommerceAdmin.switchTab('orders'); return false;" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:var(--gold); background:rgba(255,255,255,0.05); border-left:4px solid var(--gold); text-decoration:none;">
               <span>📦</span> <span>Պատվերներ</span>
             </a>
+            <a href="#admin" class="admin-nav-item" data-tab="products" onclick="window.WooCommerceAdmin.switchTab('products'); return false;" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:rgba(255,255,255,0.75); text-decoration:none;">
+              <span>💎</span> <span>Ապրանքացանկ</span>
+            </a>
+            <a href="#admin" class="admin-nav-item" data-tab="settings" onclick="window.WooCommerceAdmin.switchTab('settings'); return false;" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:rgba(255,255,255,0.75); text-decoration:none;">
+              <span>⚙️</span> <span>Կարգավորումներ</span>
+            </a>
+            <a href="#admin" class="admin-nav-item" data-tab="clients" onclick="window.WooCommerceAdmin.switchTab('clients'); return false;" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:rgba(255,255,255,0.75); text-decoration:none;">
+              <span>👤</span> <span>Հաճախորդներ</span>
+            </a>
+            <a href="#admin" class="admin-nav-item" data-tab="logs" onclick="window.WooCommerceAdmin.switchTab('logs'); return false;" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:rgba(255,255,255,0.75); text-decoration:none;">
+              <span>📜</span> <span>Գործողությունների Մատյան</span>
+            </a>
           </div>
         </aside>
 
         <!-- MAIN DASHBOARD CONTENT AREA -->
         <main class="admin-main-content" style="flex:1; padding:32px var(--gutter); background:#FAF8F5; overflow-y:auto;">
 
-          <!-- SECTION: ORDERS MANAGER (TAB 1) -->
+          <!-- SECTION 1: ORDERS MANAGER -->
           <section id="admin-sec-orders" class="admin-sec">
             <!-- 4 METRIC STAT CARDS -->
             <div class="admin-stats-grid">
@@ -383,7 +395,217 @@
             </div>
           </section>
 
+          <!-- SECTION 2: PRODUCTS & INVENTORY MANAGER (TAB 2) -->
+          <section id="admin-sec-products" class="admin-sec" style="display:none;">
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <div>
+                  <h3 class="admin-card-title">Ապրանքացանկ (Sanity CMS)</h3>
+                  <p style="font-size:13px; color:var(--tuff); margin:4px 0 0;">Կառավարեք Ձեր զարդերի տեսականին, նկարները և 1-of-1 վաճառված կարգավիճակը։</p>
+                </div>
+                <div style="display:flex; gap:12px;">
+                  <button class="admin-btn" onclick="window.WooCommerceAdmin.openProductEditor(null)" style="padding:10px 20px; font-size:13px; background:var(--gold); color:var(--green); font-weight:700;">+ Ավելացնել Նոր Ապրանք</button>
+                </div>
+              </div>
+
+              <!-- Product Search & Category Filter -->
+              <div style="display:flex; gap:16px; margin-bottom:20px; flex-wrap:wrap;">
+                <input type="text" id="admin-prod-search" placeholder="Որոնել ըստ անվանման կամ SKU..." oninput="window.WooCommerceAdmin.renderProductsSec()" style="flex:1; min-width:240px; padding:10px 14px; border:1px solid var(--pumice); font-size:13.5px; outline:none;">
+                <select id="admin-prod-cat-filter" onchange="window.WooCommerceAdmin.renderProductsSec()" style="padding:10px 14px; border:1px solid var(--pumice); font-size:13.5px; outline:none;">
+                  <option value="all">Բոլոր Տեսակները</option>
+                  <option value="Մատանիներ">Մատանիներ</option>
+                  <option value="Վզնոցներ">Վզնոցներ</option>
+                  <option value="Ապարանջաններ">Ապարանջաններ</option>
+                  <option value="Ականջօղեր">Ականջօղեր</option>
+                  <option value="Կախազարդեր">Կախազարդեր</option>
+                </select>
+              </div>
+
+              <div style="overflow-x:auto;">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Նկար</th>
+                      <th>Անվանում</th>
+                      <th>SKU</th>
+                      <th>Տեսակ</th>
+                      <th>Քար / Տարածաշրջան</th>
+                      <th>Գին ($)</th>
+                      <th>Կարգավիճակ</th>
+                      <th>Գործողություններ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-products-tbody">
+                    <!-- Rendered by admin.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECTION 3: SETTINGS -->
+          <section id="admin-sec-settings" class="admin-sec" style="display:none;">
+            <div class="admin-card">
+              <h3 class="admin-card-title" style="margin-bottom:16px;">Ադմինիստրատորների Ցուցակ</h3>
+              <p style="font-size:13.5px; color:var(--tuff); margin-bottom:24px;">Այս էլ․ փոստերն ունեն լիարժեք մուտք դեպի Urartoo Ադմին Համակարգ։</p>
+              <div id="admin-whitelist-container"></div>
+            </div>
+          </section>
+
+          <!-- SECTION 4: CLIENTS -->
+          <section id="admin-sec-clients" class="admin-sec" style="display:none;">
+            <div class="admin-card">
+              <h3 class="admin-card-title" style="margin-bottom:16px;">Գրանցված Հաճախորդներ</h3>
+              <div style="overflow-x:auto;">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Անուն Ազգանուն</th>
+                      <th>Էլ․ փոստ</th>
+                      <th>Անդամագրման Ամսաթիվ</th>
+                      <th>Պատվերներ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-clients-tbody">
+                    <!-- Rendered by admin.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECTION 5: AUDIT LOGS -->
+          <section id="admin-sec-logs" class="admin-sec" style="display:none;">
+            <div class="admin-card">
+              <h3 class="admin-card-title" style="margin-bottom:16px;">Գործողությունների Մատյան (Audit Logs)</h3>
+              <div style="overflow-x:auto;">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Ամսաթիվ / Ժամ</th>
+                      <th>Օպերատոր</th>
+                      <th>Կատարված Գործողություն</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-logs-tbody">
+                    <!-- Rendered by admin.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
         </main>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ WORDPRESS-STYLE FULL-PAGE PRODUCT EDITOR MODAL OVERLAY ═══ -->
+  <div id="product-editor-modal" class="product-editor-page" style="display:none;">
+    <div class="pe-topbar">
+      <div style="display:flex; align-items:center; gap:16px;">
+        <button type="button" onclick="window.WooCommerceAdmin.closeProductEditor()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">✕</button>
+        <div class="pe-topbar-title" id="pe-modal-title">Խմբագրել Ապրանքը (Sanity CMS)</div>
+      </div>
+      <div style="display:flex; gap:12px;">
+        <button type="button" class="filter-clear-btn" style="color:red; border-color:red; display:none;" id="btn-pe-delete" onclick="window.WooCommerceAdmin.deleteProductFromEditor()">🗑 Ջնջել Sanity-ից</button>
+        <button type="button" class="admin-btn" id="btn-pe-save" onclick="window.WooCommerceAdmin.saveProductFromEditor()" style="padding:10px 24px; font-size:13.5px; background:var(--gold); color:var(--green); font-weight:700;">💾 Պահպանել Sanity-ում</button>
+      </div>
+    </div>
+
+    <div class="pe-content">
+      <!-- MAIN EDITOR COLUMN -->
+      <div class="pe-main" style="flex:1;">
+        <div class="admin-card">
+          <div class="admin-form-group">
+            <label for="pe-name">Ապրանքի Անվանում (Title) *</label>
+            <input type="text" id="pe-name" class="admin-input" required placeholder="օր․ Վայոց Ձորի նռնաքարով մատանի">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="admin-form-group">
+              <label for="pe-sku">SKU Կոդ *</label>
+              <input type="text" id="pe-sku" class="admin-input" placeholder="UR-101">
+            </div>
+            <div class="admin-form-group">
+              <label for="pe-price">Գին ($ USD) *</label>
+              <input type="number" id="pe-price" class="admin-input" required placeholder="340">
+            </div>
+          </div>
+          <div class="admin-form-group">
+            <label for="pe-tagline">Կարճ նկարագրություն (Tagline)</label>
+            <input type="text" id="pe-tagline" class="admin-input" placeholder="օր․ 925 հարգի արծաթ, բնական նռնաքարով">
+          </div>
+          <div class="admin-form-group">
+            <label for="pe-desc">Լիարժեք նկարագրություն (Description)</label>
+            <textarea id="pe-desc" class="admin-input" rows="6" placeholder="Մանրամասն նկարագրություն զարդի և քարի ծագման մասին..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIDEBAR META COLUMN -->
+      <div class="pe-sidebar" style="width:340px;">
+        <!-- Image Upload Metabox -->
+        <div class="pe-metabox">
+          <h3>Ապրանքի Նկար (WebP Auto-Convert)</h3>
+          <div id="pe-img-preview-box" style="width:100%; height:200px; background:#FAF8F5; border:2px dashed var(--pumice); border-radius:4px; display:flex; align-items:center; justify-content:center; overflow:hidden; margin-bottom:12px; position:relative;">
+            <img id="pe-img-preview" src="" alt="" style="max-width:100%; max-height:100%; object-fit:contain; display:none;">
+            <span id="pe-img-placeholder" style="color:var(--tuff); font-size:13px;">Նկար ընտրված չէ</span>
+          </div>
+          <input type="file" id="pe-img-input" accept="image/*" onchange="window.WooCommerceAdmin.handleEditorImageUpload(event)" style="font-size:12px; width:100%;">
+          <input type="hidden" id="pe-img-url-val">
+        </div>
+
+        <!-- Meta Attributes Metabox -->
+        <div class="pe-metabox">
+          <h3>Հատկանիշներ</h3>
+          <div class="admin-form-group">
+            <label for="pe-cat">Զարդի Տեսակ (Category)</label>
+            <select id="pe-cat" class="admin-input">
+              <option value="Մատանիներ">Մատանիներ</option>
+              <option value="Վզնոցներ">Վզնոցներ</option>
+              <option value="Ապարանջաններ">Ապարանջաններ</option>
+              <option value="Ականջօղեր">Ականջօղեր</option>
+              <option value="Կախազարդեր">Կախազարդեր</option>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label for="pe-stone">Օգտագործված Քարը</label>
+            <select id="pe-stone" class="admin-input">
+              <option value="Նռնաքար">Նռնաքար</option>
+              <option value="Օբսիդիան">Օբսիդիան</option>
+              <option value="Փիրուզ">Փիրուզ</option>
+              <option value="Քվարց">Քվարց</option>
+              <option value="Ագաթ">Ագաթ</option>
+              <option value="Լազուրիտ">Լազուրիտ</option>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label for="pe-region">Քարի Տարածաշրջան</label>
+            <select id="pe-region" class="admin-input">
+              <option value="Վայոց Ձոր">Վայոց Ձոր</option>
+              <option value="Գեղարքունիք">Գեղարքունիք</option>
+              <option value="Սյունիք">Սյունիք</option>
+              <option value="Արագած">Արագած</option>
+              <option value="Տավուշ">Տավուշ</option>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label for="pe-material">Նյութ</label>
+            <select id="pe-material" class="admin-input">
+              <option value="925 արծաթ">925 արծաթ</option>
+              <option value="14K Ոսկի">14K Ոսկի</option>
+              <option value="18K Ոսկի">18K Ոսկի</option>
+            </select>
+          </div>
+          <!-- 1-of-1 Sold Out Toggle -->
+          <div class="admin-form-group" style="margin-top:20px; padding-top:16px; border-top:1px solid var(--pumice);">
+            <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+              <input type="checkbox" id="pe-sold-toggle" style="width:18px; height:18px;">
+              <span style="font-weight:700; color:var(--amber);">🏷 1-of-1 Վաճառված է (Sold Out)</span>
+            </label>
+          </div>
+        </div>
       </div>
     </div>
   </div>
