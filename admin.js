@@ -123,6 +123,23 @@
       }
     },
 
+    async syncGoogleData() {
+      const btn = document.getElementById('btn-sync-google');
+      if (btn) { btn.disabled = true; btn.textContent = '⏳ Սինխրոնացվում է...'; }
+
+      if (window.GoogleSync) {
+        const result = await window.GoogleSync.runFullSync((msg) => {
+          console.log('Google Sync Status:', msg);
+        });
+        if (result.success) {
+          alert(`Google Sheets & Drive-ից հաջողությամբ սինխրոնացվել է ${result.count} ապրանք Sanity-ում։`);
+        } else {
+          alert('Սինխրոնացման ավարտ։ Ապրանքներ չեն գտնվել Google Sheet-ում։');
+        }
+      }
+      if (btn) { btn.disabled = false; btn.textContent = '⚡ Սինխրոնացնել Google Sheets'; }
+    },
+
     bindEvents() {
       const form = document.getElementById('admin-login-form');
       if (form) {
