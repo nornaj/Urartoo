@@ -105,16 +105,22 @@
     },
 
     checkHashRoute() {
-      const hash = window.location.hash;
+      const rawHash = window.location.hash || '';
+      const hash = rawHash.replace('#', '').replace('/', '');
       const path = window.location.pathname;
       const adminView = document.getElementById('view-admin');
       if (!adminView) return;
 
-      const isAdminRoute = hash === '#admin' || hash === '#/admin' || path.endsWith('/admin') || path.endsWith('/admin.html') || path.includes('admin');
+      const isAdminRoute = rawHash.includes('admin') || hash === 'products' || hash === 'settings' || hash === 'clients' || hash === 'logs' || path.endsWith('/admin') || path.endsWith('/admin.html') || path.includes('admin');
 
       if (isAdminRoute) {
         adminView.style.display = 'block';
         document.body.classList.add('in-admin-mode');
+        if (hash === 'products' || hash === 'inventory') this.activeTab = 'products';
+        else if (hash === 'settings') this.activeTab = 'settings';
+        else if (hash === 'clients') this.activeTab = 'clients';
+        else if (hash === 'logs') this.activeTab = 'logs';
+        else if (hash === 'orders') this.activeTab = 'orders';
         this.render();
       } else {
         adminView.style.display = 'none';
@@ -187,11 +193,7 @@
       const emailEl = document.getElementById('admin-user-profile-name');
       if (emailEl) emailEl.textContent = this.currentUser.email;
 
-      if (this.activeTab === 'orders') this.renderOrdersSec();
-      if (this.activeTab === 'products') this.renderProductsSec();
-      if (this.activeTab === 'settings') this.renderSettingsSec();
-      if (this.activeTab === 'clients') this.renderClientsSec();
-      if (this.activeTab === 'logs') this.renderLogsSec();
+      this.switchTab(this.activeTab || 'orders');
     },
 
     currentEditingProductId: null,
