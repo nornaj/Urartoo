@@ -361,10 +361,22 @@
     const nameEl = document.getElementById('dash-user-name');
     const emailEl = document.getElementById('dash-user-email');
     const joinedEl = document.getElementById('dash-user-joined');
+    const adminBtn = document.getElementById('btn-admin-access');
 
     if (nameEl) nameEl.textContent = user.name;
     if (emailEl) emailEl.textContent = user.email;
     if (joinedEl) joinedEl.textContent = 'Անդամ ' + (user.joined || '2026') + ' թ․-ից';
+
+    const isAdmin = user.isAdmin || (user.email && user.email.toLowerCase() === 'najaryannorayr209@gmail.com');
+    if (adminBtn) {
+      if (isAdmin) {
+        adminBtn.classList.remove('hidden');
+        adminBtn.style.display = 'inline-block';
+      } else {
+        adminBtn.classList.add('hidden');
+        adminBtn.style.display = 'none';
+      }
+    }
 
     if (avatarEl && user.name) {
       const parts = user.name.split(' ');
