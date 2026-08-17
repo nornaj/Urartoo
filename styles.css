@@ -3820,3 +3820,66 @@ body.in-admin-mode > *:not(#view-admin):not(#product-editor-modal) {
   text-align: center;
 }
 
+/* ===================================================================
+   UNIVERSAL LUXURY CUSTOM DROPDOWN (<select>) STYLING SYSTEM
+   =================================================================== */
+select,
+.admin-input select,
+#admin-bulk-action-select,
+#admin-prod-filter-cat,
+#sort-select,
+.shop-filter-select,
+.pdp-select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-color: #FFFFFF !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%231B1D1C' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 14px center !important;
+  background-size: 14px 14px !important;
+  padding: 10px 38px 10px 14px !important;
+  border: 1px solid #D0CEC5 !important;
+  border-radius: 6px !important;
+  font-family: var(--font, 'Instrument Sans', sans-serif) !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  color: #1B1D1C !important;
+  cursor: pointer !important;
+  outline: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease !important;
+  vertical-align: middle !important;
+  line-height: 1.4 !important;
+}
+
+select:hover,
+.admin-input select:hover {
+  border-color: #B8860B !important;
+  background-color: #FCFBF9 !important;
+}
+
+select:focus,
+.admin-input select:focus {
+  border-color: #B8860B !important;
+  box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.18) !important;
+  background-color: #FFFFFF !important;
+}
+
+/* Custom Dropdown Option Styling */
+select option {
+  background-color: #FFFFFF !important;
+  color: #1B1D1C !important;
+  padding: 12px 14px !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+}
+
+select option:hover,
+select option:focus,
+select option:active,
+select option:checked {
+  background-color: #1B1D1C !important;
+  color: #FFFFFF !important;
+}
+
