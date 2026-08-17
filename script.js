@@ -622,7 +622,7 @@
     if (overlay) overlay.classList.remove('active');
   };
 
-  // Inject Admin Nav Link Globally across all storefront pages
+  // Inject Admin Nav Link & Custom Select Dropdowns Globally across all storefront pages
   document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('nav.nav').forEach(function (nav) {
       if (!nav.querySelector('.nav-link-admin')) {
@@ -635,6 +635,10 @@
         nav.appendChild(adminLink);
       }
     });
+
+    if (window.initCustomSelects) {
+      window.initCustomSelects();
+    }
   });
 
 })();

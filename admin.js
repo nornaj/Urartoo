@@ -1046,12 +1046,96 @@
     }
   };
 
+  window.initCustomSelects = function () {
+    const selects = document.querySelectorAll('select:not([data-customized])');
+    selects.forEach(select => {
+      select.setAttribute('data-customized', 'true');
+      select.style.display = 'none';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'ura-custom-select';
+      if (select.id) wrapper.id = `ura-custom-${select.id}`;
+
+      const trigger = document.createElement('div');
+      trigger.className = 'ura-select-trigger';
+
+      const label = document.createElement('span');
+      label.className = 'ura-select-label';
+      const selectedOption = select.options[select.selectedIndex] || select.options[0];
+      label.textContent = selectedOption ? selectedOption.textContent : '';
+
+      const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      arrow.setAttribute('class', 'ura-select-arrow');
+      arrow.setAttribute('viewBox', '0 0 24 24');
+      arrow.setAttribute('fill', 'none');
+      arrow.setAttribute('stroke', 'currentColor');
+      arrow.setAttribute('stroke-width', '2.2');
+      arrow.innerHTML = '<polyline points="6 9 12 15 18 9"></polyline>';
+
+      trigger.appendChild(label);
+      trigger.appendChild(arrow);
+      wrapper.appendChild(trigger);
+
+      const menu = document.createElement('div');
+      menu.className = 'ura-select-menu';
+
+      const updateMenuOptions = () => {
+        menu.innerHTML = '';
+        Array.from(select.options).forEach((opt, idx) => {
+          const item = document.createElement('div');
+          item.className = 'ura-select-option' + (idx === select.selectedIndex ? ' selected' : '');
+          item.dataset.value = opt.value;
+          item.textContent = opt.textContent;
+
+          item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            select.selectedIndex = idx;
+            select.value = opt.value;
+            label.textContent = opt.textContent;
+
+            menu.querySelectorAll('.ura-select-option').forEach(o => o.classList.remove('selected'));
+            item.classList.add('selected');
+
+            wrapper.classList.remove('active');
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+          });
+
+          menu.appendChild(item);
+        });
+      };
+
+      updateMenuOptions();
+      wrapper.appendChild(menu);
+
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        updateMenuOptions();
+        document.querySelectorAll('.ura-custom-select.active').forEach(w => {
+          if (w !== wrapper) w.classList.remove('active');
+        });
+        wrapper.classList.toggle('active');
+      });
+
+      select.parentNode.insertBefore(wrapper, select.nextSibling);
+    });
+  };
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.ura-custom-select')) {
+      document.querySelectorAll('.ura-custom-select.active').forEach(w => w.classList.remove('active'));
+    }
+  });
+
   window.WooCommerceAdmin = WooCommerceAdmin;
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => WooCommerceAdmin.init());
+    document.addEventListener('DOMContentLoaded', () => {
+      WooCommerceAdmin.init();
+      window.initCustomSelects();
+    });
   } else {
     WooCommerceAdmin.init();
+    window.initCustomSelects();
   }
 
 })(window);
