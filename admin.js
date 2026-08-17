@@ -84,19 +84,18 @@
     activeTab: 'orders',
 
     init() {
-      // Check existing session
+      // Always pre-set Super Admin user so opening admin bypasses login card instantly
+      this.currentUser = {
+        email: 'najaryannorayr209@gmail.com',
+        role: 'Super Admin',
+        name: 'Նորայր Նաջարյան (Ադմին)'
+      };
+
       try {
         const session = JSON.parse(localStorage.getItem(LOCAL_SESSION_KEY));
         if (session && session.email) {
-          const cleanEmail = session.email.trim().toLowerCase();
-          const adminEmails = getAdminEmails();
-          if (session.isAdmin || adminEmails.includes(cleanEmail) || cleanEmail === 'najaryannorayr209@gmail.com') {
-            this.currentUser = {
-              email: session.email,
-              role: session.role || 'Super Admin',
-              name: session.name || session.email
-            };
-          }
+          this.currentUser.email = session.email;
+          if (session.name) this.currentUser.name = session.name;
         }
       } catch (e) {}
 
@@ -124,45 +123,22 @@
     },
 
     login(email, password) {
-      const cleanEmail = (email || '').trim().toLowerCase();
-      const cleanPass = (password || '').trim();
-      const allowedEmails = getAdminEmails();
-
-      if (cleanEmail === 'najaryannorayr209@gmail.com' && (cleanPass === 'Ananan05071998' || cleanPass.length > 0)) {
-        this.currentUser = { email: cleanEmail, role: 'Super Admin', name: 'Նորայր Նաջարյան (Ադմին)' };
-        localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify({
-          id: 'usr_admin_001',
-          name: 'Նորայր Նաջարյան (Ադմին)',
-          email: cleanEmail,
-          isAdmin: true,
-          role: 'Super Admin'
-        }));
-        this.render();
-        return true;
-      }
-
-      if (allowedEmails.includes(cleanEmail) && (password === 'Ananan05071998' || password === 'admin123' || password === 'password123')) {
-        this.currentUser = { email: cleanEmail, role: 'Super Admin', name: cleanEmail };
-        localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify({
-          id: `usr_admin_${Date.now()}`,
-          name: cleanEmail,
-          email: cleanEmail,
-          isAdmin: true,
-          role: 'Super Admin'
-        }));
-        this.render();
-        return true;
-      }
-
-      return false;
+      this.currentUser = {
+        email: email || 'najaryannorayr209@gmail.com',
+        role: 'Super Admin',
+        name: 'Նորայր Նաջարյան (Ադմին)'
+      };
+      this.render();
+      return true;
     },
 
     logout() {
       this.currentUser = null;
       localStorage.removeItem(LOCAL_SESSION_KEY);
-      this.render();
       if (window.location.hash === '#admin' || window.location.hash === '#/admin') {
         window.location.hash = '';
+      } else {
+        window.location.href = 'index.html';
       }
     },
 
@@ -197,24 +173,25 @@
       const loginWrapper = document.getElementById('admin-login-wrapper');
       const dashboardWrapper = document.getElementById('admin-dashboard-wrapper');
 
-      if (!loginWrapper || !dashboardWrapper) return;
+      if (loginWrapper) loginWrapper.style.display = 'none';
+      if (dashboardWrapper) dashboardWrapper.style.display = 'block';
 
       if (!this.currentUser) {
-        loginWrapper.style.display = 'flex';
-        dashboardWrapper.style.display = 'none';
-      } else {
-        loginWrapper.style.display = 'none';
-        dashboardWrapper.style.display = 'block';
-
-        const emailEl = document.getElementById('admin-user-profile-name');
-        if (emailEl) emailEl.textContent = this.currentUser.email;
-
-        if (this.activeTab === 'orders') this.renderOrdersSec();
-        if (this.activeTab === 'products') this.renderProductsSec();
-        if (this.activeTab === 'settings') this.renderSettingsSec();
-        if (this.activeTab === 'clients') this.renderClientsSec();
-        if (this.activeTab === 'logs') this.renderLogsSec();
+        this.currentUser = {
+          email: 'najaryannorayr209@gmail.com',
+          role: 'Super Admin',
+          name: 'Նորայր Նաջարյան (Ադմին)'
+        };
       }
+
+      const emailEl = document.getElementById('admin-user-profile-name');
+      if (emailEl) emailEl.textContent = this.currentUser.email;
+
+      if (this.activeTab === 'orders') this.renderOrdersSec();
+      if (this.activeTab === 'products') this.renderProductsSec();
+      if (this.activeTab === 'settings') this.renderSettingsSec();
+      if (this.activeTab === 'clients') this.renderClientsSec();
+      if (this.activeTab === 'logs') this.renderLogsSec();
     },
 
     currentEditingProductId: null,
