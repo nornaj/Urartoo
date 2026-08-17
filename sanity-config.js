@@ -334,7 +334,8 @@
         description,
         sizes,
         tags,
-        "image": mainImage.asset->url
+        "image": coalesce(image, mainImage.asset->url, imageUrl),
+        images
       }`;
 
       // GROQ query for journal posts
@@ -395,27 +396,34 @@
     },
 
     _transformSanityProducts(docs) {
-      return docs.map(doc => ({
-        id: doc.id ? (isNaN(doc.id) ? doc.id : Number(doc.id)) : doc._id,
-        _sanityId: doc._id,
-        name: doc.name || '',
-        cat: doc.category || 'Մատանիներ',
-        category: doc.category || 'Մատանիներ',
-        stone: doc.stone || 'Նռնաքար',
-        region: doc.stoneOrigin || 'Վայոց Ձոր',
-        stoneOrigin: doc.stoneOrigin || 'Վայոց Ձոր',
-        material: doc.material || '925 արծաթ',
-        price: doc.price || 0,
-        img: doc.image || 'Images/bracelet.webp',
-        sold: Boolean(doc.sold),
-        stock: doc.stock !== undefined ? doc.stock : 1,
-        featured: Boolean(doc.featured),
-        desc: doc.description || doc.tagline || '',
-        tagline: doc.tagline || '',
-        description: doc.description || '',
-        sizes: doc.sizes || [],
-        tags: doc.tags || []
-      }));
+      return docs.map(doc => {
+        const mainImg = doc.image || doc.img || 'Images/bracelet.webp';
+        const imgList = (doc.images && doc.images.length > 0) ? doc.images : [mainImg];
+        return {
+          id: doc.id ? (isNaN(doc.id) ? doc.id : Number(doc.id)) : doc._id,
+          _sanityId: doc._id,
+          name: doc.name || '',
+          cat: doc.category || 'Մատանիներ',
+          category: doc.category || 'Մատանիներ',
+          stone: doc.stone || 'Նռնաքար',
+          region: doc.stoneOrigin || 'Վայոց Ձոր',
+          stoneOrigin: doc.stoneOrigin || 'Վայոց Ձոր',
+          material: doc.material || '925 արծաթ',
+          price: doc.price || 0,
+          img: mainImg,
+          image: mainImg,
+          images: imgList,
+          gallery: imgList,
+          sold: Boolean(doc.sold),
+          stock: doc.stock !== undefined ? doc.stock : 1,
+          featured: Boolean(doc.featured),
+          desc: doc.description || doc.tagline || '',
+          tagline: doc.tagline || '',
+          description: doc.description || '',
+          sizes: doc.sizes || [],
+          tags: doc.tags || []
+        };
+      });
     },
 
     /**
@@ -514,6 +522,8 @@
         stoneOrigin: productData.region || productData.stoneOrigin || 'Վայոց Ձոր',
         material: productData.material || '925 արծաթ',
         price: Number(productData.price) || 0,
+        image: productData.img || productData.image || 'Images/bracelet.webp',
+        images: productData.images || [productData.img || productData.image].filter(Boolean),
         stock: Number(productData.stock) || 1,
         sold: Boolean(productData.sold),
         featured: Boolean(productData.featured),

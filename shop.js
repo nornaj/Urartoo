@@ -108,9 +108,6 @@
     renderGrid(list);
   }
 
-    renderGrid(list);
-  }
-
   function renderGrid(items) {
     countEl.textContent = 'Ցուցադրված է ' + items.length + ' զարդ';
 
@@ -282,5 +279,6 @@
   });
 
   filterAndSort();
+  window.addEventListener('sanityCatalogReady', filterAndSort);
 
 })();
