@@ -451,14 +451,83 @@
       this.renderProductsSec();
     },
 
-    /* WORDPRESS-STYLE PRODUCT EDITOR OVERLAY CONTROLLERS */
+    /* WORDPRESS-STYLE PRODUCT EDITOR GALLERY & CONTROLLERS */
+    currentGallery: [],
+    activeImageIndex: 0,
+
+    renderGalleryThumbnails() {
+      const container = document.getElementById('pe-gallery-thumbnails-container');
+      const imgPreview = document.getElementById('pe-img-preview');
+      const imgPlaceholder = document.getElementById('pe-img-placeholder');
+      const imgUrlVal = document.getElementById('pe-img-url-val');
+
+      const activeUrl = this.currentGallery[this.activeImageIndex] || '';
+
+      if (imgPreview && imgPlaceholder) {
+        if (activeUrl) {
+          imgPreview.src = activeUrl;
+          imgPreview.style.display = 'block';
+          imgPlaceholder.style.display = 'none';
+        } else {
+          imgPreview.src = '';
+          imgPreview.style.display = 'none';
+          imgPlaceholder.style.display = 'block';
+        }
+      }
+
+      if (imgUrlVal) {
+        imgUrlVal.value = activeUrl;
+      }
+
+      if (!container) return;
+
+      let html = '';
+      this.currentGallery.forEach((url, idx) => {
+        const isActive = idx === this.activeImageIndex;
+        const borderStyle = isActive ? '2px solid #0066cc' : '1px solid #D0CEC5';
+
+        html += `
+          <div style="width:60px; height:60px; border:${borderStyle}; border-radius:6px; overflow:hidden; position:relative; cursor:pointer; background:#FFF; display:flex; align-items:center; justify-content:center; box-sizing:border-box;" onclick="window.WooCommerceAdmin.setActiveGalleryImage(${idx})">
+            <img src="${url}" style="width:100%; height:100%; object-fit:cover;" alt="Thumbnail ${idx + 1}">
+            <button type="button" onclick="event.stopPropagation(); window.WooCommerceAdmin.removeGalleryImage(${idx})" style="position:absolute; top:2px; right:2px; background:rgba(0,0,0,0.6); color:#FFF; border:none; border-radius:50%; width:16px; height:16px; font-size:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1;" title="Remove image">✕</button>
+          </div>
+        `;
+      });
+
+      // Add Plus button "+ Add more images" matching screenshot
+      html += `
+        <label style="width:60px; height:60px; border:2px dashed #0066cc; border-radius:6px; background:#F0F7FF; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; position:relative; box-sizing:border-box;" title="Add more images">
+          <span style="font-size:24px; color:#0066cc; line-height:1; font-weight:300;">+</span>
+          <input type="file" accept="image/*" multiple onchange="window.WooCommerceAdmin.handleEditorImageUpload(event)" style="display:none;">
+        </label>
+      `;
+
+      container.innerHTML = html;
+    },
+
+    setActiveGalleryImage(index) {
+      if (index >= 0 && index < this.currentGallery.length) {
+        this.activeImageIndex = index;
+        this.renderGalleryThumbnails();
+      }
+    },
+
+    removeGalleryImage(index) {
+      if (index >= 0 && index < this.currentGallery.length) {
+        this.currentGallery.splice(index, 1);
+        if (this.activeImageIndex >= this.currentGallery.length) {
+          this.activeImageIndex = Math.max(0, this.currentGallery.length - 1);
+        }
+        this.renderGalleryThumbnails();
+      }
+    },
+
     async openProductEditor(productId) {
       const modal = document.getElementById('product-editor-modal');
       if (!modal) return;
 
       this.currentEditingProductId = productId;
       const modalTitle = document.getElementById('pe-modal-title');
-      const deleteBtn = document.getElementById('btn-pe-delete');
 
       // Clear forms
       document.getElementById('pe-name').value = '';
@@ -469,14 +538,6 @@
       document.getElementById('pe-stone').value = 'Նռնաքար';
       document.getElementById('pe-region').value = 'Վայոց Ձոր';
       document.getElementById('pe-material').value = '925 արծաթ';
-
-      const imgPreview = document.getElementById('pe-img-preview');
-      const imgPlaceholder = document.getElementById('pe-img-placeholder');
-      const imgUrlVal = document.getElementById('pe-img-url-val');
-
-      imgPreview.style.display = 'none';
-      imgPlaceholder.style.display = 'block';
-      imgUrlVal.value = '';
 
       if (productId) {
         if (modalTitle) modalTitle.textContent = 'Խմբագրել Ապրանքը';
@@ -497,18 +558,20 @@
           document.getElementById('pe-region').value = found.region || found.stoneOrigin || 'Վայոց Ձոր';
           document.getElementById('pe-material').value = found.material || '925 արծաթ';
 
-          const src = found.img || found.image;
-          if (src) {
-            imgPreview.src = src;
-            imgPreview.style.display = 'block';
-            imgPlaceholder.style.display = 'none';
-            imgUrlVal.value = src;
-          }
+          const galleryImgs = found.images || found.gallery || [found.img || found.image].filter(Boolean);
+          this.currentGallery = galleryImgs.length > 0 ? [...galleryImgs] : [];
+          this.activeImageIndex = 0;
+        } else {
+          this.currentGallery = [];
+          this.activeImageIndex = 0;
         }
       } else {
         if (modalTitle) modalTitle.textContent = 'Ավելացնել Նոր Ապրանք';
+        this.currentGallery = [];
+        this.activeImageIndex = 0;
       }
 
+      this.renderGalleryThumbnails();
       modal.style.display = 'flex';
     },
 
@@ -516,43 +579,46 @@
       const modal = document.getElementById('product-editor-modal');
       if (modal) modal.style.display = 'none';
       this.currentEditingProductId = null;
+      this.currentGallery = [];
+      this.activeImageIndex = 0;
     },
 
     async handleEditorImageUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
+      const files = Array.from(e.target.files || []);
+      if (files.length === 0) return;
 
-      const imgPreview = document.getElementById('pe-img-preview');
       const imgPlaceholder = document.getElementById('pe-img-placeholder');
-      const imgUrlVal = document.getElementById('pe-img-url-val');
-
-      if (imgPlaceholder) imgPlaceholder.textContent = '⏳ Սեղմվում է WebP <200KB...';
-
-      try {
-        if (window.NovaSanity) {
-          const uploadedAssetUrl = await window.NovaSanity.uploadImage(file);
-          if (uploadedAssetUrl) {
-            imgPreview.src = uploadedAssetUrl;
-            imgPreview.style.display = 'block';
-            if (imgPlaceholder) imgPlaceholder.style.display = 'none';
-            imgUrlVal.value = uploadedAssetUrl;
-            alert('Նկարը հաջողությամբ վերածվեց WebP-ի և բեռնվեց CDN-ում։');
-            return;
-          }
-        }
-      } catch (err) {
-        console.error('Image upload failed:', err);
+      if (imgPlaceholder) {
+        imgPlaceholder.style.display = 'block';
+        imgPlaceholder.textContent = '⏳ Սեղմվում է WebP <200KB...';
       }
 
-      // Local preview fallback
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        imgPreview.src = evt.target.result;
-        imgPreview.style.display = 'block';
-        if (imgPlaceholder) imgPlaceholder.style.display = 'none';
-        imgUrlVal.value = evt.target.result;
-      };
-      reader.readAsDataURL(file);
+      for (const file of files) {
+        try {
+          if (window.NovaSanity) {
+            const uploadedAssetUrl = await window.NovaSanity.uploadImage(file);
+            if (uploadedAssetUrl) {
+              this.currentGallery.push(uploadedAssetUrl);
+              continue;
+            }
+          }
+        } catch (err) {
+          console.error('Image upload failed:', err);
+        }
+
+        // Local fallback base64
+        await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+            if (evt.target.result) this.currentGallery.push(evt.target.result);
+            resolve();
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      this.activeImageIndex = Math.max(0, this.currentGallery.length - 1);
+      this.renderGalleryThumbnails();
     },
 
     async saveProductFromEditor() {
@@ -571,6 +637,7 @@
       const stoneVal = document.getElementById('pe-stone').value.trim() || 'Նռնաքար';
       const regionVal = document.getElementById('pe-region').value.trim() || 'Վայոց Ձոր';
       const matVal = document.getElementById('pe-material').value.trim() || '925 արծաթ';
+      const mainImg = this.currentGallery[0] || 'Images/bracelet.webp';
 
       const prodData = {
         id: this.currentEditingProductId || `product-custom-${Date.now()}`,
@@ -588,8 +655,9 @@
         sold: finalIsSold,
         stock: stockVal,
         featured: true,
-        img: document.getElementById('pe-img-url-val').value || 'Images/bracelet.webp',
-        image: document.getElementById('pe-img-url-val').value || 'Images/bracelet.webp'
+        img: mainImg,
+        image: mainImg,
+        images: this.currentGallery
       };
 
       if (window.NovaSanity) {
@@ -597,7 +665,7 @@
         addAuditLog(`Պահպանվեց ապրանք: «${name}» ($${price})`);
       }
 
-      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '💾 ՊԱՀՊԱՆԵ🇱'; }
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '💾 ՊԱՀՊԱՆԵԼ'; }
       this.closeProductEditor();
       this.renderProductsSec();
       alert(`Ապրանքը «${name}» հաջողությամբ պահպանվեց։`);

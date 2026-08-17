@@ -223,14 +223,24 @@
       </div>
 
       <div class="pe-sidebar" style="width:340px;">
-        <div class="pe-metabox">
-          <h3>Ապրանքի Նկար (WebP Auto-Convert)</h3>
-          <div id="pe-img-preview-box" style="width:100%; height:200px; background:#FAF8F5; border:2px dashed var(--pumice); border-radius:4px; display:flex; align-items:center; justify-content:center; overflow:hidden; margin-bottom:12px; position:relative;">
-            <img id="pe-img-preview" src="" alt="" style="max-width:100%; max-height:100%; object-fit:contain; display:none;">
-            <span id="pe-img-placeholder" style="color:var(--tuff); font-size:13px;">Նկար ընտրված չէ</span>
+        <div class="pe-metabox" style="background:#FFF; border:1px solid #E2E0D8; border-radius:8px; padding:16px;">
+          <h3 style="margin:0 0 14px; font-size:15px; font-weight:700; color:#333;">Product Image</h3>
+          
+          <!-- Large Main Image Preview Box -->
+          <div id="pe-img-preview-box" style="width:100%; height:260px; background:#FFFFFF; border:1px solid #D0CEC5; border-radius:8px; overflow:hidden; display:flex; align-items:center; justify-content:center; margin-bottom:14px; position:relative; padding:8px; box-sizing:border-box;">
+            <img id="pe-img-preview" src="" alt="Product Image" style="max-width:100%; max-height:100%; object-fit:contain; display:none;">
+            <span id="pe-img-placeholder" style="color:var(--tuff); font-size:13px; text-align:center; padding:16px;">Նկար ընտրված չէ</span>
           </div>
-          <input type="file" id="pe-img-input" accept="image/*" onchange="window.WooCommerceAdmin.handleEditorImageUpload(event)" style="font-size:12px; width:100%;">
-          <input type="hidden" id="pe-img-url-val">
+
+          <!-- Image CDN URL Text Box (Pill Shape with rounded border) -->
+          <div style="margin-bottom:14px;">
+            <input type="text" id="pe-img-url-val" readonly placeholder="https://cdn.sanity.io/images/..." style="width:100%; border:1px solid #D0CEC5; border-radius:20px; padding:8px 14px; font-size:12px; color:#555; background:#FFF; outline:none; text-overflow:ellipsis; box-sizing:border-box;">
+          </div>
+
+          <!-- Thumbnails Row + Add More Images Button -->
+          <div id="pe-gallery-thumbnails-container" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <!-- Rendered by admin.js -->
+          </div>
         </div>
       </div>
     </div>
