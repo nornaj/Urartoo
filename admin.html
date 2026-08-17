@@ -175,23 +175,33 @@
             <label for="pe-name">Ապրանքի Անվանում (Title) *</label>
             <input type="text" id="pe-name" class="admin-input" required placeholder="օր․ Վայոց Ձորի նռնաքարով մատանի">
           </div>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-            <div class="admin-form-group">
-              <label for="pe-sku">SKU Կոդ *</label>
-              <input type="text" id="pe-sku" class="admin-input" placeholder="UR-101">
-            </div>
-            <div class="admin-form-group">
-              <label for="pe-price">Գին ($ USD) *</label>
-              <input type="number" id="pe-price" class="admin-input" required placeholder="340">
-            </div>
-          </div>
           <div class="admin-form-group">
-            <label for="pe-tagline">Կարճ նկարագրություն (Tagline)</label>
-            <input type="text" id="pe-tagline" class="admin-input" placeholder="օր․ 925 հարգի արծաթ, բնական նռնաքարով">
+            <label for="pe-price">Գին ($ USD) *</label>
+            <input type="number" id="pe-price" class="admin-input" required placeholder="340">
           </div>
           <div class="admin-form-group">
             <label for="pe-desc">Լիարժեք նկարագրություն (Description)</label>
-            <textarea id="pe-desc" class="admin-input" rows="6" placeholder="Մանրամասն նկարագրություն զարդի և քարի ծագման մասին..."></textarea>
+            <textarea id="pe-desc" class="admin-input" rows="5" placeholder="Մանրամասն նկարագրություն զարդի և քարի ծագման մասին..."></textarea>
+          </div>
+
+          <!-- ATTRIBUTE TEXT INPUTS (MOVED FROM SIDEBAR & CONVERTED FROM TOGGLES/DROPDOWNS) -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:20px; padding-top:20px; border-top:1px solid var(--pumice);">
+            <div class="admin-form-group">
+              <label for="pe-cat">Զարդի Տեսակ (Category)</label>
+              <input type="text" id="pe-cat" class="admin-input" placeholder="օր․ Մատանիներ">
+            </div>
+            <div class="admin-form-group">
+              <label for="pe-stone">Օգտագործված Քարը (Stone)</label>
+              <input type="text" id="pe-stone" class="admin-input" placeholder="օր․ Նռնաքար">
+            </div>
+            <div class="admin-form-group">
+              <label for="pe-region">Քարի Տարածաշրջան (Region)</label>
+              <input type="text" id="pe-region" class="admin-input" placeholder="օր․ Վայոց Ձոր">
+            </div>
+            <div class="admin-form-group">
+              <label for="pe-material">Նյութ (Material)</label>
+              <input type="text" id="pe-material" class="admin-input" placeholder="օր․ 925 արծաթ">
+            </div>
           </div>
         </div>
       </div>
@@ -205,50 +215,8 @@
           </div>
           <input type="file" id="pe-img-input" accept="image/*" onchange="window.WooCommerceAdmin.handleEditorImageUpload(event)" style="font-size:12px; width:100%;">
           <input type="hidden" id="pe-img-url-val">
-        </div>
 
-        <div class="pe-metabox">
-          <h3>Հատկանիշներ</h3>
-          <div class="admin-form-group">
-            <label for="pe-cat">Զարդի Տեսակ (Category)</label>
-            <select id="pe-cat" class="admin-input">
-              <option value="Մատանիներ">Մատանիներ</option>
-              <option value="Վզնոցներ">Վզնոցներ</option>
-              <option value="Ապարանջաններ">Ապարանջաններ</option>
-              <option value="Ականջօղեր">Ականջօղեր</option>
-              <option value="Կախազարդեր">Կախազարդեր</option>
-            </select>
-          </div>
-          <div class="admin-form-group">
-            <label for="pe-stone">Օգտագործված Քարը</label>
-            <select id="pe-stone" class="admin-input">
-              <option value="Նռնաքար">Նռնաքար</option>
-              <option value="Օբսիդիան">Օբսիդիան</option>
-              <option value="Փիրուզ">Փիրուզ</option>
-              <option value="Քվարց">Քվարց</option>
-              <option value="Ագաթ">Ագաթ</option>
-              <option value="Լազուրիտ">Լազուրիտ</option>
-            </select>
-          </div>
-          <div class="admin-form-group">
-            <label for="pe-region">Քարի Տարածաշրջան</label>
-            <select id="pe-region" class="admin-input">
-              <option value="Վայոց Ձոր">Վայոց Ձոր</option>
-              <option value="Գեղարքունիք">Գեղարքունիք</option>
-              <option value="Սյունիք">Սյունիք</option>
-              <option value="Արագած">Արագած</option>
-              <option value="Տավուշ">Տավուշ</option>
-            </select>
-          </div>
-          <div class="admin-form-group">
-            <label for="pe-material">Նյութ</label>
-            <select id="pe-material" class="admin-input">
-              <option value="925 արծաթ">925 արծաթ</option>
-              <option value="14K Ոսկի">14K Ոսկի</option>
-              <option value="18K Ոսկի">18K Ոսկի</option>
-            </select>
-          </div>
-          <div class="admin-form-group" style="margin-top:20px; padding-top:16px; border-top:1px solid var(--pumice);">
+          <div class="admin-form-group" style="margin-top:24px; padding-top:16px; border-top:1px solid var(--pumice);">
             <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
               <input type="checkbox" id="pe-sold-toggle" style="width:18px; height:18px;">
               <span style="font-weight:700; color:var(--amber);">🏷 1-of-1 Վաճառված է (Sold Out)</span>

@@ -379,9 +379,7 @@
 
       // Clear forms
       document.getElementById('pe-name').value = '';
-      document.getElementById('pe-sku').value = `UR-${Math.floor(100 + Math.random() * 900)}`;
       document.getElementById('pe-price').value = '300';
-      document.getElementById('pe-tagline').value = '';
       document.getElementById('pe-desc').value = '';
       document.getElementById('pe-cat').value = 'Մատանիներ';
       document.getElementById('pe-stone').value = 'Նռնաքար';
@@ -407,9 +405,7 @@
 
         if (found) {
           document.getElementById('pe-name').value = found.name || '';
-          document.getElementById('pe-sku').value = found.sku || '';
           document.getElementById('pe-price').value = found.price || 300;
-          document.getElementById('pe-tagline').value = found.tagline || '';
           document.getElementById('pe-desc').value = found.description || '';
           document.getElementById('pe-cat').value = found.cat || found.category || 'Մատանիներ';
           document.getElementById('pe-stone').value = found.stone || 'Նռնաքար';
@@ -485,20 +481,24 @@
       if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '⏳ Պահպանվում է...'; }
 
       const isSold = document.getElementById('pe-sold-toggle').checked;
+      const catVal = document.getElementById('pe-cat').value.trim() || 'Մատանիներ';
+      const stoneVal = document.getElementById('pe-stone').value.trim() || 'Նռնաքար';
+      const regionVal = document.getElementById('pe-region').value.trim() || 'Վայոց Ձոր';
+      const matVal = document.getElementById('pe-material').value.trim() || '925 արծաթ';
+
       const prodData = {
         id: this.currentEditingProductId || `product-custom-${Date.now()}`,
         _sanityId: this.currentEditingProductId,
         name: name,
-        sku: document.getElementById('pe-sku').value.trim() || 'UR-100',
+        sku: `UR-${Math.floor(100 + Math.random() * 900)}`,
         price: price,
-        tagline: document.getElementById('pe-tagline').value.trim(),
         description: document.getElementById('pe-desc').value.trim(),
-        cat: document.getElementById('pe-cat').value,
-        category: document.getElementById('pe-cat').value,
-        stone: document.getElementById('pe-stone').value,
-        region: document.getElementById('pe-region').value,
-        stoneOrigin: document.getElementById('pe-region').value,
-        material: document.getElementById('pe-material').value,
+        cat: catVal,
+        category: catVal,
+        stone: stoneVal,
+        region: regionVal,
+        stoneOrigin: regionVal,
+        material: matVal,
         sold: isSold,
         stock: isSold ? 0 : 1,
         featured: true,
