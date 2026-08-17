@@ -116,8 +116,8 @@
                 </div>
               </div>
 
-              <div style="display:flex; gap:16px; margin-bottom:20px; flex-wrap:wrap;">
-                <input type="text" id="admin-prod-search" placeholder="Որոնել ըստ անվանման կամ SKU..." oninput="window.WooCommerceAdmin.renderProductsSec()" style="flex:1; min-width:240px; padding:10px 14px; border:1px solid var(--pumice); font-size:13.5px; outline:none;">
+              <div style="display:flex; gap:16px; margin-bottom:20px; flex-wrap:wrap; align-items:center;">
+                <input type="text" id="admin-prod-search" placeholder="Որոնել ըստ անվանման..." oninput="window.WooCommerceAdmin.renderProductsSec()" style="flex:1; min-width:220px; padding:10px 14px; border:1px solid var(--pumice); font-size:13.5px; outline:none;">
                 <select id="admin-prod-cat-filter" onchange="window.WooCommerceAdmin.renderProductsSec()" style="padding:10px 14px; border:1px solid var(--pumice); font-size:13.5px; outline:none;">
                   <option value="all">Բոլոր Տեսակները</option>
                   <option value="Մատանիներ">Մատանիներ</option>
@@ -126,12 +126,22 @@
                   <option value="Ականջօղեր">Ականջօղեր</option>
                   <option value="Կախազարդեր">Կախազարդեր</option>
                 </select>
+
+                <!-- BULK ACTIONS CONTROL -->
+                <div style="display:flex; gap:8px; align-items:center;">
+                  <select id="admin-bulk-action-select" style="padding:10px 14px; border:1px solid var(--pumice); font-size:13.5px; outline:none; background:#FFF;">
+                    <option value="">Խմբաքանակային գործողություն (Bulk Action)</option>
+                    <option value="delete">🗑 Ջնջել ընտրվածները (Bulk Delete)</option>
+                  </select>
+                  <button type="button" class="admin-btn" onclick="window.WooCommerceAdmin.executeBulkAction()" style="padding:10px 18px; font-size:13px; background:var(--green); color:#FFF; font-weight:700; width:auto;">Կատարել</button>
+                </div>
               </div>
 
               <div class="admin-table-wrap-desktop" style="overflow-x:auto;">
                 <table class="admin-table">
                   <thead>
                     <tr>
+                      <th style="width:40px; text-align:center;"><input type="checkbox" id="admin-prod-select-all" onchange="window.WooCommerceAdmin.toggleSelectAllProducts(this.checked)" style="width:16px; height:16px; cursor:pointer;"></th>
                       <th>Նկար</th>
                       <th>Անվանում</th>
                       <th>SKU</th>

@@ -296,7 +296,7 @@
       });
 
       if (filtered.length === 0) {
-        if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--tuff);">Ապրանքներ չեն գտնվել</td></tr>';
+        if (tbody) tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--tuff);">Ապրանքներ չեն գտնվել</td></tr>';
         if (mobileCardsContainer) mobileCardsContainer.innerHTML = '<div style="text-align:center;padding:32px;color:var(--tuff);">Ապրանքներ չեն գտնվել</div>';
         return;
       }
@@ -312,6 +312,9 @@
           const pId = p._sanityId || p.id;
 
           return `<tr>
+            <td style="text-align:center;">
+              <input type="checkbox" class="admin-prod-checkbox" value="${pId}" style="width:16px; height:16px; cursor:pointer;">
+            </td>
             <td>
               <div style="width:48px;height:48px;background:#FAF8F5;border-radius:4px;overflow:hidden;display:flex;align-items:center;justify-content:center;">
                 <img src="${imgSrc}" style="width:100%;height:100%;object-fit:cover;" alt="">
@@ -348,6 +351,7 @@
 
           return `<div class="admin-prod-mobile-card">
             <div class="admin-prod-mobile-header">
+              <input type="checkbox" class="admin-prod-checkbox" value="${pId}" style="width:18px; height:18px; cursor:pointer; margin-right:6px;">
               <img src="${imgSrc}" class="admin-prod-mobile-img" alt="${p.name}">
               <div class="admin-prod-mobile-meta">
                 <div class="admin-prod-mobile-title">${p.name}</div>
@@ -365,6 +369,61 @@
             </div>
           </div>`;
         }).join('');
+      }
+    },
+
+    /* BULK ACTIONS CONTROLLERS */
+    toggleSelectAllProducts(isChecked) {
+      document.querySelectorAll('.admin-prod-checkbox').forEach(cb => {
+        cb.checked = isChecked;
+      });
+    },
+
+    getSelectedProductIds() {
+      const checkboxes = document.querySelectorAll('.admin-prod-checkbox:checked');
+      const ids = new Set();
+      checkboxes.forEach(cb => ids.add(cb.value));
+      return Array.from(ids);
+    },
+
+    async executeBulkAction() {
+      const selectEl = document.getElementById('admin-bulk-action-select');
+      const action = selectEl ? selectEl.value : '';
+
+      if (!action) {
+        alert('Խնդրում ենք ընտրել գործողություն (օր․ 🗑 Ջնջել ընտրվածները)։');
+        return;
+      }
+
+      const selectedIds = this.getSelectedProductIds();
+      if (selectedIds.length === 0) {
+        alert('Խնդրում ենք ընտրել առնվազն մեկ ապրանք՝ վանդակը (checkbox) նշելով։');
+        return;
+      }
+
+      if (action === 'delete') {
+        if (!confirm(`Վստա՞հ եք, որ ցանկանում եք ՀԱՎԵՐԺ ՋՆՋԵԼ ընտրված ${selectedIds.length} ապրանք(ները) Sanity CMS-ից։`)) return;
+
+        let deletedCount = 0;
+        for (const id of selectedIds) {
+          try {
+            if (window.NovaSanity) {
+              await window.NovaSanity.deleteProduct(id);
+              deletedCount++;
+            }
+          } catch (e) {
+            console.error('Error bulk deleting product:', id, e);
+          }
+        }
+
+        addAuditLog(`Խմբաքանակային ջնջում: ${deletedCount} ապրանք(ներ)`);
+
+        if (selectEl) selectEl.value = '';
+        const selectAll = document.getElementById('admin-prod-select-all');
+        if (selectAll) selectAll.checked = false;
+
+        this.renderProductsSec();
+        alert(`Ընտրված ${deletedCount} ապրանք(ները) հաջողությամբ ջնջվեցին։`);
       }
     },
 
