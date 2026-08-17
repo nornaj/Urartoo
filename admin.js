@@ -80,7 +80,7 @@
   }
 
   window.switchAdminTab = function (tabName) {
-    const validTabs = ['orders', 'products', 'clients', 'settings'];
+    const validTabs = ['orders', 'products', 'clients'];
     const activeTab = validTabs.includes(tabName) ? tabName : 'orders';
 
     validTabs.forEach(t => {
