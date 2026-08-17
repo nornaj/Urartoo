@@ -57,6 +57,7 @@
         else if (h.includes('Location') || h.includes('տարածաշրջան')) row.location = val;
         else if (h.includes('Jewelry Type') || h.includes('տեսակ')) row.category = val;
         else if (h.includes('Substance') || h.includes('Նյութ')) row.substance = val;
+        else if (h.includes('Image') || h.includes('Նկար') || h.includes('Photo') || h.includes('Picture')) row.image = val;
         else row[h] = val;
       });
       if (row.title) rows.push(row);
@@ -145,6 +146,30 @@
       .replace(/\.(jpg|jpeg|png|webp|gif)$/i, '')
       .replace(/[^a-zA-Z0-9\u0531-\u058F]/g, '')
       .toLowerCase();
+  }
+
+  /**
+   * Helper: Extracts direct Google Drive CDN image URL from share links or raw file IDs
+   */
+  function extractGoogleDriveImageUrl(urlStr) {
+    if (!urlStr) return null;
+    const str = String(urlStr).trim();
+    if (!str) return null;
+
+    if (str.startsWith('http://') || str.startsWith('https://')) {
+      const fileIdMatch = str.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) ||
+                          str.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if (fileIdMatch && fileIdMatch[1]) {
+        return `https://lh3.googleusercontent.com/d/${fileIdMatch[1]}`;
+      }
+      return str;
+    }
+
+    if (/^[a-zA-Z0-9_-]{25,}$/.test(str)) {
+      return `https://lh3.googleusercontent.com/d/${str}`;
+    }
+
+    return null;
   }
 
   const GoogleSync = {
@@ -256,19 +281,26 @@
           image: 'Images/bracelet.webp'
         };
 
-        // Match image from Google Drive folder by title
-        const normProductKey = normalizeTitleKey(title);
-        const matchedFileId = driveFileMap.get(normProductKey);
+        // Priority 1: Direct link pasted in Sheet "Image" column
+        let resolvedImageUrl = extractGoogleDriveImageUrl(row.image);
 
-        if (matchedFileId) {
-          const driveImageUrl = `https://lh3.googleusercontent.com/d/${matchedFileId}`;
-          prodData.img = driveImageUrl;
-          prodData.image = driveImageUrl;
-          prodData.images = [driveImageUrl];
+        // Priority 2: Title match from Drive folder if no direct link in Sheet
+        if (!resolvedImageUrl) {
+          const normProductKey = normalizeTitleKey(title);
+          const matchedFileId = driveFileMap.get(normProductKey);
+          if (matchedFileId) {
+            resolvedImageUrl = `https://lh3.googleusercontent.com/d/${matchedFileId}`;
+          }
+        }
+
+        if (resolvedImageUrl) {
+          prodData.img = resolvedImageUrl;
+          prodData.image = resolvedImageUrl;
+          prodData.images = [resolvedImageUrl];
 
           try {
-            // Upload image blob directly to Sanity CDN
-            const res = await fetch(driveImageUrl).catch(() => null);
+            // Upload image blob directly to Sanity CDN if possible
+            const res = await fetch(resolvedImageUrl).catch(() => null);
             if (res && res.ok) {
               const blob = await res.blob();
               if (blob && window.NovaSanity) {
