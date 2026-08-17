@@ -79,6 +79,66 @@
     } catch (e) {}
   }
 
+  window.switchAdminTab = function (tabName) {
+    const isProducts = (tabName === 'products' || tabName === 'inventory');
+
+    const btnOrders = document.getElementById('tab-btn-orders');
+    const btnProducts = document.getElementById('tab-btn-products');
+
+    if (btnOrders) {
+      if (isProducts) {
+        btnOrders.classList.remove('active');
+        btnOrders.style.color = 'rgba(255,255,255,0.75)';
+        btnOrders.style.background = 'none';
+        btnOrders.style.borderLeft = 'none';
+      } else {
+        btnOrders.classList.add('active');
+        btnOrders.style.color = 'var(--gold)';
+        btnOrders.style.background = 'rgba(255,255,255,0.05)';
+        btnOrders.style.borderLeft = '4px solid var(--gold)';
+      }
+    }
+
+    if (btnProducts) {
+      if (isProducts) {
+        btnProducts.classList.add('active');
+        btnProducts.style.color = 'var(--gold)';
+        btnProducts.style.background = 'rgba(255,255,255,0.05)';
+        btnProducts.style.borderLeft = '4px solid var(--gold)';
+      } else {
+        btnProducts.classList.remove('active');
+        btnProducts.style.color = 'rgba(255,255,255,0.75)';
+        btnProducts.style.background = 'none';
+        btnProducts.style.borderLeft = 'none';
+      }
+    }
+
+    const secOrders = document.getElementById('admin-sec-orders');
+    const secProducts = document.getElementById('admin-sec-products');
+
+    if (secOrders) {
+      secOrders.style.setProperty('display', isProducts ? 'none' : 'block', 'important');
+    }
+    if (secProducts) {
+      secProducts.style.setProperty('display', isProducts ? 'block' : 'none', 'important');
+    }
+
+    try {
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, null, isProducts ? '#products' : '#orders');
+      }
+    } catch (e) {}
+
+    if (window.WooCommerceAdmin) {
+      window.WooCommerceAdmin.activeTab = isProducts ? 'products' : 'orders';
+      if (isProducts) {
+        window.WooCommerceAdmin.renderProductsSec();
+      } else {
+        window.WooCommerceAdmin.renderOrdersSec();
+      }
+    }
+  };
+
   const WooCommerceAdmin = {
     currentUser: null,
     activeTab: 'orders',
@@ -102,12 +162,8 @@
       const initHash = (window.location.hash || '').replace('#', '').replace('/', '').trim().toLowerCase();
       if (initHash === 'products' || initHash === 'inventory') {
         this.activeTab = 'products';
-      } else if (initHash === 'settings') {
-        this.activeTab = 'settings';
-      } else if (initHash === 'clients') {
-        this.activeTab = 'clients';
-      } else if (initHash === 'logs') {
-        this.activeTab = 'logs';
+      } else {
+        this.activeTab = 'orders';
       }
 
       this.checkHashRoute();
@@ -122,7 +178,7 @@
       const adminView = document.getElementById('view-admin');
       if (!adminView) return;
 
-      const isAdminRoute = rawHash.includes('admin') || hash === 'products' || hash === 'settings' || hash === 'clients' || hash === 'logs' || path.endsWith('/admin') || path.endsWith('/admin.html') || path.includes('admin');
+      const isAdminRoute = rawHash.includes('admin') || hash === 'products' || hash === 'orders' || path.endsWith('/admin') || path.endsWith('/admin.html') || path.includes('admin');
 
       if (isAdminRoute) {
         adminView.style.display = 'block';
@@ -130,12 +186,6 @@
 
         if (hash === 'products' || hash === 'inventory') {
           this.activeTab = 'products';
-        } else if (hash === 'settings') {
-          this.activeTab = 'settings';
-        } else if (hash === 'clients') {
-          this.activeTab = 'clients';
-        } else if (hash === 'logs') {
-          this.activeTab = 'logs';
         } else if (hash === 'orders') {
           this.activeTab = 'orders';
         }
@@ -168,46 +218,9 @@
     },
 
     switchTab(tabId) {
-      if (!tabId) return;
-      this.activeTab = tabId;
-
-      try {
-        if (window.history && window.history.replaceState) {
-          window.history.replaceState(null, null, `#${tabId}`);
-        }
-      } catch (e) {}
-
-      document.querySelectorAll('.admin-nav-item').forEach(el => {
-        if (el.dataset.tab === tabId) {
-          el.classList.add('active');
-          el.style.color = 'var(--gold)';
-          el.style.background = 'rgba(255,255,255,0.05)';
-          el.style.borderLeft = '4px solid var(--gold)';
-        } else {
-          el.classList.remove('active');
-          el.style.color = 'rgba(255,255,255,0.75)';
-          el.style.background = 'none';
-          el.style.borderLeft = 'none';
-        }
-      });
-
-      const tabs = ['orders', 'products', 'settings', 'clients', 'logs'];
-      tabs.forEach(t => {
-        const sec = document.getElementById(`admin-sec-${t}`);
-        if (sec) {
-          if (t === tabId) {
-            sec.setAttribute('style', 'display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; overflow: visible !important;');
-          } else {
-            sec.setAttribute('style', 'display: none !important;');
-          }
-        }
-      });
-
-      if (tabId === 'orders') this.renderOrdersSec();
-      if (tabId === 'products') this.renderProductsSec();
-      if (tabId === 'settings') this.renderSettingsSec();
-      if (tabId === 'clients') this.renderClientsSec();
-      if (tabId === 'logs') this.renderLogsSec();
+      if (window.switchAdminTab) {
+        window.switchAdminTab(tabId);
+      }
     },
 
     render() {
@@ -228,7 +241,9 @@
       const emailEl = document.getElementById('admin-user-profile-name');
       if (emailEl) emailEl.textContent = this.currentUser.email;
 
-      this.switchTab(this.activeTab || 'orders');
+      if (window.switchAdminTab) {
+        window.switchAdminTab(this.activeTab || 'orders');
+      }
     },
 
     currentEditingProductId: null,
@@ -565,7 +580,7 @@
         <td><strong>${l.operator}</strong></td>
         <td>${l.action}</td>
       </tr>`).join('');
-    }
+    },
 
     /* TAB 1: ORDERS MANAGER RENDERER */
     renderOrdersSec() {

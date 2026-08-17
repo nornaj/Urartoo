@@ -37,20 +37,11 @@
         <aside class="admin-sidebar" style="width:240px; background:#191B1A; color:#C0C5C2; flex-shrink:0; padding:24px 0;">
           <div class="admin-nav-group">
             <div class="admin-nav-title" style="padding:0 24px 12px; font-size:10.5px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.35);">Մենյու</div>
-            <button type="button" class="admin-nav-item active" data-tab="orders" onclick="window.WooCommerceAdmin.switchTab('orders')" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:var(--gold); background:rgba(255,255,255,0.05); border:none; border-left:4px solid var(--gold); text-align:left; cursor:pointer; width:100%;">
+            <button type="button" class="admin-nav-item active" id="tab-btn-orders" data-tab="orders" onclick="window.switchAdminTab('orders')" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:var(--gold); background:rgba(255,255,255,0.05); border:none; border-left:4px solid var(--gold); text-align:left; cursor:pointer; width:100%;">
               <span>📦</span> <span>Պատվերներ</span>
             </button>
-            <button type="button" class="admin-nav-item" data-tab="products" onclick="window.WooCommerceAdmin.switchTab('products')" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:rgba(255,255,255,0.75); background:none; border:none; text-align:left; cursor:pointer; width:100%;">
+            <button type="button" class="admin-nav-item" id="tab-btn-products" data-tab="products" onclick="window.switchAdminTab('products')" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:rgba(255,255,255,0.75); background:none; border:none; text-align:left; cursor:pointer; width:100%;">
               <span>💎</span> <span>Ապրանքացանկ</span>
-            </button>
-            <button type="button" class="admin-nav-item" data-tab="settings" onclick="window.WooCommerceAdmin.switchTab('settings')" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:rgba(255,255,255,0.75); background:none; border:none; text-align:left; cursor:pointer; width:100%;">
-              <span>⚙️</span> <span>Կարգավորումներ</span>
-            </button>
-            <button type="button" class="admin-nav-item" data-tab="clients" onclick="window.WooCommerceAdmin.switchTab('clients')" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:rgba(255,255,255,0.75); background:none; border:none; text-align:left; cursor:pointer; width:100%;">
-              <span>👤</span> <span>Հաճախորդներ</span>
-            </button>
-            <button type="button" class="admin-nav-item" data-tab="logs" onclick="window.WooCommerceAdmin.switchTab('logs')" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:rgba(255,255,255,0.75); background:none; border:none; text-align:left; cursor:pointer; width:100%;">
-              <span>📜</span> <span>Գործողությունների Մատյան</span>
             </button>
           </div>
         </aside>
@@ -59,7 +50,7 @@
         <main class="admin-main-content" style="flex:1; padding:32px var(--gutter); background:#FAF8F5; overflow-y:auto;">
 
           <!-- SECTION 1: ORDERS MANAGER -->
-          <section id="admin-sec-orders" class="admin-sec">
+          <section id="admin-sec-orders" class="admin-sec" style="display:block;">
             <div class="admin-stats-grid">
               <div class="admin-stat-card">
                 <div class="admin-stat-label">Ընդհանուր Հասույթ</div>
@@ -159,56 +150,6 @@
               <div id="admin-products-mobile-cards" class="admin-mobile-cards-grid"></div>
             </div>
           </section>
-
-          <!-- SECTION 3: SETTINGS -->
-          <section id="admin-sec-settings" class="admin-sec" style="display:none;">
-            <div class="admin-card">
-              <h3 class="admin-card-title" style="margin-bottom:16px;">Ադմինիստրատորների Ցուցակ</h3>
-              <p style="font-size:13.5px; color:var(--tuff); margin-bottom:24px;">Այս էլ․ փոստերն ունեն լիարժեք մուտք դեպի Urartoo Ադմին Համակարգ։</p>
-              <div id="admin-whitelist-container"></div>
-            </div>
-          </section>
-
-          <!-- SECTION 4: CLIENTS -->
-          <section id="admin-sec-clients" class="admin-sec" style="display:none;">
-            <div class="admin-card">
-              <h3 class="admin-card-title" style="margin-bottom:16px;">Գրանցված Հաճախորդներ</h3>
-              <div style="overflow-x:auto;">
-                <table class="admin-table">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Անուն Ազգանուն</th>
-                      <th>Էլ․ փոստ</th>
-                      <th>Անդամագրման Ամսաթիվ</th>
-                      <th>Պատվերներ</th>
-                    </tr>
-                  </thead>
-                  <tbody id="admin-clients-tbody"></tbody>
-                </table>
-              </div>
-            </div>
-          </section>
-
-          <!-- SECTION 5: AUDIT LOGS -->
-          <section id="admin-sec-logs" class="admin-sec" style="display:none;">
-            <div class="admin-card">
-              <h3 class="admin-card-title" style="margin-bottom:16px;">Գործողությունների Մատյան (Audit Logs)</h3>
-              <div style="overflow-x:auto;">
-                <table class="admin-table">
-                  <thead>
-                    <tr>
-                      <th>Ամսաթիվ / Ժամ</th>
-                      <th>Օպերատոր</th>
-                      <th>Կատարված Գործողություն</th>
-                    </tr>
-                  </thead>
-                  <tbody id="admin-logs-tbody"></tbody>
-                </table>
-              </div>
-            </div>
-          </section>
-
         </main>
       </div>
     </div>
