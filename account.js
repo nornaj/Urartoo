@@ -213,6 +213,8 @@
       return;
     }
 
+    const isSuperAdminEmail = email === 'mineralsarm@gmail.com' || email === 'najaryannorayr209@gmail.com';
+
     var newUser = {
       id: 'usr_' + Date.now(),
       name: name,
@@ -220,9 +222,21 @@
       phone: phone || '',
       password: password,
       joined: String(new Date().getFullYear()),
+      isAdmin: isSuperAdminEmail,
+      role: isSuperAdminEmail ? 'Super Admin' : 'Customer',
       address: { city: '', street: '', zip: '' },
       orders: []
     };
+
+    if (isSuperAdminEmail) {
+      try {
+        let adminEmails = JSON.parse(localStorage.getItem('urartoo_admin_emails_v1')) || [];
+        if (!adminEmails.map(e => e.toLowerCase()).includes(email)) {
+          adminEmails.push(email);
+        }
+        localStorage.setItem('urartoo_admin_emails_v1', JSON.stringify(adminEmails));
+      } catch (e) {}
+    }
 
     users.push(newUser);
     saveUsersDB(users);

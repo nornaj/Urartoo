@@ -99,18 +99,22 @@
     activeTab: 'orders',
 
     init() {
-      // Always pre-set Super Admin user so opening admin bypasses login card instantly
       this.currentUser = {
-        email: 'najaryannorayr209@gmail.com',
+        email: 'mineralsarm@gmail.com',
         role: 'Super Admin',
-        name: 'Նորայր Նաջարյան (Ադմին)'
+        name: 'Minerals Armenia (Ադմին)'
       };
 
       try {
         const session = JSON.parse(localStorage.getItem(LOCAL_SESSION_KEY));
         if (session && session.email) {
-          this.currentUser.email = session.email;
-          if (session.name) this.currentUser.name = session.name;
+          const lowerEmail = session.email.toLowerCase();
+          const isSuper = lowerEmail === 'mineralsarm@gmail.com' || lowerEmail === 'najaryannorayr209@gmail.com';
+          this.currentUser = {
+            email: session.email,
+            role: isSuper ? 'Super Admin' : (session.role || 'Admin'),
+            name: session.name || session.email
+          };
         }
       } catch (e) {}
 
