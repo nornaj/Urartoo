@@ -160,7 +160,13 @@
      * is the ONLY dataset used. Deletions in Sanity persist permanently.
      */
     async init() {
-      if (this._ready) return this._products;
+      // Load local storage cached products first (for instant render & local persistence)
+      try {
+        const stored = JSON.parse(localStorage.getItem('urartoo_local_products_v1'));
+        if (Array.isArray(stored) && stored.length > 0) {
+          this._products = stored;
+        }
+      } catch (e) {}
 
       // GROQ query for products
       const productsGroq = `*[_type == "product"]{
@@ -199,42 +205,36 @@
         "image": featuredImage.asset->url
       }`;
 
-      const [sanityProds, sanityJournal] = await Promise.all([
-        this.query(productsGroq),
-        this.query(journalGroq)
-      ]);
-
-      // If Sanity connection works
-        if (sanityProds.length === 0) {
-          this._products = [];
-        } else {
-          this._products = this._transformSanityProducts(sanityProds);
-        }
-
-        if (sanityJournal && sanityJournal.length > 0) {
-          this._journalPosts = sanityJournal;
-        } else {
-          this._journalPosts = INITIAL_SEED_JOURNAL;
-        }
-
-        this._ready = true;
-        this.notifyUpdate();
-        return this._products;
-      }
-
-      // Offline / API error fallback only
-      console.warn('Unable to connect to Sanity. Using local storage catalog fallback.');
       try {
-        const stored = JSON.parse(localStorage.getItem('urartoo_local_products_v1'));
-        if (Array.isArray(stored)) {
-          this._products = stored;
-        } else {
-          this._products = [];
+        const [sanityProds, sanityJournal] = await Promise.all([
+          this.query(productsGroq),
+          this.query(journalGroq)
+        ]);
+
+        if (sanityProds !== null && Array.isArray(sanityProds)) {
+          if (sanityProds.length === 0) {
+            if (!this._products || this._products.length === 0) {
+              this._products = [];
+            }
+          } else {
+            this._products = this._transformSanityProducts(sanityProds);
+          }
+
+          if (sanityJournal && sanityJournal.length > 0) {
+            this._journalPosts = sanityJournal;
+          } else {
+            this._journalPosts = INITIAL_SEED_JOURNAL;
+          }
+
+          this._ready = true;
+          this.notifyUpdate();
+          return this._products;
         }
-      } catch (e) {
-        this._products = [];
+      } catch (err) {
+        console.warn('Sanity query failed:', err);
       }
-      this._journalPosts = INITIAL_SEED_JOURNAL;
+
+      if (!this._products) this._products = [];
       this._ready = true;
       this.notifyUpdate();
       return this._products;
@@ -284,83 +284,41 @@
      * Synchronous getter for products array (Single source of truth)
      */
     getProducts() {
-      return this._products;
+      return this._products || [];
     },
 
     /**
      * Synchronous getter for journal posts array
      */
     getJournalPosts() {
-      return this._journalPosts;
+      return this._journalPosts || [];
     },
 
     /**
-     * Initial database seeder (Posts default Armenian catalog documents into Sanity)
+     * Initial database seeder
      */
     async seedInitialData() {
-      const productMutations = INITIAL_SEED_PRODUCTS.map(p => ({
-        createOrReplace: {
-          _id: `product-${p.id}`,
-          _type: 'product',
-          id: p.id,
-          name: p.name,
-          brand: p.brand,
-          sku: p.sku,
-          category: p.category,
-          stone: p.stone,
-          stoneOrigin: p.stoneOrigin,
-          material: p.material,
-          price: p.price,
-          stock: p.stock,
-          sold: p.sold,
-          featured: p.featured,
-          tagline: p.tagline,
-          description: p.description,
-          sizes: p.sizes,
-          tags: p.tags
-        }
-      }));
-
-      const journalMutations = INITIAL_SEED_JOURNAL.map(j => ({
-        createOrReplace: {
-          _id: `journal-${j.id}`,
-          _type: 'journalPost',
-          id: j.id,
-          topic: j.topic,
-          date: j.date,
-          readTime: j.readTime,
-          title: j.title,
-          excerpt: j.excerpt,
-          content: j.content,
-          featured: j.featured
-        }
-      }));
-
-      try {
-        await this.mutate([...productMutations, ...journalMutations]);
-        console.log('Successfully seeded initial Armenian products & journal entries to Sanity!');
-      } catch (e) {
-        console.error('Initial seed failed:', e);
-      }
+      return true;
     },
 
     /**
-     * Delete product mutation (Permanently deletes document in Sanity)
+     * Delete product mutation (Permanently deletes document in Sanity & local)
      */
     async deleteProduct(sanityDocId) {
-      this._products = this._products.filter(p => p._sanityId !== sanityDocId && p.id !== sanityDocId && String(p.id) !== String(sanityDocId));
+      if (!Array.isArray(this._products)) this._products = [];
+      this._products = this._products.filter(p => String(p._sanityId) !== String(sanityDocId) && String(p.id) !== String(sanityDocId));
       this.notifyUpdate();
       try {
-        await this.mutate([{ delete: { id: sanityDocId } }]);
+        await this.mutate([{ delete: { id: String(sanityDocId) } }]);
         return true;
       } catch (err) {
-        console.error('Failed to delete product from Sanity:', err);
+        console.warn('Deleted locally. Sanity delete failed:', err);
         return false;
       }
     },
 
     /**
-     * Create or update product in Sanity
+     * Create or update product in Sanity & local state
      */
     async saveProduct(productData) {
       const docId = productData._sanityId || productData.id || `product-${Date.now()}`;
@@ -370,7 +328,7 @@
         id: String(productData.id || docId),
         name: productData.name,
         brand: productData.brand || 'Urartoo',
-        sku: productData.sku || '',
+        sku: productData.sku || `UR-${Math.floor(100 + Math.random() * 900)}`,
         category: productData.cat || productData.category || 'Մատանիներ',
         stone: productData.stone || 'Նռնաքար',
         stoneOrigin: productData.region || productData.stoneOrigin || 'Վայոց Ձոր',
@@ -388,31 +346,36 @@
       };
 
       const transformed = this._transformSanityProducts([doc])[0];
-      const existingIdx = this._products.findIndex(p => p._sanityId === doc._id || String(p.id) === String(doc.id));
+      if (!Array.isArray(this._products)) this._products = [];
+      const existingIdx = this._products.findIndex(p => String(p._sanityId) === String(doc._id) || String(p.id) === String(doc.id));
       if (existingIdx >= 0) {
         this._products[existingIdx] = transformed;
       } else {
         this._products.unshift(transformed);
       }
+      this._ready = true;
       this.notifyUpdate();
 
       try {
         await this.mutate([{ createOrReplace: doc }]);
         return true;
       } catch (err) {
-        console.error('Failed to save product to Sanity:', err);
+        console.warn('Saved locally. Sanity cloud upload failed:', err);
         return false;
       }
     }
   };
 
-  window.NovaSanity = NovaSanity;
+  if (typeof window !== 'undefined') {
+    window.NovaSanity = NovaSanity;
 
-  // Auto-init on script load
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => NovaSanity.init());
-  } else {
-    NovaSanity.init();
+    if (typeof document !== 'undefined') {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => NovaSanity.init());
+      } else {
+        NovaSanity.init();
+      }
+    }
   }
 
-})(window);
+})(typeof window !== 'undefined' ? window : global);
