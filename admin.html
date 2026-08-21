@@ -10,6 +10,31 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Sans+Armenian:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+
+  <!-- Instant Head Authentication Guard for Admin Page -->
+  <script>
+    (function () {
+      var allowedAdmins = ['mineralsarm@gmail.com', 'najaryannorayr209@gmail.com'];
+      try {
+        var extraAdmins = JSON.parse(localStorage.getItem('urartoo_admin_emails_v1')) || [];
+        extraAdmins.forEach(function(e) {
+          if (e && !allowedAdmins.includes(e.toLowerCase())) allowedAdmins.push(e.toLowerCase());
+        });
+      } catch (e) {}
+
+      var session = null;
+      try {
+        session = JSON.parse(localStorage.getItem('urartoo_user_session_v1'));
+      } catch (e) {}
+
+      var userEmail = (session && session.email) ? session.email.toLowerCase() : '';
+      var isAuthorized = session && (session.isAdmin === true || allowedAdmins.includes(userEmail));
+
+      if (!isAuthorized) {
+        window.location.href = 'account.html?redirect=admin&msg=unauthorized';
+      }
+    })();
+  </script>
 </head>
 <body class="in-admin-mode" style="background:#FAF8F5; margin:0; padding:0; min-height:100vh;">
 

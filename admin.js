@@ -98,25 +98,27 @@
     currentUser: null,
     activeTab: 'orders',
 
-    init() {
-      this.currentUser = {
-        email: 'mineralsarm@gmail.com',
-        role: 'Super Admin',
-        name: 'Minerals Armenia (Ադմին)'
-      };
-
+    getCurrentSession() {
       try {
         const session = JSON.parse(localStorage.getItem(LOCAL_SESSION_KEY));
         if (session && session.email) {
           const lowerEmail = session.email.toLowerCase();
-          const isSuper = lowerEmail === 'mineralsarm@gmail.com' || lowerEmail === 'najaryannorayr209@gmail.com';
-          this.currentUser = {
-            email: session.email,
-            role: isSuper ? 'Super Admin' : (session.role || 'Admin'),
-            name: session.name || session.email
-          };
+          const allowedAdmins = getAdminEmails();
+          if (session.isAdmin === true || allowedAdmins.includes(lowerEmail)) {
+            return {
+              email: session.email,
+              role: 'Super Admin',
+              name: session.name || session.email,
+              isAdmin: true
+            };
+          }
         }
       } catch (e) {}
+      return null;
+    },
+
+    init() {
+      this.currentUser = this.getCurrentSession();
 
       const initHash = (window.location.hash || '').replace('#', '').replace('/', '').trim().toLowerCase();
       if (initHash === 'products' || initHash === 'inventory') {
@@ -140,6 +142,17 @@
       const isAdminRoute = rawHash.includes('admin') || hash === 'products' || hash === 'orders' || path.endsWith('/admin') || path.endsWith('/admin.html') || path.includes('admin');
 
       if (isAdminRoute) {
+        const session = this.getCurrentSession();
+        if (!session) {
+          adminView.style.display = 'none';
+          document.body.classList.remove('in-admin-mode');
+          if (!window.location.pathname.endsWith('account.html')) {
+            window.location.href = 'account.html?redirect=admin&msg=unauthorized';
+          }
+          return;
+        }
+
+        this.currentUser = session;
         adminView.style.display = 'block';
         document.body.classList.add('in-admin-mode');
 

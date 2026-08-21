@@ -562,6 +562,14 @@
   document.addEventListener('DOMContentLoaded', function () {
     initUsersDatabase();
     renderAccountPage();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('msg') === 'unauthorized') {
+      const alertBox = document.getElementById('auth-alert');
+      if (alertBox) {
+        showAlert(alertBox, '🔒 Ադմինիստրատորի էջ մուտք գործելու համար անհրաժեշտ է մուտք գործել ադմինիստրատորի հաշվով։', 'error');
+      }
+    }
   });
 
 })();
