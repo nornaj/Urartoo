@@ -191,25 +191,31 @@
         images
       }`;
 
-      // GROQ query for journal posts
-      const journalGroq = `*[_type == "journalPost"]{
+      // GROQ query for user accounts
+      const usersGroq = `*[_type == "user"]{
         _id,
         id,
-        topic,
-        date,
-        readTime,
-        title,
-        excerpt,
-        content,
-        featured,
-        "image": featuredImage.asset->url
+        name,
+        email,
+        phone,
+        password,
+        joined,
+        isAdmin,
+        role,
+        address,
+        orders
       }`;
 
       try {
-        const [sanityProds, sanityJournal] = await Promise.all([
+        const [sanityProds, sanityJournal, sanityUsers] = await Promise.all([
           this.query(productsGroq),
-          this.query(journalGroq)
+          this.query(journalGroq),
+          this.query(usersGroq)
         ]);
+
+        if (sanityUsers && Array.isArray(sanityUsers)) {
+          this._syncCloudUsersToLocal(sanityUsers);
+        }
 
         if (sanityProds !== null && Array.isArray(sanityProds)) {
           if (sanityProds.length === 0) {
@@ -228,7 +234,7 @@
 
           this._ready = true;
           this.notifyUpdate();
-          return this._products;
+        }  return this._products;
         }
       } catch (err) {
         console.warn('Sanity query failed:', err);
@@ -361,6 +367,119 @@
         return true;
       } catch (err) {
         console.warn('Saved locally. Sanity cloud upload failed:', err);
+        return false;
+      }
+    },
+
+    /**
+     * GROQ Query & Sync Cloud User Accounts from Sanity
+     */
+    async getUsers() {
+      const usersGroq = `*[_type == "user"]{
+        _id,
+        id,
+        name,
+        email,
+        phone,
+        password,
+        joined,
+        isAdmin,
+        role,
+        address,
+        orders
+      }`;
+      try {
+        const cloudUsers = await this.query(usersGroq);
+        if (Array.isArray(cloudUsers) && cloudUsers.length > 0) {
+          this._syncCloudUsersToLocal(cloudUsers);
+          return cloudUsers;
+        }
+      } catch (err) {
+        console.warn('Sanity getUsers error:', err);
+      }
+      return [];
+    },
+
+    /**
+     * Merges Sanity Cloud user accounts into urartoo_users_db_v1 in localStorage
+     */
+    _syncCloudUsersToLocal(cloudUsers) {
+      if (!Array.isArray(cloudUsers)) return;
+      let localUsers = [];
+      try {
+        localUsers = JSON.parse(localStorage.getItem('urartoo_users_db_v1')) || [];
+      } catch (e) { localUsers = []; }
+
+      let updated = false;
+      cloudUsers.forEach(cu => {
+        if (!cu || !cu.email) return;
+        const lowerEmail = String(cu.email).trim().toLowerCase();
+        const idx = localUsers.findIndex(u => u && u.email && u.email.trim().toLowerCase() === lowerEmail);
+
+        const userObj = {
+          id: cu.id || cu._id || `usr_${Date.now()}`,
+          name: cu.name || lowerEmail,
+          email: lowerEmail,
+          phone: cu.phone || '',
+          password: String(cu.password || ''),
+          joined: cu.joined || String(new Date().getFullYear()),
+          isAdmin: Boolean(cu.isAdmin),
+          role: cu.role || (cu.isAdmin ? 'Super Admin' : 'Customer'),
+          address: cu.address || { city: '', street: '', zip: '' },
+          orders: cu.orders || []
+        };
+
+        if (idx >= 0) {
+          if (!localUsers[idx].password && userObj.password) {
+            localUsers[idx].password = userObj.password;
+            updated = true;
+          }
+          if (userObj.isAdmin) {
+            localUsers[idx].isAdmin = true;
+            localUsers[idx].role = 'Super Admin';
+            updated = true;
+          }
+        } else {
+          localUsers.push(userObj);
+          updated = true;
+        }
+      });
+
+      if (updated) {
+        try {
+          localStorage.setItem('urartoo_users_db_v1', JSON.stringify(localUsers));
+        } catch (e) {}
+      }
+    },
+
+    /**
+     * Creates or updates a user document in Sanity Cloud Database
+     */
+    async saveUser(userData) {
+      if (!userData || !userData.email) return false;
+      const lowerEmail = String(userData.email).trim().toLowerCase();
+      const docId = `user-${lowerEmail.replace(/[^a-z0-9]/gi, '_')}`;
+
+      const doc = {
+        _id: docId,
+        _type: 'user',
+        id: userData.id || docId,
+        name: userData.name || lowerEmail,
+        email: lowerEmail,
+        phone: userData.phone || '',
+        password: String(userData.password || ''),
+        joined: String(userData.joined || new Date().getFullYear()),
+        isAdmin: Boolean(userData.isAdmin),
+        role: userData.role || (userData.isAdmin ? 'Super Admin' : 'Customer'),
+        address: userData.address || { city: '', street: '', zip: '' },
+        orders: userData.orders || []
+      };
+
+      try {
+        await this.mutate([{ createOrReplace: doc }]);
+        return true;
+      } catch (err) {
+        console.warn('Could not save user to Sanity Cloud:', err);
         return false;
       }
     }

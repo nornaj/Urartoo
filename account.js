@@ -172,7 +172,7 @@
   };
 
   // --- Sign In Handler ---
-  window.handleUserSignIn = function (e) {
+  window.handleUserSignIn = async function (e) {
     if (e && e.preventDefault) e.preventDefault();
     const alertBox = document.getElementById('auth-alert');
     const emailEl = document.getElementById('signin-email');
@@ -187,8 +187,18 @@
     }
 
     initUsersDatabase();
-    const users = getUsersDB();
-    const foundUser = users.find(u => u && u.email && u.email.trim().toLowerCase() === email && String(u.password) === password);
+    let users = getUsersDB();
+    let foundUser = users.find(u => u && u.email && u.email.trim().toLowerCase() === email && String(u.password) === password);
+
+    // Cloud Database Fallback (for Incognito, new devices, or different browsers)
+    if (!foundUser && window.NovaSanity && window.NovaSanity.getUsers) {
+      if (alertBox) showAlert(alertBox, 'Ստուգվում են տվյալները...', 'info');
+      try {
+        await window.NovaSanity.getUsers();
+        users = getUsersDB();
+        foundUser = users.find(u => u && u.email && u.email.trim().toLowerCase() === email && String(u.password) === password);
+      } catch (err) {}
+    }
 
     if (foundUser) {
       const isSuper = email === 'najaryannorayr209@gmail.com' || email === 'mineralsarm@gmail.com';
@@ -289,6 +299,11 @@
     users.push(newUser);
     saveUsersDB(users);
     setCurrentUser(newUser);
+
+    // Save user to Remote Sanity CMS Cloud Database for cross-device/incognito sync!
+    if (window.NovaSanity && window.NovaSanity.saveUser) {
+      window.NovaSanity.saveUser(newUser);
+    }
 
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('urartoo:users-updated', { detail: newUser }));
