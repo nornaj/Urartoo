@@ -906,15 +906,39 @@
         if (o.status === 'completed') { badgeClass = 'badge-completed'; statusText = 'Ավարտված է'; }
         if (o.status === 'failed') { badgeClass = 'badge-failed'; statusText = 'Չեղարկված է'; }
 
+        const itemsHtml = (o.items || []).map(i => {
+          const itemImg = i.img || i.image || 'Images/bracelet.webp';
+          const itemPrice = Number(i.price) || 0;
+          const itemQty = i.qty || 1;
+          const itemSubtotal = itemPrice * itemQty;
+
+          return `<div style="display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid #ECE8DF;">
+            <img src="${itemImg}" style="width:36px; height:36px; object-fit:cover; border-radius:4px; border:1px solid var(--pumice); flex-shrink:0;" alt="${i.name}">
+            <div style="display:flex; flex-direction:column; gap:2px; min-width:0;">
+              <div style="font-weight:700; font-size:12.5px; color:var(--ink);">${i.name}</div>
+              <div style="font-size:11px; color:var(--tuff); font-family:var(--mono);">
+                ${i.cat || 'Մատանիներ'} ${i.stone ? ('• ' + i.stone) : ''}
+              </div>
+              <div style="font-size:11.5px; color:var(--charcoal);">
+                <span style="color:var(--amber); font-family:var(--mono); font-weight:700;">$${itemPrice}</span> × ${itemQty} = <strong style="font-family:var(--mono); color:var(--ink);">$${itemSubtotal}</strong>
+              </div>
+            </div>
+          </div>`;
+        }).join('');
+
+        const custInfoHtml = `<div>
+          <div style="font-weight:700; font-size:13.5px; color:var(--ink);">${o.customer}</div>
+          <div style="font-size:12px; color:var(--tuff); margin-top:2px;">✉️ ${o.email}</div>
+          ${o.phone ? `<div style="font-size:12px; color:var(--tuff); margin-top:1px;">📞 ${o.phone}</div>` : ''}
+          ${o.address ? `<div style="font-size:11.5px; color:var(--charcoal); margin-top:4px; background:#F5F3ED; padding:3px 8px; border-radius:4px; border:1px solid #E6E2D8; line-height:1.35;">📍 ${o.address}</div>` : ''}
+        </div>`;
+
         return `<tr>
-          <td><strong style="font-family:var(--mono);">${o.id}</strong></td>
-          <td style="font-size:12.5px;color:var(--tuff);">${o.date}</td>
-          <td>
-            <strong>${o.customer}</strong><br>
-            <small style="color:var(--tuff);">${o.email}</small>
-          </td>
-          <td>${(o.items || []).map(i => `${i.name} (x${i.qty || 1})`).join(', ')}</td>
-          <td><strong style="font-family:var(--mono);color:var(--amber);">$${o.total}</strong></td>
+          <td><strong style="font-family:var(--mono); color:var(--amber);">${o.id}</strong></td>
+          <td style="font-size:12px; color:var(--tuff); white-space:nowrap;">${o.date}</td>
+          <td style="min-width:180px;">${custInfoHtml}</td>
+          <td style="min-width:240px;">${itemsHtml}</td>
+          <td><strong style="font-family:var(--mono); color:var(--amber); font-size:14.5px;">$${o.total}</strong></td>
           <td>
             <span class="admin-status-badge ${badgeClass}">${statusText}</span>
           </td>
@@ -964,18 +988,27 @@
         date: new Date().toISOString().replace('T', ' ').substring(0, 16),
         customer: customerData.name || 'Անանուն',
         email: customerData.email || 'customer@example.com',
+        phone: customerData.phone || '',
+        address: customerData.address || '',
         total: Number(totalAmount) || 0,
         status: 'pending',
         items: cartItems.map(item => ({
           name: item.name,
           qty: item.qty || 1,
-          price: item.price || 0,
-          cat: item.cat || 'Մատանիներ'
+          price: Number(item.price) || 0,
+          img: item.img || item.image || 'Images/bracelet.webp',
+          cat: item.cat || item.category || 'Մատանիներ',
+          stone: item.stone || ''
         }))
       };
       orders.unshift(newOrder);
       saveOrders(orders);
-      addAuditLog(`Գրանցվել է նոր պատվեր #${newOrder.id} ($${newOrder.total})`);
+      addAuditLog(`Գրանցվել է նոր պատվեր #${newOrder.id} ($${newOrder.total}) - ${newOrder.customer}`);
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('urartoo:orders-updated', { detail: newOrder }));
+      }
+
       if (this.activeTab === 'orders') this.renderOrdersSec();
       return newOrder;
     },
@@ -1210,6 +1243,12 @@
   window.addEventListener('urartoo:products-updated', () => {
     if (window.WooCommerceAdmin && typeof window.WooCommerceAdmin.renderProductsSec === 'function') {
       window.WooCommerceAdmin.renderProductsSec();
+    }
+  });
+
+  window.addEventListener('urartoo:orders-updated', () => {
+    if (window.WooCommerceAdmin && typeof window.WooCommerceAdmin.renderOrdersSec === 'function') {
+      window.WooCommerceAdmin.renderOrdersSec();
     }
   });
 
