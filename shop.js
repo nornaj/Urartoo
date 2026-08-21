@@ -31,6 +31,28 @@
   let minPrice = 100;
   let maxPrice = 600;
   let activeSort = 'new';
+
+  // Read URL parameters if coming from Homepage stone/category cards
+  try {
+    var urlParams = new URLSearchParams(window.location.search);
+    var stoneParam = urlParams.get('stone');
+    var catParam = urlParams.get('cat');
+
+    if (stoneParam) {
+      activeStone = stoneParam;
+      document.querySelectorAll('#stone-chips .filter-chip').forEach(function(c) {
+        c.classList.toggle('active', c.dataset.stone === stoneParam);
+      });
+    }
+
+    if (catParam) {
+      activeCat = catParam;
+      document.querySelectorAll('#cat-chips .filter-chip').forEach(function(c) {
+        c.classList.toggle('active', c.dataset.cat === catParam);
+      });
+    }
+  } catch (e) {}
+
   // Initialize from localStorage
   var savedItems = {};
   var addedItems = {};

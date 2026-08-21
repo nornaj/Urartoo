@@ -117,16 +117,64 @@
   }
 
   /* ─── Categories ───────────────────────────────────────────────── */
-  const catGrid = document.getElementById('categories-grid');
-  if (catGrid) {
+  function renderCategories() {
+    var catGrid = document.getElementById('categories-grid');
+    if (!catGrid) return;
+
+    var currentPieces = (window.NovaSanity && window.NovaSanity._ready)
+      ? window.NovaSanity.getProducts()
+      : pieces;
+
     catGrid.innerHTML = categories.map(function (c) {
-      return '<a href="shop.html" class="category-card">' +
+      var realCount = (currentPieces || []).filter(function (p) {
+        var pCat = (p.cat || p.category || '').trim().toLowerCase();
+        return pCat === c.name.trim().toLowerCase();
+      }).length;
+
+      return '<a href="shop.html?cat=' + encodeURIComponent(c.name) + '" class="category-card">' +
         '<div class="category-img">' +
           '<div class="category-img-inner">' +
             '<img src="' + c.img + '" alt="' + c.name + '" loading="lazy">' +
           '</div>' +
-          '<span class="category-badge">' + c.name + '</span>' +
+          '<span class="category-badge">' + c.name + ' (' + realCount + ')</span>' +
         '</div>' +
+      '</a>';
+    }).join('');
+  }
+
+  /* ─── Stones ───────────────────────────────────────────────────── */
+  function renderStones() {
+    var stonesGrid = document.getElementById('stones-grid');
+    if (!stonesGrid) return;
+
+    var currentPieces = (window.NovaSanity && window.NovaSanity._ready)
+      ? window.NovaSanity.getProducts()
+      : pieces;
+
+    stonesGrid.innerHTML = stones.map(function (s) {
+      var realCount = (currentPieces || []).filter(function (p) {
+        var pStone = (p.stone || '').trim().toLowerCase();
+        var pName = (p.name || '').trim().toLowerCase();
+        var sName = s.name.trim().toLowerCase();
+        return pStone === sName || pName.indexOf(sName) !== -1;
+      }).length;
+
+      return '<a href="shop.html?stone=' + encodeURIComponent(s.name) + '" class="stone-card">' +
+        '<span class="stone-card-top">' +
+          '<span class="stone-eyebrow">' + s.name + '</span>' +
+          '<span class="stone-chevron">' +
+            '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FAF8F5" stroke-width="2.4"><path d="M9 5l7 7-7 7"/></svg>' +
+          '</span>' +
+        '</span>' +
+        '<span class="stone-headline">' + s.headline + '</span>' +
+        '<span class="stone-note">' + s.note + '</span>' +
+        '<span class="stone-swatch-wrap">' +
+          '<span class="stone-swatch" style="background:' + s.color + '"></span>' +
+        '</span>' +
+        '<span class="stone-foot">' +
+          '<span class="stone-region">' + s.region + '</span>' +
+          '<span class="stone-count">' + realCount + ' զարդ</span>' +
+        '</span>' +
       '</a>';
     }).join('');
   }
@@ -284,16 +332,21 @@
     };
   }
 
-  if (window.NovaSanity) {
-    window.NovaSanity.init().then(function() { renderProducts(); });
-  } else {
+  function updateAllStoreData() {
     renderProducts();
+    renderCategories();
+    renderStones();
+  }
+
+  if (window.NovaSanity) {
+    window.NovaSanity.init().then(function() { updateAllStoreData(); });
+  } else {
+    updateAllStoreData();
   }
 
   window.addEventListener('urartoo:products-updated', function () {
-    renderProducts();
+    updateAllStoreData();
   });
-
   /* ─── Product Slider Controls ──────────────────────────────────── */
   var prevBtn = document.getElementById('prod-prev');
   var nextBtn = document.getElementById('prod-next');
@@ -310,30 +363,6 @@
       var cardWidth = card ? card.offsetWidth : 280;
       prodGrid.scrollBy({ left: (cardWidth + 20), behavior: 'smooth' });
     });
-  }
-
-  /* ─── Stones ───────────────────────────────────────────────────── */
-  var stonesGrid = document.getElementById('stones-grid');
-  if (stonesGrid) {
-    stonesGrid.innerHTML = stones.map(function (s) {
-      return '<a href="shop.html" class="stone-card">' +
-        '<span class="stone-card-top">' +
-          '<span class="stone-eyebrow">' + s.name + '</span>' +
-          '<span class="stone-chevron">' +
-            '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FAF8F5" stroke-width="2.4"><path d="M9 5l7 7-7 7"/></svg>' +
-          '</span>' +
-        '</span>' +
-        '<span class="stone-headline">' + s.headline + '</span>' +
-        '<span class="stone-note">' + s.note + '</span>' +
-        '<span class="stone-swatch-wrap">' +
-          '<span class="stone-swatch" style="background:' + s.color + '"></span>' +
-        '</span>' +
-        '<span class="stone-foot">' +
-          '<span class="stone-region">' + s.region + '</span>' +
-          '<span class="stone-count">' + s.count + ' զարդ</span>' +
-        '</span>' +
-      '</a>';
-    }).join('');
   }
 
   /* ─── Testimonials Slider ─────────────────────────────────────── */
