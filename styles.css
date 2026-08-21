@@ -3990,3 +3990,9 @@ select option:checked {
   display: none !important;
 }
 
+/* Hide newsletter banner across all pages */
+.newsletter, .journal-nl-banner {
+  display: none !important;
+}
+
+
