@@ -920,23 +920,10 @@
       </ul>`;
     },
 
-    /* TAB 4: CLIENTS RENDERER */
-    renderClientsSec() {
-      const tbody = document.getElementById('admin-clients-tbody');
-      if (!tbody) return;
-      let users = [];
-      try { users = JSON.parse(localStorage.getItem('urartoo_users_db_v1')) || []; } catch (e) {}
-      if (users.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--tuff);">Գրանցված հաճախորդներ չկան</td></tr>';
-        return;
-      }
-      tbody.innerHTML = users.map(u => `<tr>
-        <td><code style="font-family:var(--mono);">${u.id || 'usr-1'}</code></td>
-        <td><strong>${u.name}</strong></td>
-        <td>${u.email}</td>
-        <td>${u.joined || '2026'}</td>
-        <td><strong style="color:var(--amber);">${(u.orders || []).length} պատվեր</strong></td>
-      </tr>`).join('');
+    /* TAB 4: CLIENTS RENDERER (fetches from Sanity) */
+    async renderClientsSec() {
+      // Delegate to the detailed Sanity-based renderer
+      await this._renderClientsFromSanity();
     },
 
     /* TAB 5: AUDIT LOGS RENDERER */
@@ -1159,14 +1146,25 @@
       this.renderProductsSec();
     },
 
-    renderClientsSec() {
+    async _renderClientsFromSanity() {
       const tbody = document.getElementById('admin-clients-tbody');
       const searchInput = document.getElementById('admin-client-search');
       const searchQ = searchInput ? searchInput.value.trim().toLowerCase() : '';
 
       const orders = getOrders();
+
+      // Fetch users from Sanity CMS (sole source of truth)
       let usersDB = [];
-      try { usersDB = JSON.parse(localStorage.getItem('urartoo_users_db_v1')) || []; } catch (e) { usersDB = []; }
+      try {
+        const SANITY_TOKEN = 'sknNBnm3TWuTaSZw1TnVkytJGAZT2dTrDMKqVypR4SeaHcq71pMhBnZulwLmjC12rmwe1xMYFIt8t78BcXkmueG1HFwVIzACwXOc4qEq3y0fEHcegdVZCUeCqo9QDZbCzfmprbB4SQQkfWV3Gx4Xdz1ZkEcq0hXpjwnYLO6TPLMuS7c2wsud';
+        const groq = encodeURIComponent('*[_type == "userAccount"]{ _id, name, email, phone, joined, isAdmin, role, orders }');
+        const url = 'https://g1vi85kp.api.sanity.io/v2024-01-01/data/query/production?query=' + groq;
+        const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + SANITY_TOKEN } });
+        if (res.ok) {
+          const data = await res.json();
+          usersDB = data.result || [];
+        }
+      } catch (e) { console.warn('Failed to fetch users from Sanity:', e); }
 
       const clientMap = new Map();
 
