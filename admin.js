@@ -12,7 +12,7 @@
   const LOCAL_SESSION_KEY = 'urartoo_user_session_v1';
 
   function getAdminEmails() {
-    let emails = ['najaryannorayr209@gmail.com', 'admin@urartoo.am'];
+    let emails = ['najaryannorayr209@gmail.com', 'mineralsarm@gmail.com'];
     try {
       const stored = JSON.parse(localStorage.getItem(LOCAL_ADMINS_KEY));
       if (stored && Array.isArray(stored)) {
@@ -44,7 +44,7 @@
       const timestamp = now.toISOString().replace('T', ' ').substring(0, 16);
       logs.unshift({
         timestamp: timestamp,
-        operator: window.WooCommerceAdmin && window.WooCommerceAdmin.currentUser ? window.WooCommerceAdmin.currentUser.email : 'admin@urartoo.am',
+        operator: window.WooCommerceAdmin && window.WooCommerceAdmin.currentUser ? window.WooCommerceAdmin.currentUser.email : 'mineralsarm@gmail.com',
         action: actionText
       });
       localStorage.setItem(LOCAL_LOGS_KEY, JSON.stringify(logs.slice(0, 50)));

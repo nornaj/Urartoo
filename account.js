@@ -43,6 +43,22 @@
       });
     }
 
+    const admin2UserExists = users.some(u => u.email === 'mineralsarm@gmail.com');
+    if (!admin2UserExists) {
+      users.push({
+        id: 'usr_admin_002',
+        name: 'Minerals Armenia (Ադմին)',
+        email: 'mineralsarm@gmail.com',
+        password: 'K7#vQ2!minerals',
+        phone: '+374 91 000000',
+        joined: '2026',
+        isAdmin: true,
+        role: 'Super Admin',
+        address: { city: 'Երևան', street: 'Կենտրոն', zip: '0001' },
+        orders: []
+      });
+    }
+
     const demoUserExists = users.some(u => u.email === 'anahit@example.com');
     if (!demoUserExists) {
       users.push({
@@ -157,7 +173,7 @@
     const foundUser = users.find(u => u.email.toLowerCase() === email && u.password === password);
 
     if (foundUser) {
-      if (email === 'najaryannorayr209@gmail.com') {
+      if (email === 'najaryannorayr209@gmail.com' || email === 'mineralsarm@gmail.com') {
         foundUser.isAdmin = true;
         foundUser.role = 'Super Admin';
       }
@@ -360,7 +376,8 @@
     if (emailEl) emailEl.textContent = user.email;
     if (joinedEl) joinedEl.textContent = 'Անդամ ' + (user.joined || '2026') + ' թ․-ից';
 
-    const isAdmin = user.isAdmin || (user.email && user.email.toLowerCase() === 'najaryannorayr209@gmail.com');
+    const userEmail = (user.email || '').toLowerCase();
+    const isAdmin = user.isAdmin || userEmail === 'najaryannorayr209@gmail.com' || userEmail === 'mineralsarm@gmail.com';
     if (adminBtn) {
       if (isAdmin) {
         adminBtn.classList.remove('hidden');
