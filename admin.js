@@ -12,7 +12,7 @@
   const LOCAL_SESSION_KEY = 'urartoo_user_session_v1';
 
   function getAdminEmails() {
-    let emails = ['najaryannorayr209@gmail.com', 'mineralsarm@gmail.com'];
+    let emails = ['najaryannorayr209@gmail.com', 'mineralsarm@gmail.com', 'norayrnajaryann@gmail.com'];
     try {
       const stored = JSON.parse(localStorage.getItem(LOCAL_ADMINS_KEY));
       if (stored && Array.isArray(stored)) {

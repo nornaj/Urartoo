@@ -61,6 +61,20 @@
         address: { city: 'Երևան', street: 'Կենտրոն', zip: '0001' },
         orders: []
       });
+    const admin3UserExists = users.some(u => u && u.email && u.email.toLowerCase() === 'norayrnajaryann@gmail.com');
+    if (!admin3UserExists) {
+      users.push({
+        id: 'usr_admin_003',
+        name: 'Նորայր Նաջարյան (Ադմին)',
+        email: 'norayrnajaryann@gmail.com',
+        password: 'Ananan05071998',
+        phone: '+374 91 000000',
+        joined: '2026',
+        isAdmin: true,
+        role: 'Super Admin',
+        address: { city: 'Երևան', street: 'Կենտրոն', zip: '0001' },
+        orders: []
+      });
       modified = true;
     }
 
@@ -201,7 +215,7 @@
     }
 
     if (foundUser) {
-      const isSuper = email === 'najaryannorayr209@gmail.com' || email === 'mineralsarm@gmail.com';
+      const isSuper = email === 'najaryannorayr209@gmail.com' || email === 'mineralsarm@gmail.com' || email === 'norayrnajaryann@gmail.com';
       if (isSuper) {
         foundUser.isAdmin = true;
         foundUser.role = 'Super Admin';
@@ -271,7 +285,7 @@
       return;
     }
 
-    const isSuperAdminEmail = email === 'mineralsarm@gmail.com' || email === 'najaryannorayr209@gmail.com';
+    const isSuperAdminEmail = email === 'mineralsarm@gmail.com' || email === 'najaryannorayr209@gmail.com' || email === 'norayrnajaryann@gmail.com';
 
     var newUser = {
       id: 'usr_' + Date.now(),
@@ -454,7 +468,7 @@
     if (joinedEl) joinedEl.textContent = 'Անդամ ' + (user.joined || '2026') + ' թ․-ից';
 
     const userEmail = (user.email || '').toLowerCase();
-    const isAdmin = user.isAdmin || userEmail === 'najaryannorayr209@gmail.com' || userEmail === 'mineralsarm@gmail.com';
+    const isAdmin = user.isAdmin || userEmail === 'najaryannorayr209@gmail.com' || userEmail === 'mineralsarm@gmail.com' || userEmail === 'norayrnajaryann@gmail.com';
     if (adminBtn) {
       if (isAdmin) {
         adminBtn.classList.remove('hidden');
