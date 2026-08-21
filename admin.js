@@ -243,7 +243,7 @@
       });
 
       if (filtered.length === 0) {
-        if (tbody) tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--tuff);">Ապրանքներ չեն գտնվել</td></tr>';
+        if (tbody) tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:36px 16px;color:var(--tuff);">Ապրանքներ չեն գտնվել</td></tr>';
         if (mobileCardsContainer) mobileCardsContainer.innerHTML = '<div style="text-align:center;padding:32px;color:var(--tuff);">Ապրանքներ չեն գտնվել</div>';
         return;
       }
