@@ -61,6 +61,9 @@
         address: { city: 'Երևան', street: 'Կենտրոն', zip: '0001' },
         orders: []
       });
+      modified = true;
+    }
+
     const admin3UserExists = users.some(u => u && u.email && u.email.toLowerCase() === 'norayrnajaryann@gmail.com');
     if (!admin3UserExists) {
       users.push({
