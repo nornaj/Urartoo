@@ -218,15 +218,35 @@
         }
 
         this._ready = true;
+        this.notifyUpdate();
         return this._products;
       }
 
       // Offline / API error fallback only
-      console.warn('Unable to connect to Sanity. Using local catalog fallback.');
-      this._products = INITIAL_SEED_PRODUCTS;
+      console.warn('Unable to connect to Sanity. Using local storage catalog fallback.');
+      try {
+        const stored = JSON.parse(localStorage.getItem('urartoo_local_products_v1'));
+        if (Array.isArray(stored)) {
+          this._products = stored;
+        } else {
+          this._products = [];
+        }
+      } catch (e) {
+        this._products = [];
+      }
       this._journalPosts = INITIAL_SEED_JOURNAL;
       this._ready = true;
+      this.notifyUpdate();
       return this._products;
+    },
+
+    notifyUpdate() {
+      try {
+        localStorage.setItem('urartoo_local_products_v1', JSON.stringify(this._products));
+      } catch (e) {}
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('urartoo:products-updated', { detail: this._products }));
+      }
     },
 
     _transformSanityProducts(docs) {
@@ -328,10 +348,10 @@
      * Delete product mutation (Permanently deletes document in Sanity)
      */
     async deleteProduct(sanityDocId) {
+      this._products = this._products.filter(p => p._sanityId !== sanityDocId && p.id !== sanityDocId && String(p.id) !== String(sanityDocId));
+      this.notifyUpdate();
       try {
         await this.mutate([{ delete: { id: sanityDocId } }]);
-        // Remove locally from cached state
-        this._products = this._products.filter(p => p._sanityId !== sanityDocId && p.id !== sanityDocId);
         return true;
       } catch (err) {
         console.error('Failed to delete product from Sanity:', err);
@@ -343,9 +363,9 @@
      * Create or update product in Sanity
      */
     async saveProduct(productData) {
-      const docId = productData._sanityId || `product-${productData.id || Date.now()}`;
+      const docId = productData._sanityId || productData.id || `product-${Date.now()}`;
       const doc = {
-        _id: docId,
+        _id: String(docId),
         _type: 'product',
         id: String(productData.id || docId),
         name: productData.name,
@@ -367,9 +387,17 @@
         tags: productData.tags || []
       };
 
+      const transformed = this._transformSanityProducts([doc])[0];
+      const existingIdx = this._products.findIndex(p => p._sanityId === doc._id || String(p.id) === String(doc.id));
+      if (existingIdx >= 0) {
+        this._products[existingIdx] = transformed;
+      } else {
+        this._products.unshift(transformed);
+      }
+      this.notifyUpdate();
+
       try {
         await this.mutate([{ createOrReplace: doc }]);
-        await this.init(); // Refresh products
         return true;
       } catch (err) {
         console.error('Failed to save product to Sanity:', err);

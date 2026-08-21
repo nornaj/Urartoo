@@ -271,5 +271,10 @@
 
   filterAndSort();
   window.addEventListener('sanityCatalogReady', filterAndSort);
+  window.addEventListener('urartoo:products-updated', filterAndSort);
+
+  if (window.NovaSanity && !window.NovaSanity._ready) {
+    window.NovaSanity.init().then(filterAndSort);
+  }
 
 })();

@@ -217,6 +217,10 @@
     renderProducts();
   }
 
+  window.addEventListener('urartoo:products-updated', function () {
+    renderProducts();
+  });
+
   /* ─── Product Slider Controls ──────────────────────────────────── */
   var prevBtn = document.getElementById('prod-prev');
   var nextBtn = document.getElementById('prod-next');

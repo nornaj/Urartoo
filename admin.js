@@ -1100,6 +1100,12 @@
 
   window.WooCommerceAdmin = WooCommerceAdmin;
 
+  window.addEventListener('urartoo:products-updated', () => {
+    if (window.WooCommerceAdmin && typeof window.WooCommerceAdmin.renderProductsSec === 'function') {
+      window.WooCommerceAdmin.renderProductsSec();
+    }
+  });
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       WooCommerceAdmin.init();
