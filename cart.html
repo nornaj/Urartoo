@@ -162,6 +162,156 @@
     </div>
   </footer>
 
+  <!-- ═══ 4. CHECKOUT MODAL ═══ -->
+  <div id="checkout-modal" class="checkout-modal-overlay">
+    <div class="checkout-modal-card">
+      <div class="checkout-modal-header">
+        <div class="checkout-modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2A379" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span>ՊԱՏՎԵՐԻ ՁԵՎԱԿԵՐՊՈՒՄ (CHECKOUT)</span>
+        </div>
+        <button type="button" class="checkout-modal-close" onclick="closeCheckoutModal()">✕</button>
+      </div>
+
+      <div id="checkout-user-badge" class="checkout-user-badge hidden">
+        <span class="user-badge-icon">✓</span>
+        <span id="checkout-user-info-text">Մուտք գործված է որպես: ...</span>
+      </div>
+
+      <form id="checkout-form" onsubmit="handleCheckoutSubmit(event)">
+        <div class="checkout-grid">
+          <!-- Left Column: Customer & Delivery & Card Details -->
+          <div class="checkout-fields-col">
+
+            <!-- Section 1: Customer Info -->
+            <div class="chk-section">
+              <h3 class="chk-sec-title">1. Գնորդի Տվյալներ</h3>
+              <div class="chk-field-group">
+                <label class="chk-label" for="chk-name">Անուն, Ազգանուն (Ամբողջական)</label>
+                <input type="text" id="chk-name" class="chk-input" required placeholder="Անահիտ Սարգսյան">
+              </div>
+              <div class="chk-row">
+                <div class="chk-field-group">
+                  <label class="chk-label" for="chk-email">Էլ․ փոստի հասցե</label>
+                  <input type="email" id="chk-email" class="chk-input" required placeholder="anahit@example.com">
+                </div>
+                <div class="chk-field-group">
+                  <label class="chk-label" for="chk-phone">Հեռախոսահամար</label>
+                  <input type="tel" id="chk-phone" class="chk-input" required placeholder="+374 91 234567">
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 2: Delivery Address -->
+            <div class="chk-section">
+              <h3 class="chk-sec-title">2. Առաքման Հասցե</h3>
+              <div class="chk-row">
+                <div class="chk-field-group">
+                  <label class="chk-label" for="chk-city">Քաղաք / Մարզ</label>
+                  <input type="text" id="chk-city" class="chk-input" required placeholder="Երևան">
+                </div>
+                <div class="chk-field-group">
+                  <label class="chk-label" for="chk-street">Փողոց, Շենք, Բնակարան (Կոնկրետ հասցե)</label>
+                  <input type="text" id="chk-street" class="chk-input" required placeholder="Աբովյան փող․ 12, բն․ 4">
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 3: Payment Card Details -->
+            <div class="chk-section">
+              <h3 class="chk-sec-title">3. Վճարման Բանկային Քարտ</h3>
+              <div class="chk-field-group">
+                <label class="chk-label" for="chk-card-name">Քարտապանի Անուն Ազգանուն</label>
+                <input type="text" id="chk-card-name" class="chk-input uppercase-input" required placeholder="ANAHIT SARGSYAN">
+              </div>
+              <div class="chk-field-group">
+                <label class="chk-label" for="chk-card-num">Քարտի Համար (16 նիշ)</label>
+                <input type="text" id="chk-card-num" class="chk-input" required placeholder="4532 8910 2345 6789" maxlength="19">
+              </div>
+              <div class="chk-row">
+                <div class="chk-field-group">
+                  <label class="chk-label" for="chk-card-exp">Գործողության Ժամկետ</label>
+                  <input type="text" id="chk-card-exp" class="chk-input" required placeholder="MM/YY" maxlength="5">
+                </div>
+                <div class="chk-field-group">
+                  <label class="chk-label" for="chk-card-cvc">CVC / CVV</label>
+                  <input type="password" id="chk-card-cvc" class="chk-input" required placeholder="•••" maxlength="4">
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right Column: Order Summary Sidebar -->
+          <div class="checkout-summary-col">
+            <div class="chk-summary-card">
+              <h3 class="chk-summary-title">Պատվերի Ամփոփում</h3>
+              <div id="chk-items-preview" class="chk-items-preview">
+                <!-- JS renders purchased items -->
+              </div>
+              <div class="chk-totals-row">
+                <span>Ենթամենը</span>
+                <span id="chk-subtotal">$0</span>
+              </div>
+              <div class="chk-totals-row">
+                <span>Առաքում</span>
+                <span style="color:var(--green); font-weight:700;">Անվճար</span>
+              </div>
+              <div class="chk-totals-row chk-grand-total">
+                <span>Վճարման ենթակա</span>
+                <span id="chk-grand-total-val">$0</span>
+              </div>
+              <button type="submit" id="btn-chk-submit" class="btn-primary chk-submit-btn">
+                🔒 ՎՃԱՐԵԼ ԵՎ ԳՐԱՆՑԵԼ ՊԱՏՎԵՐԸ
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══ 5. SUCCESS CONFIRMATION MODAL ═══ -->
+  <div id="checkout-success-modal" class="checkout-modal-overlay">
+    <div class="checkout-success-card">
+      <div class="success-icon-wrap">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2D6B4F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </div>
+      <h2 class="success-title">ՇՆՈՐՀԱԿԱԼՈՒԹՅՈՒՆ</h2>
+      <p class="success-subtitle">Ձեր պատվերը հաջողությամբ գրանցվել է և ուղարկվել պատրաստման։</p>
+
+      <div class="success-order-box">
+        <div class="success-order-num">ՊԱՏՎԵՐ #<span id="succ-order-id">UR-1001</span></div>
+        <div class="success-meta-row">
+          <span>Ստացող:</span>
+          <strong id="succ-cust-name">Անահիտ Սարգսյան</strong>
+        </div>
+        <div class="success-meta-row">
+          <span>Էլ․ փոստ:</span>
+          <strong id="succ-cust-email">anahit@example.com</strong>
+        </div>
+        <div class="success-meta-row">
+          <span>Հեռախոս:</span>
+          <strong id="succ-cust-phone">+374 91 234567</strong>
+        </div>
+        <div class="success-meta-row">
+          <span>Առաքման հասցե:</span>
+          <strong id="succ-cust-address">Երևան, Աբովյան փող․ 12, բն․ 4</strong>
+        </div>
+        <div class="success-meta-row" style="margin-top:10px; border-top:1px solid var(--pumice); padding-top:10px;">
+          <span>Վճարված ընդամենը:</span>
+          <strong style="color:var(--amber); font-size:16px;" id="succ-order-total">$0</strong>
+        </div>
+      </div>
+
+      <div class="success-actions">
+        <a href="shop.html" class="btn-primary" style="text-decoration:none; padding:12px 24px; font-size:13px;">ՎԵՐԱԴԱՌՆԱԼ ԽԱՆՈՒԹ</a>
+        <a href="account.html" class="btn-primary" style="background:var(--charcoal); text-decoration:none; padding:12px 24px; font-size:13px;">ԻՄ ՀԱՇԻՎԸ (ՊԱՏՎԵՐՆԵՐ)</a>
+      </div>
+    </div>
+  </div>
+
+<script src="admin.js"></script>
 <script src="script.js"></script>
 <script src="cart-page.js"></script>
 </body>
