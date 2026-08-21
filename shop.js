@@ -233,26 +233,69 @@
     var saveBtn = e.target.closest('[data-save]');
 
     if (addBtn) {
-      var id = Number(addBtn.dataset.add);
-      var product = allProducts.find(function (p) { return p.id === id; });
-      if (!product) return;
+      var id = addBtn.dataset.add;
+      var product = allProducts.find(function (p) {
+        return String(p.id) === String(id) || String(p._sanityId) === String(id);
+      });
+      if (!product || product.sold || product.stock === 0) return;
 
       // Read current cart from localStorage
       var cart = [];
       try { cart = JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch (e) { cart = []; }
 
       // Check if already in cart
-      var existingIdx = cart.findIndex(function (c) { return c.id === id; });
+      var existingIdx = cart.findIndex(function (c) {
+        return String(c.id) === String(product.id) || String(c._sanityId) === String(product.id) || (product._sanityId && String(c.id) === String(product._sanityId));
+      });
+
       if (existingIdx > -1) {
-        cart[existingIdx].qty += 1;
+        cart[existingIdx].qty = (cart[existingIdx].qty || 1) + 1;
       } else {
-        cart.push({ id: product.id, name: product.name, price: product.price, img: product.img, qty: 1 });
+        cart.push({
+          id: product.id || product._sanityId,
+          _sanityId: product._sanityId,
+          name: product.name,
+          price: product.price,
+          img: product.img || product.image || 'Images/bracelet.webp',
+          cat: product.cat || product.category || 'Մատանիներ',
+          qty: 1
+        });
       }
 
       localStorage.setItem(CART_KEY, JSON.stringify(cart));
       addedItems[id] = true;
       syncCartBadge();
       filterAndSort();
+
+      var toastContainer = document.getElementById('storefront-toast-container');
+      if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'storefront-toast-container';
+        toastContainer.style.cssText = 'position:fixed; bottom:28px; right:28px; z-index:100000; display:flex; flex-direction:column; gap:10px; pointer-events:none;';
+        document.body.appendChild(toastContainer);
+      }
+
+      var toast = document.createElement('div');
+      toast.style.cssText = 'background:#17181A; color:#FFFFFF; font-family:var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif); font-size:13px; font-weight:600; padding:14px 20px; border-left:4px solid #C2A379; border-radius:6px; box-shadow:0 12px 36px rgba(0,0,0,0.5); display:flex; align-items:center; gap:12px; opacity:0; transform:translateY(16px); transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1); pointer-events:auto; max-width:380px;';
+
+      toast.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2D6B4F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>' +
+        '<span style="flex:1; line-height:1.4;">«' + product.name + '» ավելացվեց զամբյուղում:</span>' +
+        '<a href="cart.html" style="color:#C2A379; text-decoration:none; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid #C2A379; padding-bottom:1px; flex-shrink:0;">ԶԱՄԲՅՈՒՂ →</a>';
+
+      toastContainer.appendChild(toast);
+
+      requestAnimationFrame(function() {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+      });
+
+      setTimeout(function() {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(16px)';
+        setTimeout(function() {
+          if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 350);
+      }, 4000);
     }
 
     if (saveBtn) {

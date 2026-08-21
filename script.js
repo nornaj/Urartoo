@@ -132,15 +132,57 @@
   }
 
   /* ─── Products ─────────────────────────────────────────────────── */
+  function showStorefrontToast(msg) {
+    if (!msg) return;
+    var container = document.getElementById('storefront-toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'storefront-toast-container';
+      container.style.cssText = 'position:fixed; bottom:28px; right:28px; z-index:100000; display:flex; flex-direction:column; gap:10px; pointer-events:none;';
+      document.body.appendChild(container);
+    }
+
+    var toast = document.createElement('div');
+    toast.style.cssText = 'background:#17181A; color:#FFFFFF; font-family:var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif); font-size:13px; font-weight:600; padding:14px 20px; border-left:4px solid #C2A379; border-radius:6px; box-shadow:0 12px 36px rgba(0,0,0,0.5); display:flex; align-items:center; gap:12px; opacity:0; transform:translateY(16px); transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1); pointer-events:auto; max-width:380px;';
+
+    toast.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2D6B4F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>' +
+      '<span style="flex:1; line-height:1.4;">' + msg + '</span>' +
+      '<a href="cart.html" style="color:#C2A379; text-decoration:none; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid #C2A379; padding-bottom:1px; flex-shrink:0;">ԶԱՄԲՅՈՒՂ →</a>';
+
+    container.appendChild(toast);
+
+    requestAnimationFrame(function() {
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateY(0)';
+    });
+
+    setTimeout(function() {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(16px)';
+      setTimeout(function() {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 350);
+    }, 4000);
+  }
+
+  function getCartArray() {
+    try { return JSON.parse(localStorage.getItem('urartoo_cart_v1')) || []; }
+    catch (e) { return []; }
+  }
+
   function updateCartDisplay() {
+    var cart = getCartArray();
+    var totalQty = cart.reduce(function (sum, item) { return sum + (item.qty || 1); }, 0);
     document.querySelectorAll('[data-cart-count]').forEach(function (el) {
-      el.textContent = cartCount;
+      el.textContent = totalQty;
     });
   }
 
   function renderProducts() {
     var grid = document.getElementById('products-grid');
     if (!grid) return;
+
+    updateCartDisplay();
 
     var currentPieces = (window.NovaSanity && window.NovaSanity._ready)
       ? window.NovaSanity.getProducts()
@@ -151,11 +193,19 @@
       return;
     }
 
+    var cart = getCartArray();
+    var cartMap = {};
+    cart.forEach(function(c) {
+      if (c.id) cartMap[String(c.id)] = true;
+      if (c._sanityId) cartMap[String(c._sanityId)] = true;
+    });
+
     grid.innerHTML = currentPieces.map(function (p, i) {
+      var pId = p.id || p._sanityId || i;
       var dot = STONE_DOTS[p.stone] || '#2C2F2E';
-      var isSold = p.sold;
-      var isAdded = !!added[p.id || i];
-      var isSaved = !!saved[p.id || i];
+      var isSold = p.sold || p.stock === 0;
+      var isAdded = !!cartMap[String(pId)] || !!cartMap[String(p._sanityId)] || !!added[pId];
+      var isSaved = !!saved[pId];
       var formattedPrice = typeof p.price === 'number' ? ('$' + p.price) : p.price;
 
       var heartSvg = '<svg width="15" height="15" viewBox="0 0 24 24" fill="' +
@@ -163,16 +213,16 @@
         (isSaved ? '#2D6B4F' : '#0C0E0D') + '" stroke-width="1.5">' +
         '<path d="M12 20.5l-7.1-7a4.4 4.4 0 016.2-6.2l.9.9.9-.9a4.4 4.4 0 016.2 6.2z"/></svg>';
 
-      return '<div class="product-card' + (isSold ? ' sold' : '') + '" data-idx="' + (p.id || i) + '">' +
+      return '<div class="product-card' + (isSold ? ' sold' : '') + '" data-idx="' + pId + '">' +
         '<div class="media">' +
-          '<a href="product.html?id=' + (p.id || (i + 1)) + '" class="media-inner">' +
+          '<a href="product.html?id=' + pId + '" class="media-inner">' +
             '<img src="' + (p.img || p.image || 'Images/bracelet.webp') + '" alt="' + p.name + '" loading="lazy">' +
           '</a>' +
-          '<button class="heart' + (isSaved ? ' saved' : '') + '" data-save="' + (p.id || i) + '" aria-label="Պահպանել զարդը">' + heartSvg + '</button>' +
+          '<button class="heart' + (isSaved ? ' saved' : '') + '" data-save="' + pId + '" aria-label="Պահպանել զարդը">' + heartSvg + '</button>' +
           (isSold
             ? '<span class="sold-badge">Վաճառված</span>'
-            : '<button class="add-btn' + (isAdded ? ' added' : '') + '" data-add="' + (p.id || i) + '">' +
-                (isAdded ? 'Ավելացված է' : 'Ավելացնել զամբյուղ') +
+            : '<button class="add-btn' + (isAdded ? ' added' : '') + '" data-add="' + pId + '">' +
+                (isAdded ? '✓ Ավելացված է' : 'Ավելացնել զամբյուղ') +
               '</button>'
           ) +
         '</div>' +
@@ -182,7 +232,7 @@
         '</div>' +
         '<div class="card-meta">' +
           '<span class="stone-dot" style="background:' + dot + '"></span>' +
-          '<span class="card-stone">' + p.stone + ' · ' + (p.region || p.stoneOrigin || '') + '</span>' +
+          '<span class="card-stone">' + (p.stone || 'Նռնաքար') + ' · ' + (p.region || p.stoneOrigin || 'Վայոց Ձոր') + '</span>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -194,12 +244,35 @@
 
       if (addBtn) {
         var pid = addBtn.dataset.add;
-        var prod = currentPieces.find(function(item) { return String(item.id) === String(pid); }) || currentPieces[pid];
-        if (prod && !prod.sold && !added[pid]) {
+        var prod = currentPieces.find(function(item) {
+          return String(item.id) === String(pid) || String(item._sanityId) === String(pid);
+        }) || currentPieces[pid];
+
+        if (prod && !prod.sold && prod.stock !== 0) {
+          var cart = getCartArray();
+          var existingIdx = cart.findIndex(function(c) {
+            return String(c.id) === String(prod.id) || String(c._sanityId) === String(prod.id) || (prod._sanityId && String(c.id) === String(prod._sanityId));
+          });
+
+          if (existingIdx > -1) {
+            cart[existingIdx].qty = (cart[existingIdx].qty || 1) + 1;
+          } else {
+            cart.push({
+              id: prod.id || prod._sanityId,
+              _sanityId: prod._sanityId,
+              name: prod.name,
+              price: Number(prod.price) || 0,
+              img: prod.img || prod.image || 'Images/bracelet.webp',
+              cat: prod.cat || prod.category || 'Մատանիներ',
+              qty: 1
+            });
+          }
+
+          localStorage.setItem('urartoo_cart_v1', JSON.stringify(cart));
           added[pid] = true;
-          cartCount++;
           updateCartDisplay();
           renderProducts();
+          showStorefrontToast('«' + prod.name + '» ավելացվեց զամբյուղում:');
         }
       }
 
