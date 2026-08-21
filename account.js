@@ -188,7 +188,33 @@
     }
   };
 
-  // --- Sign In Handler ---
+  // --- Sanity API helpers (direct, no dependency on NovaSanity loading) ---
+  const SANITY_PROJECT = 'g1vi85kp';
+  const SANITY_DATASET = 'production';
+  const SANITY_API_VER = '2024-01-01';
+  const SANITY_TOKEN = 'sknNBnm3TWuTaSZw1TnVkytJGAZT2dTrDMKqVypR4SeaHcq71pMhBnZulwLmjC12rmwe1xMYFIt8t78BcXkmueG1HFwVIzACwXOc4qEq3y0fEHcegdVZCUeCqo9QDZbCzfmprbB4SQQkfWV3Gx4Xdz1ZkEcq0hXpjwnYLO6TPLMuS7c2wsud';
+  const SANITY_BASE = 'https://' + SANITY_PROJECT + '.api.sanity.io/v' + SANITY_API_VER + '/data';
+
+  async function sanityQuery(groq) {
+    const url = SANITY_BASE + '/query/' + SANITY_DATASET + '?query=' + encodeURIComponent(groq);
+    const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + SANITY_TOKEN } });
+    if (!res.ok) throw new Error('Sanity query failed: ' + res.status);
+    const data = await res.json();
+    return data.result || [];
+  }
+
+  async function sanityMutate(mutations) {
+    const url = SANITY_BASE + '/mutate/' + SANITY_DATASET;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SANITY_TOKEN },
+      body: JSON.stringify({ mutations: mutations })
+    });
+    if (!res.ok) throw new Error('Sanity mutate failed: ' + res.status);
+    return await res.json();
+  }
+
+  // --- Sign In Handler (Sanity-first) ---
   window.handleUserSignIn = async function (e) {
     if (e && e.preventDefault) e.preventDefault();
     const alertBox = document.getElementById('auth-alert');
@@ -203,53 +229,56 @@
       return;
     }
 
-    initUsersDatabase();
-    let users = getUsersDB();
-    let foundUser = users.find(u => u && u.email && u.email.trim().toLowerCase() === email && String(u.password) === password);
+    showAlert(alertBox, 'Ստուգվում են տվյալները...', 'info');
 
-    // Cloud Database Fallback (for Incognito, new devices, or different browsers)
-    if (!foundUser && window.NovaSanity && window.NovaSanity.getUsers) {
-      if (alertBox) showAlert(alertBox, 'Ստուգվում են տվյալները...', 'info');
-      try {
-        await window.NovaSanity.getUsers();
-        users = getUsersDB();
-        foundUser = users.find(u => u && u.email && u.email.trim().toLowerCase() === email && String(u.password) === password);
-      } catch (err) {}
-    }
+    try {
+      // Query Sanity for a user with this email
+      const groq = '*[_type == "userAccount" && email == "' + email + '"][0]{ _id, name, email, password, phone, joined, isAdmin, role, address, orders }';
+      const foundUser = await sanityQuery(groq);
 
-    if (foundUser) {
-      const isSuper = email === 'najaryannorayr209@gmail.com' || email === 'mineralsarm@gmail.com' || email === 'norayrnajaryann@gmail.com';
-      if (isSuper) {
-        foundUser.isAdmin = true;
-        foundUser.role = 'Super Admin';
+      if (!foundUser || !foundUser.email) {
+        showAlert(alertBox, 'Այս էլ․ փոստով հաշիվ չի գտնվել։ Խնդրում ենք գրանցվել։', 'error');
+        return;
       }
 
-      showAlert(alertBox, 'Բարի գալուստ, ' + (foundUser.name || foundUser.email) + '։ Մուտքը հաջողվեց։', 'success');
-      setCurrentUser(foundUser);
+      if (String(foundUser.password) !== password) {
+        showAlert(alertBox, 'Մուտքագրված գաղտնաբառը սխալ է։ Խնդրում ենք փորձել նորից։', 'error');
+        return;
+      }
+
+      // Successful login
+      const SUPER_ADMINS = ['najaryannorayr209@gmail.com', 'mineralsarm@gmail.com', 'norayrnajaryann@gmail.com'];
+      const isSuper = SUPER_ADMINS.includes(email);
+
+      const sessionUser = {
+        id: foundUser._id,
+        name: foundUser.name || email,
+        email: foundUser.email,
+        phone: foundUser.phone || '',
+        joined: foundUser.joined || '2026',
+        isAdmin: isSuper || Boolean(foundUser.isAdmin),
+        role: isSuper ? 'Super Admin' : (foundUser.role || 'Customer'),
+        address: foundUser.address || { city: '', street: '', zip: '' },
+        orders: foundUser.orders || []
+      };
+
+      setCurrentUser(sessionUser);
 
       if (window.WooCommerceAdmin) {
-        window.WooCommerceAdmin.currentUser = {
-          email: foundUser.email,
-          role: foundUser.role || (isSuper ? 'Super Admin' : 'Customer'),
-          name: foundUser.name
-        };
+        window.WooCommerceAdmin.currentUser = { email: sessionUser.email, role: sessionUser.role, name: sessionUser.name };
       }
 
-      setTimeout(() => {
-        renderAccountPage();
-      }, 400);
-    } else {
-      const emailExists = users.some(u => u && u.email && u.email.trim().toLowerCase() === email);
-      if (emailExists) {
-        showAlert(alertBox, 'Մուտքագրված գաղտնաբառը սխալ է։ Խնդրում ենք փորձել նորից։', 'error');
-      } else {
-        showAlert(alertBox, 'Այս էլ․ փոստով հաշիվ չի գտնվել։ Խնդրում ենք գրանցվել։', 'error');
-      }
+      showAlert(alertBox, 'Բարի գալուստ, ' + sessionUser.name + '։ Մուտքը հաջողվեց։', 'success');
+      setTimeout(function () { renderAccountPage(); }, 400);
+
+    } catch (err) {
+      console.error('Sign in error:', err);
+      showAlert(alertBox, 'Կապի խնդիր՝ խնդրում ենք փորձել նորից։', 'error');
     }
   };
 
-  // --- Register Handler ---
-  window.handleUserRegister = function (e) {
+  // --- Register Handler (Sanity-first) ---
+  window.handleUserRegister = async function (e) {
     if (e && e.preventDefault) e.preventDefault();
     const alertBox = document.getElementById('auth-alert');
     const nameEl = document.getElementById('reg-name');
@@ -279,57 +308,59 @@
       return;
     }
 
-    initUsersDatabase();
-    const users = getUsersDB();
-    const exists = users.some(u => u && u.email && u.email.trim().toLowerCase() === email);
+    showAlert(alertBox, 'Գրանցվում է...', 'info');
 
-    if (exists) {
-      showAlert(alertBox, 'Այս էլ․ փոստով հաշիվ արդեն գոյություն ունի։ Խնդրում ենք մուտք գործել։', 'error');
-      return;
+    try {
+      var checkGroq = '*[_type == "userAccount" && email == "' + email + '"][0]{ _id, email }';
+      var existing = await sanityQuery(checkGroq);
+
+      if (existing && existing.email) {
+        showAlert(alertBox, 'Այս էլ․ փոստով հաշիվ արդեն գոյություն ունի։', 'error');
+        return;
+      }
+
+      var SUPER_ADMINS = ['najaryannorayr209@gmail.com', 'mineralsarm@gmail.com', 'norayrnajaryann@gmail.com'];
+      var isSuper = SUPER_ADMINS.includes(email);
+      var docId = 'user-' + email.replace(/[^a-z0-9]/gi, '-');
+
+      var userDoc = {
+        _id: docId,
+        _type: 'userAccount',
+        name: name,
+        email: email,
+        phone: phone,
+        password: password,
+        joined: String(new Date().getFullYear()),
+        isAdmin: isSuper,
+        role: isSuper ? 'Super Admin' : 'Customer',
+        address: { city: '', street: '', zip: '' },
+        orders: []
+      };
+
+      await sanityMutate([{ createOrReplace: userDoc }]);
+
+      var sessionUser = {
+        id: docId,
+        name: name,
+        email: email,
+        phone: phone,
+        joined: userDoc.joined,
+        isAdmin: isSuper,
+        role: userDoc.role,
+        address: userDoc.address,
+        orders: []
+      };
+
+      setCurrentUser(sessionUser);
+      window.dispatchEvent(new CustomEvent('urartoo:users-updated', { detail: sessionUser }));
+
+      showAlert(alertBox, 'Շնորհավորում ենք, Ձեր հաշիվը հաջողությամբ ստեղծվեց։', 'success');
+      setTimeout(function () { renderAccountPage(); }, 400);
+
+    } catch (err) {
+      console.error('Registration error:', err);
+      showAlert(alertBox, 'Գրանցման խնդիր՝ խնդրում ենք փորձել նորից։', 'error');
     }
-
-    const isSuperAdminEmail = email === 'mineralsarm@gmail.com' || email === 'najaryannorayr209@gmail.com' || email === 'norayrnajaryann@gmail.com';
-
-    var newUser = {
-      id: 'usr_' + Date.now(),
-      name: name,
-      email: email,
-      phone: phone || '',
-      password: password,
-      joined: String(new Date().getFullYear()),
-      isAdmin: isSuperAdminEmail,
-      role: isSuperAdminEmail ? 'Super Admin' : 'Customer',
-      address: { city: '', street: '', zip: '' },
-      orders: []
-    };
-
-    if (isSuperAdminEmail) {
-      try {
-        let adminEmails = JSON.parse(localStorage.getItem('urartoo_admin_emails_v1')) || [];
-        if (!adminEmails.map(e => String(e).toLowerCase()).includes(email)) {
-          adminEmails.push(email);
-        }
-        localStorage.setItem('urartoo_admin_emails_v1', JSON.stringify(adminEmails));
-      } catch (e) {}
-    }
-
-    users.push(newUser);
-    saveUsersDB(users);
-    setCurrentUser(newUser);
-
-    // Save user to Remote Sanity CMS Cloud Database for cross-device/incognito sync!
-    if (window.NovaSanity && window.NovaSanity.saveUser) {
-      window.NovaSanity.saveUser(newUser);
-    }
-
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('urartoo:users-updated', { detail: newUser }));
-    }
-
-    showAlert(alertBox, 'Շնորհավորում ենք, Ձեր հաշիվը հաջողությամբ ստեղծվեց։', 'success');
-    setTimeout(() => {
-      renderAccountPage();
-    }, 400);
   };
 
   // --- Show Alert Utility ---
