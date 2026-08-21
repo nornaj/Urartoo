@@ -15,16 +15,7 @@
     if (window.NovaSanity && window.NovaSanity._ready) {
       return window.NovaSanity.getProducts();
     }
-    return [
-      { id: 1, name: 'Վայոց Ձորի նռնաքարով մատանի', cat: 'Մատանիներ', stone: 'Նռնաքար', region: 'Վայոց Ձոր', price: 340, img: 'Images/bracelet.webp' },
-      { id: 2, name: 'Գուտանասարի օբսիդիանով կախազարդ', cat: 'Վզնոցներ', stone: 'Օբսիդիան', region: 'Գուտանասար', price: 265, img: 'Images/bracelet.webp' },
-      { id: 3, name: 'Սյունիքի փիրուզով ապարանջան', cat: 'Ապարանջաններ', stone: 'Փիրուզ', region: 'Սյունիք', price: 410, img: 'Images/bracelet.webp' },
-      { id: 4, name: 'Արենիի հասպիսով ականջօղեր', cat: 'Ականջօղեր', stone: 'Հասպիս', region: 'Արենի', price: 190, img: 'Images/bracelet.webp' },
-      { id: 5, name: 'Սևանի եղնգաքարով մատանի', cat: 'Մատանիներ', stone: 'Եղնգաքար', region: 'Սևան', price: 380, img: 'Images/bracelet.webp' },
-      { id: 6, name: 'Արարատյան ագաթով վզնոց', cat: 'Վզնոցներ', stone: 'Ագաթ', region: 'Արարատյան դաշտ', price: 455, img: 'Images/bracelet.webp' },
-      { id: 7, name: 'Արագածի քվարցով կախազարդ', cat: 'Վզնոցներ', stone: 'Քվարց', region: 'Արագած', price: 295, img: 'Images/bracelet.webp' },
-      { id: 8, name: 'Գառնիի նռնաքարով ապարանջան', cat: 'Ապարանջաններ', stone: 'Նռնաքար', region: 'Վայոց Ձոր', price: 520, img: 'Images/bracelet.webp' }
-    ];
+    return [];
   }
 
   // Seed default demo user in local database
@@ -66,16 +57,7 @@
           street: 'Աբովյան փող․ 12, բն․ 4',
           zip: '0001'
         },
-        orders: [
-          {
-            id: 'UR-1082',
-            date: '04 Օգոստոսի 2026',
-            status: 'processing',
-            statusText: 'Վերամշակվում է',
-            items: [{ name: 'Վայոց Ձորի նռնաքարով մատանի', price: 340, qty: 1 }],
-            total: 340
-          }
-        ]
+        orders: []
       });
     }
     localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));

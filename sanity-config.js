@@ -16,161 +16,8 @@
 
   const BASE_URL = `https://${SANITY_CONFIG.projectId}.api.sanity.io/v${SANITY_CONFIG.apiVersion}/data`;
 
-  // Default initial Armenian seed items (used strictly for first-time database seeding if Sanity is empty)
-  const INITIAL_SEED_PRODUCTS = [
-    {
-      id: "ring-1",
-      name: "Վայոց Ձորի նռնաքարով մատանի",
-      brand: "Urartoo",
-      sku: "UR-RING-GAR-01",
-      category: "Մատանիներ",
-      stone: "Նռնաքար",
-      stoneOrigin: "Վայոց Ձոր",
-      material: "925 արծաթ",
-      price: 340,
-      stock: 1,
-      sold: false,
-      featured: true,
-      tagline: "Ձեռքով հավաքված նռնաքար 925 հարգի արծաթում",
-      description: "Եզակի նռնաքարի կտոր՝ հավաքված Վայոց Ձորի գետափնյակներից։ Հղկված և տեղադրված 925 հարգի արծաթի մեջ՝ մեկ վարպետի կողմից Երևանում։",
-      image: "Images/bracelet.webp",
-      sizes: [{ label: "6", price: 340 }, { label: "7", price: 340 }, { label: "8", price: 340 }],
-      tags: ["Ձեռագործ", "Եզակի", "Նվեր"]
-    },
-    {
-      id: "pendant-2",
-      name: "Գուտանասարի օբսիդիանով կախազարդ",
-      brand: "Urartoo",
-      sku: "UR-PEND-OBS-02",
-      category: "Վզնոցներ",
-      stone: "Օբսիդիան",
-      stoneOrigin: "Գուտանասար",
-      material: "925 արծաթ",
-      price: 265,
-      stock: 1,
-      sold: false,
-      featured: true,
-      tagline: "Հրաբխային օբսիդիան արծաթե շղթայի վրա",
-      description: "Սև օբսիդիանի կտոր՝ հավաքված Գուտանասարի հրաբխային լանջերից։ Տեղադրված արծաթե շղթայի վրա, հավերժական կախազարդ։",
-      image: "Images/bracelet.webp",
-      sizes: [{ label: "45 սմ", price: 265 }, { label: "50 սմ", price: 265 }],
-      tags: ["Հրաբխային", "Ձեռագործ"]
-    },
-    {
-      id: "bracelet-3",
-      name: "Սյունիքի փիրուզով ապարանջան",
-      brand: "Urartoo",
-      sku: "UR-BRAC-TUR-03",
-      category: "Ապարանջաններ",
-      stone: "Փիրուզ",
-      stoneOrigin: "Սյունիք",
-      material: "925 արծաթ",
-      price: 410,
-      stock: 1,
-      sold: false,
-      featured: true,
-      tagline: "Բնական փիրուզ Սյունիքի հանքերից",
-      description: "Փիրուզի երկու կտորի կոմբինացիա՝ տեղադրված Սյունիքի քարերից 925 հարգի արծաթե ապարանջանի մեջ։",
-      image: "Images/bracelet.webp",
-      sizes: [{ label: "Standard", price: 410 }],
-      tags: ["Փիրուզ", "Սյունիք"]
-    },
-    {
-      id: "earring-4",
-      name: "Արենիի հասպիսով ականջօղեր",
-      brand: "Urartoo",
-      sku: "UR-EAR-JAS-04",
-      category: "Ականջօղեր",
-      stone: "Հասպիս",
-      stoneOrigin: "Արենի",
-      material: "925 արծաթ",
-      price: 190,
-      stock: 0,
-      sold: true,
-      featured: true,
-      tagline: "Տաք կարմիր հասպիսով ականջօղեր",
-      description: "Հասպիսի ջերմ կարմիր երանգներով ականջօղեր՝ հավաքված Արենիի շրջակայքից։ (Վաճառված է)",
-      image: "Images/bracelet.webp",
-      sizes: [{ label: "Standard", price: 190 }],
-      tags: ["Հասպիս", "Արենի"]
-    },
-    {
-      id: "ring-5",
-      name: "Սևանի եղնգաքարով մատանի",
-      brand: "Urartoo",
-      sku: "UR-RING-ONYX-05",
-      category: "Մատանիներ",
-      stone: "Եղնգաքար",
-      stoneOrigin: "Սևան",
-      material: "925 արծաթ",
-      price: 380,
-      stock: 1,
-      sold: false,
-      featured: true,
-      tagline: "Սևանա լճի եղնգաքար արծաթե շրջանակում",
-      description: "Սևանա լճի եղնգաքարի կտոր՝ հղկված և տեղադրված արծաթի մեջ։ Յուրաքանչյուրը ունիկալ դիզայն է։",
-      image: "Images/bracelet.webp",
-      sizes: [{ label: "7", price: 380 }, { label: "8", price: 380 }],
-      tags: ["Եղնգաքար", "Սևան"]
-    },
-    {
-      id: "necklace-6",
-      name: "Արարատյան ագաթով վզնոց",
-      brand: "Urartoo",
-      sku: "UR-NECK-AGA-06",
-      category: "Վզնոցներ",
-      stone: "Ագաթ",
-      stoneOrigin: "Արարատյան դաշտ",
-      material: "925 արծաթ",
-      price: 455,
-      stock: 1,
-      sold: false,
-      featured: true,
-      tagline: "Շերտավոր ագաթով նրբագեղ վզնոց",
-      description: "Ագաթի կտոր՝ հավաքված Արարատյան դաշտից։ Տեղադրված արծաթե շղթայի վրա, նրբագեղ վզնոց։",
-      image: "Images/bracelet.webp",
-      sizes: [{ label: "50 սմ", price: 455 }],
-      tags: ["Ագաթ"]
-    },
-    {
-      id: "pendant-7",
-      name: "Արագածի քվարցով կախազարդ",
-      brand: "Urartoo",
-      sku: "UR-PEND-QTZ-07",
-      category: "Վզնոցներ",
-      stone: "Քվարց",
-      stoneOrigin: "Արագած",
-      material: "925 արծաթ",
-      price: 295,
-      stock: 1,
-      sold: false,
-      featured: true,
-      tagline: "Լեռնային թափանցիկ քվարց",
-      description: "Քվարցի կտոր՝ հավաքված Արագածի լեռներից։ Թափանցիկ և կիսաթափանցիկ կախազարդ։",
-      image: "Images/bracelet.webp",
-      sizes: [{ label: "45 սմ", price: 295 }],
-      tags: ["Քվարց", "Արագած"]
-    },
-    {
-      id: "bracelet-8",
-      name: "Գառնիի նռնաքարով ապարանջան",
-      brand: "Urartoo",
-      sku: "UR-BRAC-GAR-08",
-      category: "Ապարանջաններ",
-      stone: "Նռնաքար",
-      stoneOrigin: "Վայոց Ձոր",
-      material: "925 արծաթ",
-      price: 520,
-      stock: 1,
-      sold: false,
-      featured: true,
-      tagline: "Խորը կարմիր նռնաքարով ապարանջան",
-      description: "Նռնաքարի երկու կտորից՝ տեղադրված արծաթե ապարանջանի մեջ։ Հայաստանի ամենախորը քարը։",
-      image: "Images/bracelet.webp",
-      sizes: [{ label: "Standard", price: 520 }],
-      tags: ["Նռնաքար"]
-    }
-  ];
+  // Default initial Armenian seed items (empty — no mock products)
+  const INITIAL_SEED_PRODUCTS = [];
 
   const INITIAL_SEED_JOURNAL = [
     {
@@ -358,23 +205,10 @@
       ]);
 
       // If Sanity connection works
-      if (sanityProds !== null) {
         if (sanityProds.length === 0) {
-          // Check local flag so we don't re-seed if the user intentionally deleted all products in Sanity
-          const hasSeededBefore = localStorage.getItem('urartoo_sanity_seeded_v1');
-          if (!hasSeededBefore) {
-            console.log('Sanity database is empty on first load. Seeding default Armenian items...');
-            await this.seedInitialData();
-            localStorage.setItem('urartoo_sanity_seeded_v1', 'true');
-            const reFetched = await this.query(productsGroq);
-            this._products = (reFetched && reFetched.length > 0) ? this._transformSanityProducts(reFetched) : [];
-          } else {
-            // User deleted all products from Sanity — keep empty array []
-            this._products = [];
-          }
+          this._products = [];
         } else {
           this._products = this._transformSanityProducts(sanityProds);
-          localStorage.setItem('urartoo_sanity_seeded_v1', 'true');
         }
 
         if (sanityJournal && sanityJournal.length > 0) {

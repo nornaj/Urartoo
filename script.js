@@ -27,16 +27,7 @@
     { name: 'Ականջօղեր', count: 11, img: 'Images/earring.webp' }
   ];
 
-  const pieces = [
-    { name: 'Վայոց Ձորի նռնաքարով մատանի', region: 'Վայոց Ձոր', stone: 'Նռնաքար', price: '$340', img: 'Images/bracelet.webp', sold: false },
-    { name: 'Գուտանասարի օբսիդիանով կախազարդ', region: 'Գուտանասար', stone: 'Օբսիդիան', price: '$265', img: 'Images/bracelet.webp', sold: false },
-    { name: 'Սյունիքի փիրուզով ապարանջան', region: 'Սյունիք', stone: 'Փիրուզ', price: '$410', img: 'Images/bracelet.webp', sold: false },
-    { name: 'Արենիի հասպիսով ականջօղեր', region: 'Արենի', stone: 'Հասպիս', price: '$190', img: 'Images/bracelet.webp', sold: true },
-    { name: 'Սևանի եղնգաքարով մատանի', region: 'Սևան', stone: 'Եղնգաքար', price: '$380', img: 'Images/bracelet.webp', sold: false },
-    { name: 'Արարատյան ագաթով վզնոց', region: 'Արարատյան դաշտ', stone: 'Ագաթ', price: '$455', img: 'Images/bracelet.webp', sold: false },
-    { name: 'Արագածի քվարցով կախազարդ', region: 'Արագած', stone: 'Քվարց', price: '$295', img: 'Images/bracelet.webp', sold: false },
-    { name: 'Գառնիի նռնաքարով ապարանջան', region: 'Վայոց Ձոր', stone: 'Նռնաքար', price: '$520', img: 'Images/bracelet.webp', sold: false }
-  ];
+  const pieces = [];
 
   const stones = [
     { name: 'Օբսիդիան', headline: 'Հրաբխային ապակի՝ հղկված մինչև սայր։', region: 'Գուտանասար', count: 12, color: '#17181A', note: 'Վերցնում է այնպիսի սրություն, որ ուրիշ ոչ մի քար չի պահի, և տասից ինն անգամ սխալ է կոտրվում։' },
@@ -622,20 +613,8 @@
     if (overlay) overlay.classList.remove('active');
   };
 
-  // Inject Admin Nav Link & Custom Select Dropdowns Globally across all storefront pages
+  // Custom Select Dropdowns Initialization
   document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('nav.nav').forEach(function (nav) {
-      if (!nav.querySelector('.nav-link-admin')) {
-        var adminLink = document.createElement('a');
-        adminLink.href = 'admin.html';
-        adminLink.className = 'nav-link nav-link-admin';
-        adminLink.style.color = 'var(--gold, #C9A227)';
-        adminLink.style.fontWeight = '700';
-        adminLink.innerHTML = '⚡ ԱԴՄԻՆ';
-        nav.appendChild(adminLink);
-      }
-    });
-
     if (window.initCustomSelects) {
       window.initCustomSelects();
     }

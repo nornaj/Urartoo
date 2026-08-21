@@ -3985,3 +3985,8 @@ select option:checked {
   font-weight: 700;
 }
 
+/* Hide admin link from header navigation */
+.nav-link-admin {
+  display: none !important;
+}
+

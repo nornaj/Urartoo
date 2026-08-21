@@ -28,35 +28,7 @@
       const stored = JSON.parse(localStorage.getItem(LOCAL_ORDERS_KEY));
       if (stored && Array.isArray(stored)) return stored;
     } catch (e) {}
-    const defaults = [
-      {
-        id: "UR-1082",
-        date: "2026-08-17 09:12",
-        customer: "Անահիտ Սարգսյան",
-        email: "anahit@example.com",
-        total: 340,
-        status: "processing",
-        items: [{ name: "Վայոց Ձորի նռնաքարով մատանի", qty: 1, price: 340, cat: "Մատանիներ" }]
-      },
-      {
-        id: "UR-1079",
-        date: "2026-08-16 14:45",
-        customer: "Մարի Թադևոսյան",
-        email: "mari@example.com",
-        total: 265,
-        status: "completed",
-        items: [{ name: "Գուտանասարի օբսիդիանով կախազարդ", qty: 1, price: 265, cat: "Վզնոցներ" }]
-      },
-      {
-        id: "UR-1075",
-        date: "2026-08-15 11:20",
-        customer: "Լիլիթ Ավագյան",
-        email: "lilit@example.com",
-        total: 410,
-        status: "completed",
-        items: [{ name: "Սյունիքի փիրուզով ապարանջան", qty: 1, price: 410, cat: "Ապարանջաններ" }]
-      }
-    ];
+    const defaults = [];
     localStorage.setItem(LOCAL_ORDERS_KEY, JSON.stringify(defaults));
     return defaults;
   }
