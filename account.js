@@ -23,11 +23,14 @@
     let users = [];
     try {
       users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
+      if (!Array.isArray(users)) users = [];
     } catch (e) {
       users = [];
     }
 
-    const adminUserExists = users.some(u => u.email === 'najaryannorayr209@gmail.com');
+    let modified = false;
+
+    const adminUserExists = users.some(u => u && u.email && u.email.toLowerCase() === 'najaryannorayr209@gmail.com');
     if (!adminUserExists) {
       users.push({
         id: 'usr_admin_001',
@@ -41,9 +44,10 @@
         address: { city: 'Երևան', street: 'Կենտրոն', zip: '0001' },
         orders: []
       });
+      modified = true;
     }
 
-    const admin2UserExists = users.some(u => u.email === 'mineralsarm@gmail.com');
+    const admin2UserExists = users.some(u => u && u.email && u.email.toLowerCase() === 'mineralsarm@gmail.com');
     if (!admin2UserExists) {
       users.push({
         id: 'usr_admin_002',
@@ -57,9 +61,10 @@
         address: { city: 'Երևան', street: 'Կենտրոն', zip: '0001' },
         orders: []
       });
+      modified = true;
     }
 
-    const demoUserExists = users.some(u => u.email === 'anahit@example.com');
+    const demoUserExists = users.some(u => u && u.email && u.email.toLowerCase() === 'anahit@example.com');
     if (!demoUserExists) {
       users.push({
         id: 'usr_demo_101',
@@ -75,8 +80,12 @@
         },
         orders: []
       });
+      modified = true;
     }
-    localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
+
+    if (modified || localStorage.getItem(USERS_DB_KEY) === null) {
+      localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
+    }
   }
 
   // Session Helper Functions
@@ -164,52 +173,91 @@
 
   // --- Sign In Handler ---
   window.handleUserSignIn = function (e) {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     const alertBox = document.getElementById('auth-alert');
-    const email = document.getElementById('signin-email')?.value.trim().toLowerCase();
-    const password = document.getElementById('signin-password')?.value;
+    const emailEl = document.getElementById('signin-email');
+    const passEl = document.getElementById('signin-password');
 
+    const email = emailEl ? emailEl.value.trim().toLowerCase() : '';
+    const password = passEl ? passEl.value.trim() : '';
+
+    if (!email || !password) {
+      showAlert(alertBox, 'Խնդրում ենք լրացնել էլ․ փոստը և գաղտնաբառը։', 'error');
+      return;
+    }
+
+    initUsersDatabase();
     const users = getUsersDB();
-    const foundUser = users.find(u => u.email.toLowerCase() === email && u.password === password);
+    const foundUser = users.find(u => u && u.email && u.email.trim().toLowerCase() === email && String(u.password).trim() === password);
 
     if (foundUser) {
-      if (email === 'najaryannorayr209@gmail.com' || email === 'mineralsarm@gmail.com') {
+      const isSuper = email === 'najaryannorayr209@gmail.com' || email === 'mineralsarm@gmail.com';
+      if (isSuper) {
         foundUser.isAdmin = true;
         foundUser.role = 'Super Admin';
       }
-      showAlert(alertBox, 'Բարի գալուստ, ' + foundUser.name + '։ Մուտքը հաջողվեց։', 'success');
+
+      showAlert(alertBox, 'Բարի գալուստ, ' + (foundUser.name || foundUser.email) + '։ Մուտքը հաջողվեց։', 'success');
       setCurrentUser(foundUser);
+
       if (window.WooCommerceAdmin) {
-        window.WooCommerceAdmin.currentUser = { email: foundUser.email, role: foundUser.role || 'Super Admin', name: foundUser.name };
+        window.WooCommerceAdmin.currentUser = {
+          email: foundUser.email,
+          role: foundUser.role || (isSuper ? 'Super Admin' : 'Customer'),
+          name: foundUser.name
+        };
       }
+
       setTimeout(() => {
         renderAccountPage();
       }, 400);
     } else {
-      showAlert(alertBox, 'Էլ․ փոստը կամ գաղտնաբառը սխալ է։ Խնդրում ենք փորձել նորից։', 'error');
+      const emailExists = users.some(u => u && u.email && u.email.trim().toLowerCase() === email);
+      if (emailExists) {
+        showAlert(alertBox, 'Մուտքագրված գաղտնաբառը սխալ է։ Խնդրում ենք փորձել նորից։', 'error');
+      } else {
+        showAlert(alertBox, 'Այս էլ․ փոստով հաշիվ չի գտնվել։ Խնդրում ենք գրանցվել։', 'error');
+      }
     }
   };
 
   // --- Register Handler ---
   window.handleUserRegister = function (e) {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     const alertBox = document.getElementById('auth-alert');
-    const name = document.getElementById('reg-name')?.value.trim();
-    const email = document.getElementById('reg-email')?.value.trim().toLowerCase();
-    const phone = document.getElementById('reg-phone')?.value.trim();
-    const password = document.getElementById('reg-password')?.value;
-    const confirm = document.getElementById('reg-confirm')?.value;
+    const nameEl = document.getElementById('reg-name');
+    const emailEl = document.getElementById('reg-email');
+    const phoneEl = document.getElementById('reg-phone');
+    const passEl = document.getElementById('reg-password');
+    const confirmEl = document.getElementById('reg-confirm');
+
+    const name = nameEl ? nameEl.value.trim() : '';
+    const email = emailEl ? emailEl.value.trim().toLowerCase() : '';
+    const phone = phoneEl ? phoneEl.value.trim() : '';
+    const password = passEl ? passEl.value.trim() : '';
+    const confirm = confirmEl ? confirmEl.value.trim() : '';
+
+    if (!name || !email || !password) {
+      showAlert(alertBox, 'Խնդրում ենք լրացնել բոլոր պարտադիր դաշտերը։', 'error');
+      return;
+    }
+
+    if (password.length < 4) {
+      showAlert(alertBox, 'Գաղտնաբառը պետք է պարունակի առնվազն 4 նիշ։', 'error');
+      return;
+    }
 
     if (password !== confirm) {
       showAlert(alertBox, 'Գաղտնաբառերը չեն համապատասխանում։', 'error');
       return;
     }
 
+    initUsersDatabase();
     const users = getUsersDB();
-    const exists = users.some(u => u.email.toLowerCase() === email);
+    const exists = users.some(u => u && u.email && u.email.trim().toLowerCase() === email);
 
     if (exists) {
-      showAlert(alertBox, 'Այս էլ․ փոստով հաշիվ արդեն գոյություն ունի։', 'error');
+      showAlert(alertBox, 'Այս էլ․ փոստով հաշիվ արդեն գոյություն ունի։ Խնդրում ենք մուտք գործել։', 'error');
       return;
     }
 
@@ -231,7 +279,7 @@
     if (isSuperAdminEmail) {
       try {
         let adminEmails = JSON.parse(localStorage.getItem('urartoo_admin_emails_v1')) || [];
-        if (!adminEmails.map(e => e.toLowerCase()).includes(email)) {
+        if (!adminEmails.map(e => String(e).toLowerCase()).includes(email)) {
           adminEmails.push(email);
         }
         localStorage.setItem('urartoo_admin_emails_v1', JSON.stringify(adminEmails));
@@ -249,7 +297,7 @@
     showAlert(alertBox, 'Շնորհավորում ենք, Ձեր հաշիվը հաջողությամբ ստեղծվեց։', 'success');
     setTimeout(() => {
       renderAccountPage();
-    }, 500);
+    }, 400);
   };
 
   // --- Show Alert Utility ---
