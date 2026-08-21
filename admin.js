@@ -335,38 +335,61 @@
       });
     },
 
-    /* CUSTOM BOTTOM-LEFT TOAST NOTIFICATION SYSTEM */
-    showToast(msg) {
-      if (!msg) return;
+    /* CUSTOM BOTTOM-LEFT TOAST NOTIFICATION & ACTION LOADER SYSTEM */
+    showToast(msg, type = 'info', duration = 3500) {
+      if (!msg) return null;
       let container = document.getElementById('admin-toast-container');
       if (!container) {
         container = document.createElement('div');
         container.id = 'admin-toast-container';
-        container.style.cssText = 'position:fixed; bottom:24px; left:24px; z-index:10000; display:flex; flex-direction:column; gap:10px; pointer-events:none;';
+        container.style.cssText = 'position:fixed; bottom:24px; left:24px; z-index:100000; display:flex; flex-direction:column; gap:10px; pointer-events:none;';
         document.body.appendChild(container);
       }
 
       const toast = document.createElement('div');
+      
+      let borderColor = '#C9A227';
+      let icon = '';
+
+      if (type === 'loading') {
+        borderColor = '#C9A227';
+        icon = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation: urartooSpin 0.8s linear infinite; flex-shrink:0;"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="12"/></svg>`;
+      } else if (type === 'success') {
+        borderColor = '#2D6B4F';
+        icon = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2D6B4F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>`;
+      } else if (type === 'danger' || type === 'delete') {
+        borderColor = '#D9534F';
+        icon = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#D9534F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`;
+      } else if (type === 'sync') {
+        borderColor = '#C9A227';
+        icon = `<span style="color:#C9A227; font-weight:bold; font-size:15px; flex-shrink:0;">⚡</span>`;
+      } else {
+        icon = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C2A379" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+      }
+
       toast.style.cssText = `
-        background: #111111;
+        background: #17181A;
         color: #FFFFFF;
         font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 0.6px;
-        text-transform: uppercase;
-        padding: 14px 22px;
-        border-left: 3px solid #C2A379;
-        border-radius: 2px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+        padding: 13px 20px;
+        border-left: 4px solid ${borderColor};
+        border-radius: 4px;
+        box-shadow: 0 12px 36px rgba(0,0,0,0.55);
+        display: flex;
+        align-items: center;
+        gap: 12px;
         opacity: 0;
-        transform: translateY(12px);
+        transform: translateY(16px);
         transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         pointer-events: auto;
-        max-width: 420px;
+        max-width: 440px;
         line-height: 1.4;
       `;
-      toast.textContent = msg;
+
+      toast.innerHTML = `${icon}<span class="toast-msg-text">${msg}</span>`;
       container.appendChild(toast);
 
       requestAnimationFrame(() => {
@@ -374,13 +397,54 @@
         toast.style.transform = 'translateY(0)';
       });
 
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(12px)';
-        setTimeout(() => {
-          if (toast.parentNode) toast.parentNode.removeChild(toast);
-        }, 350);
-      }, 3500);
+      let autoTimer = null;
+      if (duration > 0) {
+        autoTimer = setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateY(16px)';
+          setTimeout(() => {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+          }, 350);
+        }, duration);
+      }
+
+      return {
+        update(newMsg, newType = 'success', autoCloseDuration = 3500) {
+          if (autoTimer) clearTimeout(autoTimer);
+
+          let newBorderColor = '#2D6B4F';
+          let newIcon = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2D6B4F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+          if (newType === 'danger' || newType === 'delete') {
+            newBorderColor = '#D9534F';
+            newIcon = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#D9534F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`;
+          } else if (newType === 'sync') {
+            newBorderColor = '#C9A227';
+            newIcon = `<span style="color:#C9A227; font-weight:bold; font-size:15px; flex-shrink:0;">⚡</span>`;
+          }
+
+          toast.style.borderLeftColor = newBorderColor;
+          toast.innerHTML = `${newIcon}<span class="toast-msg-text">${newMsg}</span>`;
+
+          if (autoCloseDuration > 0) {
+            setTimeout(() => {
+              toast.style.opacity = '0';
+              toast.style.transform = 'translateY(16px)';
+              setTimeout(() => {
+                if (toast.parentNode) toast.parentNode.removeChild(toast);
+              }, 350);
+            }, autoCloseDuration);
+          }
+        },
+        remove() {
+          if (autoTimer) clearTimeout(autoTimer);
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateY(16px)';
+          setTimeout(() => {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+          }, 350);
+        }
+      };
     },
 
     getSelectedProductIds() {
@@ -397,9 +461,14 @@
       if (!action) return;
 
       const selectedIds = this.getSelectedProductIds();
-      if (selectedIds.length === 0) return;
+      if (selectedIds.length === 0) {
+        this.showToast('Խնդրում ենք ընտրել առնվազն 1 ապրանք:', 'info', 3000);
+        return;
+      }
 
       if (action === 'delete') {
+        const loadingToast = this.showToast(`Ջնջվում են ընտրված ${selectedIds.length} ապրանքները...`, 'loading', 0);
+
         let deletedCount = 0;
         for (const id of selectedIds) {
           try {
@@ -419,7 +488,10 @@
         if (selectAll) selectAll.checked = false;
 
         this.renderProductsSec();
-        this.showToast(`${deletedCount} PRODUCTS HAVE BEEN DELETED.`);
+
+        if (loadingToast) {
+          loadingToast.update(`${deletedCount} ապրանք հաջողությամբ ջնջվեց։`, 'danger', 4000);
+        }
       }
     },
 
@@ -430,14 +502,18 @@
       try {
         if (window.NovaSanity) {
           const products = await window.NovaSanity.getProducts();
-          const found = products.find(p => p._sanityId === productId || p.id === productId);
+          const found = products.find(p => String(p._sanityId) === String(productId) || String(p.id) === String(productId));
 
           if (found) {
+            const loadingToast = this.showToast(`Թարմացվում է «${found.name}» քանակը...`, 'loading', 0);
             found.stock = stockNum;
             found.sold = isSold;
             await window.NovaSanity.saveProduct(found);
             addAuditLog(`Քանակի արագ փոփոխություն: «${found.name}» -> ${stockNum}`);
-            this.showToast(`"${found.name}" STOCK UPDATED TO ${stockNum}.`);
+
+            if (loadingToast) {
+              loadingToast.update(`«${found.name}» քանակը թարմացվեց: ${stockNum} ${isSold ? '(Վաճառված)' : ''}`, 'success', 3500);
+            }
           }
         }
       } catch (err) {
@@ -639,6 +715,8 @@
       const matVal = document.getElementById('pe-material').value.trim() || '925 արծաթ';
       const mainImg = this.currentGallery[0] || 'Images/bracelet.webp';
 
+      const loadingToast = this.showToast(`Պահպանվում է ապրանքը «${name}»...`, 'loading', 0);
+
       const prodData = {
         id: this.currentEditingProductId || `product-custom-${Date.now()}`,
         _sanityId: this.currentEditingProductId,
@@ -668,21 +746,31 @@
       if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '💾 ՊԱՀՊԱՆԵԼ'; }
       this.closeProductEditor();
       this.renderProductsSec();
-      this.showToast(`"${name.toUpperCase()}" HAS BEEN SAVED.`);
+
+      if (loadingToast) {
+        loadingToast.update(`Ապրանք «${name}» հաջողությամբ պահպանվեց։`, 'success', 4000);
+      }
     },
 
     async deleteProduct(productId) {
-      let prodName = 'PRODUCT';
+      let prodName = 'Ապրանք';
       if (window.NovaSanity) {
         const products = await window.NovaSanity.getProducts();
-        const found = products.find(p => p._sanityId === productId || p.id === productId);
+        const found = products.find(p => String(p._sanityId) === String(productId) || String(p.id) === String(productId));
         if (found) prodName = found.name;
+      }
 
+      const loadingToast = this.showToast(`Ջնջվում է «${prodName}»...`, 'loading', 0);
+
+      if (window.NovaSanity) {
         await window.NovaSanity.deleteProduct(productId);
         addAuditLog(`Ջնջվեց ապրանք Sanity-ից ID: ${productId}`);
         this.renderProductsSec();
       }
-      this.showToast(`"${prodName.toUpperCase()}" HAS BEEN DELETED.`);
+
+      if (loadingToast) {
+        loadingToast.update(`Ապրանք «${prodName}» ջնջվեց։`, 'danger', 4000);
+      }
     },
 
     async deleteProductFromEditor() {
@@ -846,6 +934,7 @@
         saveOrders(orders);
         addAuditLog(`Փոխվել է պատվեր #${orderId}-ի կարգավիճակը -> ${newStatus}`);
         this.renderOrdersSec();
+        this.showToast(`Պատվերի #${orderId} կարգավիճակը թարմացվեց: ${newStatus}`, 'success', 3500);
       }
     },
 
@@ -855,7 +944,7 @@
       saveOrders(orders);
       addAuditLog(`Ջնջվել է պատվեր #${orderId}`);
       this.renderOrdersSec();
-      this.showToast(`ORDER #${orderId} HAS BEEN DELETED.`);
+      this.showToast(`Պատվերը #${orderId} ջնջվեց։`, 'danger', 3500);
     },
 
     /**
@@ -887,15 +976,26 @@
     async syncGoogleData() {
       const btn = document.getElementById('btn-sync-google');
       if (btn) { btn.disabled = true; btn.textContent = '⏳ Սինխրոնացվում է...'; }
+      const loadingToast = this.showToast('Սինխրոնացվում է Google Sheets & Drive տվյալների հետ...', 'loading', 0);
 
-      if (window.GoogleSync) {
-        await window.GoogleSync.runFullSync((msg) => {
-          console.log('Google Sync Status:', msg);
-        });
+      try {
+        if (window.GoogleSync) {
+          await window.GoogleSync.runFullSync((msg) => {
+            console.log('Google Sync Status:', msg);
+          });
+        }
+        if (loadingToast) {
+          loadingToast.update('Google Sheets սինխրոնացումը ավարտվեց։', 'sync', 4500);
+        }
+      } catch (e) {
+        console.error('Google Sync failed:', e);
+        if (loadingToast) {
+          loadingToast.update('Google Sheets սինխրոնացման սխալ։', 'danger', 4000);
+        }
       }
+
       if (btn) { btn.disabled = false; btn.textContent = '⚡ Սինխրոնացնել Google Sheets'; }
       this.renderProductsSec();
-      this.showToast('GOOGLE SHEETS SYNC COMPLETED.');
     },
 
     renderClientsSec() {
@@ -981,7 +1081,7 @@
       const sett = { name, email, currency };
       localStorage.setItem('urartoo_store_settings_v1', JSON.stringify(sett));
       addAuditLog(`Թարմացվեցին խանութի կարգավորումները (${name}, ${currency})`);
-      this.showToast('STORE SETTINGS SAVED.');
+      this.showToast('Խանութի կարգավորումները պահպանվեցին։', 'success', 3500);
     },
 
     handleAdminFormSubmit(e) {

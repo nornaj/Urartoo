@@ -3995,4 +3995,9 @@ select option:checked {
   display: none !important;
 }
 
+@keyframes urartooSpin {
+  100% { transform: rotate(360deg); }
+}
+
+
 
