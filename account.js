@@ -237,7 +237,10 @@
       const foundUser = await sanityQuery(groq);
 
       if (!foundUser || !foundUser.email) {
-        showAlert(alertBox, 'Այս էլ․ փոստով հաշիվ չի գտնվել։ Խնդրում ենք գրանցվել։', 'error');
+        if (alertBox) {
+          alertBox.innerHTML = 'Այս էլ։ փոստով հաշիվ չի գտնվել։ Հնարավոր է նորից <a href="#" onclick="switchAuthTab(\'register\'); return false;" style="color:var(--amber); text-decoration:underline; font-weight:600;">գրանցվել</a>։';
+          alertBox.className = 'acc-alert visible error';
+        }
         return;
       }
 
