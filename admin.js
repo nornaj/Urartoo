@@ -326,6 +326,10 @@
           </div>`;
         }).join('');
       }
+
+      if (window.initCustomSelects) {
+        setTimeout(() => window.initCustomSelects(), 50);
+      }
     },
 
     /* BULK ACTIONS CONTROLLERS */
@@ -645,6 +649,9 @@
 
       this.renderGalleryThumbnails();
       modal.style.display = 'flex';
+      if (window.initCustomSelects) {
+        setTimeout(() => window.initCustomSelects(), 50);
+      }
     },
 
     closeProductEditor() {
