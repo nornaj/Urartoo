@@ -252,8 +252,8 @@
         tbody.innerHTML = filtered.map(p => {
           const isSold = p.sold || p.stock === 0;
           const statusBadge = isSold
-            ? '<span class="admin-status-badge badge-failed">Վաճառված (Sold)</span>'
-            : '<span class="admin-status-badge badge-processing">Առկա (In Stock)</span>';
+            ? '<span class="admin-status-badge badge-failed">Վաճառված</span>'
+            : '<span class="admin-status-badge badge-processing">Առկա</span>';
 
           const imgSrc = p.img || p.image || 'Images/bracelet.webp';
           const pId = p._sanityId || p.id;
@@ -313,7 +313,7 @@
                   <span style="font-size:11px; background:#F4F3EF; padding:2px 8px; border-radius:2px; color:var(--tuff);">${p.stone || 'Նռնաքար'} (${p.region || 'Վայոց Ձոր'})</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:6px; margin-top:6px;">
-                  <span style="font-size:11.5px; color:var(--tuff); font-weight:600;">Քանակ (Stock):</span>
+                  <span style="font-size:11.5px; color:var(--tuff); font-weight:600;">Քանակ:</span>
                   <input type="number" min="0" value="${currentStock}" onchange="window.WooCommerceAdmin.updateQuickStock('${pId}', this.value)" style="width:55px; padding:4px 6px; border:1px solid var(--pumice); border-radius:4px; font-weight:700; font-family:var(--mono); text-align:center; font-size:12px; background:#FFF;">
                 </div>
               </div>
