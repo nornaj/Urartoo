@@ -179,7 +179,7 @@
     const passEl = document.getElementById('signin-password');
 
     const email = emailEl ? emailEl.value.trim().toLowerCase() : '';
-    const password = passEl ? passEl.value.trim() : '';
+    const password = passEl ? passEl.value : '';
 
     if (!email || !password) {
       showAlert(alertBox, 'Խնդրում ենք լրացնել էլ․ փոստը և գաղտնաբառը։', 'error');
@@ -188,7 +188,7 @@
 
     initUsersDatabase();
     const users = getUsersDB();
-    const foundUser = users.find(u => u && u.email && u.email.trim().toLowerCase() === email && String(u.password).trim() === password);
+    const foundUser = users.find(u => u && u.email && u.email.trim().toLowerCase() === email && String(u.password) === password);
 
     if (foundUser) {
       const isSuper = email === 'najaryannorayr209@gmail.com' || email === 'mineralsarm@gmail.com';
@@ -234,8 +234,8 @@
     const name = nameEl ? nameEl.value.trim() : '';
     const email = emailEl ? emailEl.value.trim().toLowerCase() : '';
     const phone = phoneEl ? phoneEl.value.trim() : '';
-    const password = passEl ? passEl.value.trim() : '';
-    const confirm = confirmEl ? confirmEl.value.trim() : '';
+    const password = passEl ? passEl.value : '';
+    const confirm = confirmEl ? confirmEl.value : '';
 
     if (!name || !email || !password) {
       showAlert(alertBox, 'Խնդրում ենք լրացնել բոլոր պարտադիր դաշտերը։', 'error');
