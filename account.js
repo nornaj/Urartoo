@@ -212,6 +212,10 @@
     saveUsersDB(users);
     setCurrentUser(newUser);
 
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('urartoo:users-updated', { detail: newUser }));
+    }
+
     showAlert(alertBox, 'Շնորհավորում ենք, Ձեր հաշիվը հաջողությամբ ստեղծվեց։', 'success');
     setTimeout(() => {
       renderAccountPage();

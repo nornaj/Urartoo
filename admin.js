@@ -1044,14 +1044,37 @@
       const searchQ = searchInput ? searchInput.value.trim().toLowerCase() : '';
 
       const orders = getOrders();
+      let usersDB = [];
+      try { usersDB = JSON.parse(localStorage.getItem('urartoo_users_db_v1')) || []; } catch (e) { usersDB = []; }
+
       const clientMap = new Map();
 
+      // 1. Populate registered users from database
+      usersDB.forEach(u => {
+        const email = (u.email || '').toLowerCase();
+        if (!email) return;
+        clientMap.set(email, {
+          name: u.name || 'Անանուն',
+          email: email,
+          phone: u.phone || '',
+          joined: u.joined || '2026',
+          isAdmin: !!u.isAdmin || u.role === 'Super Admin',
+          ordersCount: (u.orders || []).length,
+          totalSpent: (u.orders || []).reduce((sum, o) => sum + (Number(o.total) || 0), 0),
+          lastOrderDate: (u.orders && u.orders.length > 0) ? u.orders[0].date : ''
+        });
+      });
+
+      // 2. Merge orders list (for guest checkouts or additional orders)
       orders.forEach(o => {
         const email = (o.email || 'customer@example.com').toLowerCase();
         if (!clientMap.has(email)) {
           clientMap.set(email, {
-            name: o.customer || 'Անանուն',
+            name: o.customer || 'Գնորդ',
             email: email,
+            phone: o.phone || '',
+            joined: '2026',
+            isAdmin: false,
             ordersCount: 0,
             totalSpent: 0,
             lastOrderDate: o.date
@@ -1060,14 +1083,15 @@
         const client = clientMap.get(email);
         client.ordersCount += 1;
         client.totalSpent += (Number(o.total) || 0);
-        if (new Date(o.date) > new Date(client.lastOrderDate)) {
+        if (o.phone && !client.phone) client.phone = o.phone;
+        if (!client.lastOrderDate || new Date(o.date) > new Date(client.lastOrderDate)) {
           client.lastOrderDate = o.date;
         }
       });
 
       let clients = Array.from(clientMap.values());
       if (searchQ) {
-        clients = clients.filter(c => c.name.toLowerCase().includes(searchQ) || c.email.toLowerCase().includes(searchQ));
+        clients = clients.filter(c => c.name.toLowerCase().includes(searchQ) || c.email.toLowerCase().includes(searchQ) || c.phone.toLowerCase().includes(searchQ));
       }
 
       // Update stat cards
@@ -1085,20 +1109,34 @@
       if (!tbody) return;
 
       if (clients.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:32px; color:var(--tuff);">Հաճախորդներ չեն գտնվել։</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:32px; color:var(--tuff);">Գրանցված հաճախորդներ չեն գտնվել։</td></tr>';
         return;
       }
 
-      tbody.innerHTML = clients.map(c => `
-        <tr>
-          <td style="font-weight:600; color:var(--green);">${c.name}</td>
-          <td style="color:var(--tuff); font-size:13px;">${c.email}</td>
-          <td><span style="background:#F0F7FF; color:#0066cc; padding:4px 10px; border-radius:12px; font-weight:700; font-size:12px;">${c.ordersCount} պատվեր</span></td>
-          <td style="font-weight:700; color:#2E8C8C;">$${c.totalSpent}</td>
-          <td style="font-size:12.5px; color:var(--tuff);">${c.lastOrderDate}</td>
-          <td><span style="background:#E6F4EA; color:#137333; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">Ակտիվ</span></td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = clients.map(c => {
+        let badgeClass = 'badge-pending';
+        let statusText = 'Գրանցված';
+        if (c.isAdmin) {
+          badgeClass = 'badge-completed';
+          statusText = 'Ադմին';
+        } else if (c.ordersCount > 0) {
+          badgeClass = 'badge-processing';
+          statusText = 'Ակտիվ Գնորդ';
+        }
+
+        return `<tr>
+          <td>
+            <strong style="font-size:13.5px; color:var(--ink);">${c.name}</strong>
+            ${c.phone ? `<div style="font-size:12px; color:var(--tuff); margin-top:2px;">📞 ${c.phone}</div>` : ''}
+            <div style="font-size:11px; color:var(--tuff); margin-top:1px;">Գրանցված: ${c.joined}</div>
+          </td>
+          <td style="font-size:13px; color:var(--charcoal); font-weight:500;">✉️ ${c.email}</td>
+          <td><span class="admin-status-badge ${c.ordersCount > 0 ? 'badge-processing' : 'badge-pending'}">${c.ordersCount} պատվեր</span></td>
+          <td style="font-family:var(--mono); font-weight:700; color:var(--amber); font-size:14px;">$${c.totalSpent}</td>
+          <td style="font-size:12px; color:var(--tuff);">${c.lastOrderDate || '—'}</td>
+          <td><span class="admin-status-badge ${badgeClass}">${statusText}</span></td>
+        </tr>`;
+      }).join('');
     },
 
     renderSettingsSec() {
@@ -1249,6 +1287,12 @@
   window.addEventListener('urartoo:orders-updated', () => {
     if (window.WooCommerceAdmin && typeof window.WooCommerceAdmin.renderOrdersSec === 'function') {
       window.WooCommerceAdmin.renderOrdersSec();
+    }
+  });
+
+  window.addEventListener('urartoo:users-updated', () => {
+    if (window.WooCommerceAdmin && typeof window.WooCommerceAdmin.renderClientsSec === 'function') {
+      window.WooCommerceAdmin.renderClientsSec();
     }
   });
 
