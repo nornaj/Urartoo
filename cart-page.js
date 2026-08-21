@@ -22,6 +22,11 @@
     });
   }
 
+  function parsePrice(val) {
+    if (typeof val === 'number') return val;
+    return Number(String(val || 0).replace(/[^0-9.]/g, '')) || 0;
+  }
+
   function renderCart() {
     var cart = getCart();
     var listEl = document.getElementById('cart-items-list');
@@ -42,7 +47,7 @@
       totalsCol.classList.add('hidden');
       if (tableHead) tableHead.classList.add('hidden');
       if (gridEl) gridEl.classList.add('cart-is-empty');
-      checkoutBtn.disabled = true;
+      if (checkoutBtn) checkoutBtn.disabled = true;
       return;
     }
 
@@ -50,12 +55,13 @@
     totalsCol.classList.remove('hidden');
     if (tableHead) tableHead.classList.remove('hidden');
     if (gridEl) gridEl.classList.remove('cart-is-empty');
-    checkoutBtn.disabled = false;
+    if (checkoutBtn) checkoutBtn.disabled = false;
 
     var subtotal = 0;
 
     listEl.innerHTML = cart.map(function (item, idx) {
-      var lineTotal = item.price * (item.qty || 1);
+      var itemPrice = parsePrice(item.price);
+      var lineTotal = itemPrice * (item.qty || 1);
       subtotal += lineTotal;
 
       return '<div class="cart-item" data-idx="' + idx + '">' +
@@ -66,7 +72,7 @@
           '<img src="' + item.img + '" alt="' + item.name + '" loading="lazy">' +
         '</a>' +
         '<a href="product.html?id=' + item.id + '" class="cart-item-name">' + item.name + '</a>' +
-        '<span class="cart-item-price">$' + item.price + '</span>' +
+        '<span class="cart-item-price">$' + itemPrice + '</span>' +
         '<div class="cart-item-qty">' +
           '<button class="qty-btn" data-qty-minus="' + idx + '">-</button>' +
           '<span class="qty-val">' + (item.qty || 1) + '</span>' +
@@ -85,6 +91,13 @@
     var removeBtn = e.target.closest('[data-remove]');
     var minusBtn = e.target.closest('[data-qty-minus]');
     var plusBtn = e.target.closest('[data-qty-plus]');
+    var checkoutBtnClick = e.target.closest('#cart-checkout-btn');
+
+    if (checkoutBtnClick) {
+      e.preventDefault();
+      openCheckoutModal();
+      return;
+    }
 
     if (removeBtn) {
       var cart = getCart();
@@ -118,7 +131,7 @@
   // --- CHECKOUT & ORDER LOGIC ---
   window.openCheckoutModal = function () {
     var cart = getCart();
-    if (cart.length === 0) return;
+    if (!cart || cart.length === 0) return;
 
     var modal = document.getElementById('checkout-modal');
     if (!modal) return;
@@ -155,7 +168,8 @@
     var subtotal = 0;
     if (previewEl) {
       previewEl.innerHTML = cart.map(function (item) {
-        var lineTotal = (Number(item.price) || 0) * (item.qty || 1);
+        var numPrice = parsePrice(item.price);
+        var lineTotal = numPrice * (item.qty || 1);
         subtotal += lineTotal;
         return '<div class="chk-item-row">' +
           '<span>' + item.name + ' (x' + (item.qty || 1) + ')</span>' +
@@ -168,11 +182,15 @@
     if (grandTotalEl) grandTotalEl.textContent = '$' + subtotal;
 
     modal.classList.add('open');
+    modal.style.display = 'flex';
   };
 
   window.closeCheckoutModal = function () {
     var modal = document.getElementById('checkout-modal');
-    if (modal) modal.classList.remove('open');
+    if (modal) {
+      modal.classList.remove('open');
+      modal.style.display = 'none';
+    }
   };
 
   // Card Number Auto-Formatter (16 digits with 4-digit spacing)
