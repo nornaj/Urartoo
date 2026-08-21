@@ -112,7 +112,10 @@
                   <h3 class="admin-card-title" style="margin:0 0 6px;">Ապրանքացանկ</h3>
                   <p style="margin:0; font-size:13px; color:var(--tuff);">Կառավարեք Ձեր զարդերի տեսականին, նկարները և 1-of-1 վաճառված կարգավիճակը։</p>
                 </div>
-                <button type="button" class="btn-primary" onclick="window.WooCommerceAdmin.openProductEditor(null)" style="padding:10px 20px; font-size:13px; font-weight:700; white-space:nowrap;">+ ԱՎԵԼԱՑՆԵԼ ՆՈՐ ԱՊՐԱՆՔ</button>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                  <button type="button" class="btn-primary" onclick="window.WooCommerceAdmin.openStoneEditor()" style="padding:10px 18px; font-size:13px; font-weight:700; background:var(--gold); color:var(--green); border:none; white-space:nowrap;">+ ԱՎԵԼԱՑՆԵԼ ՔԱՐ</button>
+                  <button type="button" class="btn-primary" onclick="window.WooCommerceAdmin.openProductEditor(null)" style="padding:10px 20px; font-size:13px; font-weight:700; white-space:nowrap;">+ ԱՎԵԼԱՑՆԵԼ ՆՈՐ ԱՊՐԱՆՔ</button>
+                </div>
               </div>
 
               <!-- Filter Bar & Search -->
@@ -253,7 +256,15 @@
             </div>
             <div class="admin-form-group">
               <label for="pe-stone">Օգտագործված Քարը (Stone)</label>
-              <input type="text" id="pe-stone" class="admin-input" placeholder="օր․ Նռնաքար">
+              <select id="pe-stone" class="admin-input">
+                <option value="Նռնաքար">Նռնաքար</option>
+                <option value="Օբսիդիան">Օբսիդիան</option>
+                <option value="Փիրուզ">Փիրուզ</option>
+                <option value="Հասպիս">Հասպիս</option>
+                <option value="Եղնգաքար">Եղնգաքար</option>
+                <option value="Ագաթ">Ագաթ</option>
+                <option value="Քվարց">Քվարց</option>
+              </select>
             </div>
             <div class="admin-form-group">
               <label for="pe-region">Քարի Տարածաշրջան (Region)</label>
@@ -286,6 +297,47 @@
           <div id="pe-gallery-thumbnails-container" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
             <!-- Rendered by admin.js -->
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ STONE EDITOR MODAL OVERLAY ═══ -->
+  <div id="stone-editor-modal" class="product-editor-page" style="display:none;">
+    <div class="pe-topbar">
+      <div style="display:flex; align-items:center; gap:16px;">
+        <button type="button" onclick="window.WooCommerceAdmin.closeStoneEditor()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">✕</button>
+        <div class="pe-topbar-title" id="stone-modal-title">Ավելացնել Նոր Քար</div>
+      </div>
+      <div>
+        <button type="button" class="admin-btn" id="btn-stone-save" onclick="window.WooCommerceAdmin.saveStoneFromEditor()" style="padding:10px 24px; font-size:13.5px; background:var(--gold); color:var(--green); font-weight:700;">💾 ՊԱՀՊԱՆԵԼ</button>
+      </div>
+    </div>
+
+    <div class="pe-content" style="max-width:680px; margin:40px auto; padding:0 20px;">
+      <div class="admin-card" style="width:100%;">
+        <h2 style="font-family:var(--font-serif, Cormorant, serif); font-size:22px; color:var(--ink, #17181A); margin:0 0 20px 0;">Քարի Տվյալներ (Stone Details)</h2>
+        
+        <!-- Input 1: Stone Name -->
+        <div class="admin-form-group" style="margin-bottom:20px;">
+          <label for="se-name" style="font-weight:600; font-size:13.5px; color:var(--charcoal, #333);">1. Քարի Անվանում (Stone Name) *</label>
+          <input type="text" id="se-name" class="admin-input" required placeholder="օր․ Ամեթիստ / Ագաթ / Լազուրիտ">
+        </div>
+
+        <!-- Input 2: Color Picker -->
+        <div class="admin-form-group" style="margin-bottom:20px;">
+          <label for="se-color" style="font-weight:600; font-size:13.5px; color:var(--charcoal, #333);">2. Քարի Գույն (Color Picker) *</label>
+          <div style="display:flex; align-items:center; gap:16px; margin-top:6px;">
+            <input type="color" id="se-color" value="#7B2D3B" style="width:54px; height:44px; padding:2px; border:1px solid var(--pumice, #D0CEC5); border-radius:6px; cursor:pointer; background:#fff;" oninput="document.getElementById('se-color-hex').value=this.value; document.getElementById('se-color-preview').style.background=this.value;">
+            <input type="text" id="se-color-hex" class="admin-input" value="#7B2D3B" placeholder="#7B2D3B" style="max-width:140px; font-family:var(--mono, monospace); font-weight:700;" oninput="document.getElementById('se-color').value=this.value; document.getElementById('se-color-preview').style.background=this.value;">
+            <span id="se-color-preview" style="width:36px; height:36px; border-radius:50%; background:#7B2D3B; border:1px solid rgba(0,0,0,0.2); box-shadow:0 2px 6px rgba(0,0,0,0.15); display:inline-block;"></span>
+          </div>
+        </div>
+
+        <!-- Input 3: Region / Origin -->
+        <div class="admin-form-group">
+          <label for="se-region" style="font-weight:600; font-size:13.5px; color:var(--charcoal, #333);">3. Քարի Տարածաշրջան (Region / Origin)</label>
+          <input type="text" id="se-region" class="admin-input" placeholder="օր․ Սյունիք / Լոռի / Վայոց Ձոր">
         </div>
       </div>
     </div>

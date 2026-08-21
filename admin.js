@@ -598,10 +598,114 @@
       }
     },
 
+    // --- STONE MANAGER METHODS ---
+    getStones() {
+      const defaultStones = [
+        { name: 'Նռնաքար', color: '#7B2D3B', region: 'Վայոց Ձոր' },
+        { name: 'Օբսիդիան', color: '#17181A', region: 'Գուտանասար' },
+        { name: 'Փիրուզ', color: '#2E8C8C', region: 'Սյունիք' },
+        { name: 'Հասպիս', color: '#A4442B', region: 'Արենի' },
+        { name: 'Եղնգաքար', color: '#1B1D1C', region: 'Լոռի' },
+        { name: 'Ագաթ', color: '#C2A379', region: 'Տավուշ' },
+        { name: 'Քվարց', color: '#6B5B4E', region: 'Գեղարքունիք' }
+      ];
+
+      let customStones = [];
+      try {
+        customStones = JSON.parse(localStorage.getItem('urartoo_stones_db_v1')) || [];
+      } catch (e) {}
+
+      const mergedMap = new Map();
+      defaultStones.forEach(s => mergedMap.set(s.name, s));
+      customStones.forEach(s => mergedMap.set(s.name, s));
+
+      return Array.from(mergedMap.values());
+    },
+
+    populateStoneDropdown() {
+      const selectEl = document.getElementById('pe-stone');
+      if (!selectEl) return;
+
+      const stones = this.getStones();
+      const currentVal = selectEl.value;
+
+      selectEl.innerHTML = stones.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+      if (currentVal && Array.from(selectEl.options).some(opt => opt.value === currentVal)) {
+        selectEl.value = currentVal;
+      }
+    },
+
+    openStoneEditor() {
+      const modal = document.getElementById('stone-editor-modal');
+      if (!modal) return;
+
+      if (document.getElementById('se-name')) document.getElementById('se-name').value = '';
+      if (document.getElementById('se-color')) document.getElementById('se-color').value = '#7B2D3B';
+      if (document.getElementById('se-color-hex')) document.getElementById('se-color-hex').value = '#7B2D3B';
+      if (document.getElementById('se-color-preview')) document.getElementById('se-color-preview').style.background = '#7B2D3B';
+      if (document.getElementById('se-region')) document.getElementById('se-region').value = '';
+
+      modal.style.display = 'block';
+    },
+
+    closeStoneEditor() {
+      const modal = document.getElementById('stone-editor-modal');
+      if (modal) modal.style.display = 'none';
+    },
+
+    saveStoneFromEditor() {
+      const nameInput = document.getElementById('se-name');
+      const colorInput = document.getElementById('se-color');
+      const regionInput = document.getElementById('se-region');
+
+      if (!nameInput || !nameInput.value.trim()) {
+        alert('Խնդրում ենք մուտքագրել քարի անվանումը։');
+        return;
+      }
+
+      const stoneName = nameInput.value.trim();
+      const stoneColor = (colorInput ? colorInput.value : '#7B2D3B') || '#7B2D3B';
+      const stoneRegion = (regionInput ? regionInput.value.trim() : '') || 'Հայաստան';
+
+      let customStones = [];
+      try {
+        customStones = JSON.parse(localStorage.getItem('urartoo_stones_db_v1')) || [];
+      } catch (e) {}
+
+      const existingIdx = customStones.findIndex(s => s.name.toLowerCase() === stoneName.toLowerCase());
+      const newStoneObj = { name: stoneName, color: stoneColor, region: stoneRegion };
+
+      if (existingIdx >= 0) {
+        customStones[existingIdx] = newStoneObj;
+      } else {
+        customStones.push(newStoneObj);
+      }
+
+      try {
+        localStorage.setItem('urartoo_stones_db_v1', JSON.stringify(customStones));
+      } catch (e) {}
+
+      this.populateStoneDropdown();
+      const peStoneEl = document.getElementById('pe-stone');
+      if (peStoneEl) peStoneEl.value = stoneName;
+
+      const peRegionEl = document.getElementById('pe-region');
+      if (peRegionEl && stoneRegion) peRegionEl.value = stoneRegion;
+
+      this.closeStoneEditor();
+
+      window.dispatchEvent(new CustomEvent('urartoo:stones-updated', { detail: newStoneObj }));
+
+      if (window.showToastNotification) {
+        window.showToastNotification(`✓ «${stoneName}» քարը հաջողությամբ ավելացվեց։`, 'success', 3500);
+      }
+    },
+
     async openProductEditor(productId) {
       const modal = document.getElementById('product-editor-modal');
       if (!modal) return;
 
+      this.populateStoneDropdown();
       this.currentEditingProductId = productId;
       const modalTitle = document.getElementById('pe-modal-title');
 
