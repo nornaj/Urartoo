@@ -664,7 +664,6 @@
       if (document.getElementById('se-color')) document.getElementById('se-color').value = '#7B2D3B';
       if (document.getElementById('se-color-hex')) document.getElementById('se-color-hex').value = '#7B2D3B';
       if (document.getElementById('se-color-preview')) document.getElementById('se-color-preview').style.background = '#7B2D3B';
-      if (document.getElementById('se-region')) document.getElementById('se-region').value = '';
 
       modal.style.setProperty('display', 'flex', 'important');
       modal.style.setProperty('visibility', 'visible', 'important');
