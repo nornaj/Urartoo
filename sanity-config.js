@@ -355,7 +355,7 @@
         id: String(productData.id || docId),
         name: productData.name,
         brand: productData.brand || 'Urartoo',
-        sku: productData.sku || `UR-${Math.floor(100 + Math.random() * 900)}`,
+        sku: productData.sku || 'UR-001',
         category: productData.cat || productData.category || 'Մատանիներ',
         stone: productData.stone || 'Նռնաքար',
         stoneOrigin: productData.region || productData.stoneOrigin || 'Վայոց Ձոր',

@@ -295,6 +295,34 @@
 
       if (statusCallback) statusCallback(`Սինխրոնացվում է Sanity CMS-ի հետ...`);
 
+      // Calculate the next available sequential SKU number
+      let maxSkuNum = 0;
+      if (window.NovaSanity) {
+        const existingProducts = window.NovaSanity.getProducts();
+        existingProducts.forEach(function(p) {
+          if (p.sku) {
+            var match = p.sku.match(/^UR-(\d+)$/);
+            if (match) {
+              var num = parseInt(match[1], 10);
+              if (num > maxSkuNum) maxSkuNum = num;
+            }
+          }
+        });
+      }
+      // Also check trash
+      try {
+        var trashItems = JSON.parse(localStorage.getItem('urartoo_trash_v1')) || [];
+        trashItems.forEach(function(p) {
+          if (p.sku) {
+            var match = p.sku.match(/^UR-(\d+)$/);
+            if (match) {
+              var num = parseInt(match[1], 10);
+              if (num > maxSkuNum) maxSkuNum = num;
+            }
+          }
+        });
+      } catch (e) {}
+
       let syncedCount = 0;
 
       for (let i = 0; i < sheetRows.length; i++) {
@@ -309,7 +337,7 @@
         const prodData = {
           id: `product-gsheet-${i + 1}`,
           name: title,
-          sku: `UR-GS-${i + 1}`,
+          sku: 'UR-' + String(maxSkuNum + i + 1).padStart(3, '0'),
           cat: row.category || 'Մատանիներ',
           category: row.category || 'Մատանիներ',
           stone: ensureStoneExists(row.stone),

@@ -736,6 +736,7 @@
 
       this.populateStoneDropdown();
       this.currentEditingProductId = productId;
+      this._currentEditingSku = null;
       const modalTitle = document.getElementById('pe-modal-title');
 
       // Clear forms
@@ -833,6 +834,43 @@
       this.renderGalleryThumbnails();
     },
 
+
+    /**
+     * Generates the next sequential SKU (UR-001, UR-002, etc.)
+     * by scanning all existing products for the highest UR-XXX number.
+     */
+    getNextSKU() {
+      let maxNum = 0;
+      // Scan Sanity products
+      if (window.NovaSanity) {
+        const products = window.NovaSanity.getProducts();
+        products.forEach(p => {
+          if (p.sku) {
+            const match = p.sku.match(/^UR-(\d+)$/);
+            if (match) {
+              const num = parseInt(match[1], 10);
+              if (num > maxNum) maxNum = num;
+            }
+          }
+        });
+      }
+      // Also scan trash for used SKUs
+      try {
+        const trash = JSON.parse(localStorage.getItem('urartoo_trash_v1')) || [];
+        trash.forEach(p => {
+          if (p.sku) {
+            const match = p.sku.match(/^UR-(\d+)$/);
+            if (match) {
+              const num = parseInt(match[1], 10);
+              if (num > maxNum) maxNum = num;
+            }
+          }
+        });
+      } catch (e) {}
+      const next = maxNum + 1;
+      return 'UR-' + String(next).padStart(3, '0');
+    },
+
     async saveProductFromEditor() {
       const nameInput = document.getElementById('pe-name');
       const name = nameInput ? nameInput.value.trim() : '';
@@ -861,7 +899,7 @@
         id: this.currentEditingProductId || `product-custom-${Date.now()}`,
         _sanityId: this.currentEditingProductId,
         name: name,
-        sku: `UR-${Math.floor(100 + Math.random() * 900)}`,
+        sku: this.currentEditingProductId ? (this._currentEditingSku || this.getNextSKU()) : this.getNextSKU(),
         price: price,
         description: document.getElementById('pe-desc').value.trim(),
         cat: catVal,
