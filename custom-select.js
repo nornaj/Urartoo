@@ -1,7 +1,7 @@
 /**
  * Urartoo Universal Custom Select Dropdown
- * Auto-upgrades all <select> elements into styled custom dropdowns.
- * Excludes admin panel selects (inside #admin-sec-*).
+ * Replaces native <select> elements with styled custom dropdowns.
+ * Excludes admin panel selects.
  */
 (function () {
   'use strict';
@@ -10,13 +10,20 @@
     var selects = document.querySelectorAll('select');
 
     selects.forEach(function (sel) {
-      // Skip if already converted
       if (sel.dataset.uraConverted === 'true') return;
 
       // Skip admin panel selects
-      if (sel.closest('[id^="admin-sec-"]') || sel.closest('.admin-card') || sel.closest('#product-editor-modal') || sel.closest('#stone-editor-modal')) return;
+      if (
+        sel.closest('[id^="admin-sec-"]') ||
+        sel.closest('.admin-card') ||
+        sel.closest('#product-editor-modal') ||
+        sel.closest('#stone-editor-modal') ||
+        sel.classList.contains('admin-input')
+      ) {
+        return;
+      }
 
-      // Skip hidden selects
+      // Skip hidden selects (unless part of a form that might become visible)
       if (sel.offsetParent === null && !sel.closest('form')) return;
 
       convertSelect(sel);
@@ -25,16 +32,14 @@
 
   function convertSelect(sel) {
     sel.dataset.uraConverted = 'true';
-    sel.style.display = 'none';
+    sel.style.setProperty('display', 'none', 'important');
 
     // Build wrapper
     var wrapper = document.createElement('div');
     wrapper.className = 'ura-custom-select';
+    wrapper.tabIndex = 0;
     if (sel.style.maxWidth) wrapper.style.maxWidth = sel.style.maxWidth;
     if (sel.className) wrapper.dataset.originalClass = sel.className;
-
-    // Match parent width
-    wrapper.style.width = '100%';
 
     // Build trigger button
     var trigger = document.createElement('div');
@@ -66,64 +71,114 @@
     var menu = document.createElement('div');
     menu.className = 'ura-select-menu';
 
-    Array.from(sel.options).forEach(function (opt, idx) {
-      var item = document.createElement('div');
-      item.className = 'ura-select-option';
-      if (idx === sel.selectedIndex) item.classList.add('selected');
-      item.textContent = opt.textContent;
-      item.dataset.value = opt.value;
+    function renderOptions() {
+      menu.innerHTML = '';
+      Array.from(sel.options).forEach(function (opt, idx) {
+        var item = document.createElement('div');
+        item.className = 'ura-select-option';
+        if (idx === sel.selectedIndex) item.classList.add('selected');
+        item.textContent = opt.textContent;
+        item.dataset.value = opt.value;
 
-      item.addEventListener('click', function (e) {
-        e.stopPropagation();
+        item.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
 
-        // Update native select
-        sel.value = opt.value;
-        sel.selectedIndex = idx;
+          // Update native select
+          sel.value = opt.value;
+          sel.selectedIndex = idx;
 
-        // Trigger change event
-        var evt = new Event('change', { bubbles: true });
-        sel.dispatchEvent(evt);
+          // Dispatch change & input events
+          sel.dispatchEvent(new Event('change', { bubbles: true }));
+          sel.dispatchEvent(new Event('input', { bubbles: true }));
 
-        // Also trigger input event
-        var inputEvt = new Event('input', { bubbles: true });
-        sel.dispatchEvent(inputEvt);
+          // Update UI
+          triggerText.textContent = opt.textContent;
+          menu.querySelectorAll('.ura-select-option').forEach(function (o) {
+            o.classList.remove('selected');
+          });
+          item.classList.add('selected');
 
-        // Update UI
-        triggerText.textContent = opt.textContent;
-        menu.querySelectorAll('.ura-select-option').forEach(function (o) {
-          o.classList.remove('selected');
+          // Close dropdown
+          wrapper.classList.remove('active');
         });
-        item.classList.add('selected');
 
-        // Close dropdown
-        wrapper.classList.remove('active');
+        menu.appendChild(item);
       });
+    }
 
-      menu.appendChild(item);
-    });
+    renderOptions();
 
     wrapper.appendChild(trigger);
     wrapper.appendChild(menu);
+
+    // If the select is inside a <label>, prevent label activation
+    var parentLabel = sel.closest('label');
+    if (parentLabel) {
+      parentLabel.addEventListener('click', function (e) {
+        if (e.target.closest('.ura-custom-select')) {
+          e.preventDefault();
+        }
+      });
+    }
 
     // Insert after the native select
     sel.parentNode.insertBefore(wrapper, sel.nextSibling);
 
     // Toggle dropdown on trigger click
     trigger.addEventListener('click', function (e) {
+      e.preventDefault();
       e.stopPropagation();
 
-      // Close all other custom selects
+      var isCurrentlyActive = wrapper.classList.contains('active');
+
+      // Close all other custom selects first
       document.querySelectorAll('.ura-custom-select.active').forEach(function (other) {
         if (other !== wrapper) other.classList.remove('active');
       });
 
-      wrapper.classList.toggle('active');
+      if (isCurrentlyActive) {
+        wrapper.classList.remove('active');
+      } else {
+        renderOptions();
+        wrapper.classList.add('active');
+      }
+    });
+
+    // Prevent clicks inside menu from closing or bubbling
+    menu.addEventListener('click', function (e) {
+      e.stopPropagation();
+    });
+
+    // Keyboard support on wrapper
+    wrapper.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        wrapper.classList.toggle('active');
+      } else if (e.key === 'Escape') {
+        wrapper.classList.remove('active');
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (!wrapper.classList.contains('active')) {
+          wrapper.classList.add('active');
+        } else if (sel.selectedIndex < sel.options.length - 1) {
+          sel.selectedIndex++;
+          sel.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (sel.selectedIndex > 0) {
+          sel.selectedIndex--;
+          sel.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
     });
 
     // Keep in sync if native select changes externally
     sel.addEventListener('change', function () {
       var val = sel.value;
-      var text = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].textContent : val;
+      var opt = sel.options[sel.selectedIndex];
+      var text = opt ? opt.textContent : val;
       triggerText.textContent = text;
       menu.querySelectorAll('.ura-select-option').forEach(function (o) {
         o.classList.toggle('selected', o.dataset.value === val);
@@ -131,8 +186,11 @@
     });
   }
 
-  // Close all custom selects on outside click
-  document.addEventListener('click', function () {
+  // Close all custom selects when clicking outside
+  document.addEventListener('click', function (e) {
+    if (e.target && e.target.closest && e.target.closest('.ura-custom-select')) {
+      return;
+    }
     document.querySelectorAll('.ura-custom-select.active').forEach(function (el) {
       el.classList.remove('active');
     });
@@ -154,9 +212,8 @@
     initCustomSelects();
   }
 
-  // Re-init after a delay to catch dynamically rendered selects
+  setTimeout(initCustomSelects, 500);
   setTimeout(initCustomSelects, 1500);
 
-  // Expose for manual re-init
   window.initCustomSelects = initCustomSelects;
 })();
