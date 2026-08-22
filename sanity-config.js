@@ -191,6 +191,19 @@
         images
       }`;
 
+      // GROQ query for journal posts
+      const journalGroq = `*[_type == "journalPost"]{
+        _id,
+        id,
+        topic,
+        date,
+        readTime,
+        title,
+        excerpt,
+        content,
+        featured
+      }`;
+
       // GROQ query for user accounts
       const usersGroq = `*[_type == "user"]{
         _id,
@@ -218,23 +231,31 @@
         }
 
         if (sanityProds !== null && Array.isArray(sanityProds)) {
-          if (sanityProds.length === 0) {
-            if (!this._products || this._products.length === 0) {
-              this._products = [];
-            }
-          } else {
-            this._products = this._transformSanityProducts(sanityProds);
-          }
+          const transformedCloud = this._transformSanityProducts(sanityProds);
+          
+          // Merge local localStorage products with cloud products so nothing is lost
+          const localProds = this._products || [];
+          const mergedMap = new Map();
+          
+          // Add local products first
+          localProds.forEach(p => {
+            const pKey = String(p._sanityId || p.id);
+            if (pKey) mergedMap.set(pKey, p);
+          });
+          
+          // Merge/overwrite with cloud products
+          transformedCloud.forEach(p => {
+            const pKey = String(p._sanityId || p.id);
+            if (pKey) mergedMap.set(pKey, p);
+          });
 
-          if (sanityJournal && sanityJournal.length > 0) {
+          this._products = Array.from(mergedMap.values());
+
+          if (sanityJournal && Array.isArray(sanityJournal) && sanityJournal.length > 0) {
             this._journalPosts = sanityJournal;
           } else {
             this._journalPosts = INITIAL_SEED_JOURNAL;
           }
-
-          this._ready = true;
-          this.notifyUpdate();
-        }  return this._products;
         }
       } catch (err) {
         console.warn('Sanity query failed:', err);

@@ -4343,5 +4343,487 @@ select option:hover, select option:focus, select option:checked {
   100% { transform: rotate(360deg); }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   SINGLE BLOG POST PAGE STYLES (.journal-post-page)
+   ═══════════════════════════════════════════════════════════════════════════ */
 
+.journal-post-article {
+  padding: 44px max(var(--gutter), calc((100% - var(--max)) / 2)) 0;
+}
 
+.journal-post-meta-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tuff);
+  margin-bottom: 18px;
+}
+
+.journal-post-meta-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--amber);
+  display: inline-block;
+}
+
+.journal-post-title {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(32px, 4.4vw, 56px);
+  line-height: 1.06;
+  letter-spacing: -0.025em;
+  color: var(--obsidian);
+  margin: 0 0 20px;
+  max-width: 22ch;
+}
+
+.journal-post-lead {
+  font-size: 18px;
+  line-height: 1.65;
+  color: var(--graphite);
+  margin: 0 0 32px;
+  max-width: 60ch;
+}
+
+.journal-post-hero-wrap {
+  aspect-ratio: 21/9;
+  background: var(--warm-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 56px;
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.journal-post-hero-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.journal-post-hero-placeholder {
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.8;
+  color: rgba(12, 14, 13, 0.4);
+  max-width: 260px;
+  text-align: center;
+}
+
+/* Main 2-Column Grid Layout */
+.journal-post-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+@media (min-width: 992px) {
+  .journal-post-grid {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 72px;
+  }
+}
+
+.journal-post-body {
+  min-width: 0;
+}
+
+.journal-post-block {
+  margin-bottom: 22px;
+}
+
+.journal-post-block h2 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(24px, 2.5vw, 30px);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--obsidian);
+  margin: 44px 0 18px;
+  scroll-margin-top: 110px;
+}
+
+.journal-post-block p {
+  font-size: 16.5px;
+  line-height: 1.78;
+  color: var(--graphite);
+  margin: 0;
+  max-width: 66ch;
+}
+
+.journal-post-block blockquote {
+  border-left: 2px solid var(--amber);
+  margin: 34px 0;
+  padding: 4px 0 4px 28px;
+}
+
+.journal-post-block blockquote span {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: clamp(20px, 2.2vw, 26px);
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+  color: var(--obsidian);
+  max-width: 34ch;
+}
+
+.journal-post-block figure {
+  margin: 36px 0;
+}
+
+.journal-post-figure-img {
+  aspect-ratio: 3/2;
+  background: var(--warm-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.journal-post-figure-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.journal-post-figure-caption {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--tuff);
+  margin-top: 12px;
+}
+
+/* Bench Author Box */
+.bench-author-box {
+  border-top: 1px solid var(--obsidian);
+  margin-top: 56px;
+  padding-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.bench-author-avatar {
+  width: 54px;
+  height: 54px;
+  background: var(--warm-light);
+  flex: 0 0 auto;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--amber);
+  font-weight: 600;
+  font-size: 18px;
+  border: 1px solid var(--pumice);
+}
+
+.bench-author-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--obsidian);
+}
+
+.bench-author-desc {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--tuff);
+  margin-top: 4px;
+  max-width: 52ch;
+}
+
+/* Sticky Sidebar */
+.journal-post-sidebar {
+  position: sticky;
+  top: 96px;
+  min-width: 0;
+}
+
+.journal-sidebar-box {
+  border-top: 1px solid var(--obsidian);
+  padding-top: 18px;
+}
+
+.journal-sidebar-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tuff);
+  margin-bottom: 16px;
+}
+
+.journal-toc-nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.journal-toc-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--tuff);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.journal-toc-link:hover,
+.journal-toc-link.active {
+  color: var(--obsidian);
+  font-weight: 500;
+}
+
+.journal-toc-mark {
+  width: 10px;
+  height: 1px;
+  flex: 0 0 auto;
+  background: var(--pumice);
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease;
+}
+
+.journal-toc-link.active .journal-toc-mark {
+  width: 18px;
+  background: var(--amber);
+}
+
+/* Share Block */
+.journal-share-box {
+  border-top: 1px solid var(--pumice);
+  margin-top: 28px;
+  padding-top: 18px;
+}
+
+.journal-share-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.journal-share-btn {
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--pumice);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  color: var(--graphite);
+}
+
+.journal-share-btn:hover {
+  background: var(--obsidian);
+  border-color: var(--obsidian);
+  color: var(--bone);
+}
+
+.journal-share-status {
+  font-size: 12px;
+  color: var(--amber);
+  margin-top: 12px;
+  min-height: 18px;
+  font-weight: 500;
+}
+
+/* From This Trip Featured Product Card */
+.journal-from-trip-card {
+  background: var(--surface);
+  margin-top: 28px;
+  padding: 22px;
+  border: 1px solid var(--pumice);
+}
+
+.journal-from-trip-img {
+  aspect-ratio: 1/1;
+  background: var(--warm-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+
+.journal-from-trip-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.journal-from-trip-title {
+  font-size: 14.5px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--obsidian);
+}
+
+.journal-from-trip-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.journal-from-trip-badge {
+  font-size: 12.5px;
+  color: var(--tuff);
+}
+
+.journal-from-trip-price {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--obsidian);
+  font-weight: 500;
+}
+
+.journal-from-trip-cta {
+  display: block;
+  text-align: center;
+  background: var(--obsidian);
+  color: var(--bone);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 13px 0;
+  margin-top: 16px;
+  text-decoration: none;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.journal-from-trip-cta:hover {
+  background: var(--amber);
+  color: var(--obsidian);
+}
+
+/* Related Field Notes Section */
+.journal-related-section {
+  padding: 80px max(var(--gutter), calc((100% - var(--max)) / 2)) 0;
+}
+
+.journal-related-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.journal-related-title {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(24px, 2.6vw, 36px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--obsidian);
+  margin: 0;
+}
+
+.journal-related-all {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--obsidian);
+  border-bottom: 1px solid var(--pumice);
+  padding-bottom: 3px;
+  text-decoration: none;
+  transition: border-color 0.25s ease, color 0.25s ease;
+}
+
+.journal-related-all:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+/* Single Blog Dark CTA Banner */
+.blog-post-cta-banner {
+  background: var(--obsidian);
+  color: var(--bone);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  align-items: center;
+  padding: 48px 36px;
+  margin: 80px max(var(--gutter), calc((100% - var(--max)) / 2)) 80px;
+}
+
+@media (min-width: 768px) {
+  .blog-post-cta-banner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 40px;
+    padding: 52px 48px;
+  }
+}
+
+.blog-cta-headline {
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 2.8vw, 32px);
+  font-weight: 400;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  max-width: 24ch;
+  color: var(--bone);
+}
+
+.blog-cta-text {
+  font-size: 15px;
+  line-height: 1.7;
+  color: rgba(232, 226, 218, 0.7);
+  margin: 0;
+  max-width: 54ch;
+}
+
+.blog-cta-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.blog-cta-btn-primary {
+  background: var(--amber);
+  color: var(--obsidian);
+  padding: 15px 30px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.blog-cta-btn-primary:hover {
+  background: var(--bone);
+  color: var(--obsidian);
+}
+
+.blog-cta-link-secondary {
+  color: var(--bone);
+  font-size: 13px;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(232, 226, 218, 0.35);
+  padding-bottom: 3px;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: border-color 0.25s ease, color 0.25s ease;
+}
+
+.blog-cta-link-secondary:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+}

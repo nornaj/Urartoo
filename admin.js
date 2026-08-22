@@ -662,7 +662,7 @@
       if (document.getElementById('se-color-preview')) document.getElementById('se-color-preview').style.background = '#7B2D3B';
       if (document.getElementById('se-region')) document.getElementById('se-region').value = '';
 
-      modal.style.display = 'block';
+      modal.style.display = 'flex';
     },
 
     closeStoneEditor() {

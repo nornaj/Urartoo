@@ -28,8 +28,8 @@
   let activeCat = 'all';
   let activeStone = 'all';
   let searchQuery = '';
-  let minPrice = 100;
-  let maxPrice = 600;
+  let minPrice = 0;
+  let maxPrice = 10000;
   let activeSort = 'new';
 
   // Read URL parameters if coming from Homepage stone/category cards
@@ -174,13 +174,13 @@
     activeCat = 'all';
     activeStone = 'all';
     searchQuery = '';
-    minPrice = 100;
-    maxPrice = 600;
+    minPrice = 0;
+    maxPrice = 10000;
     activeSort = 'new';
 
     if (searchInput) searchInput.value = '';
-    if (priceMinInput) priceMinInput.value = 100;
-    if (priceMaxInput) priceMaxInput.value = 600;
+    if (priceMinInput) priceMinInput.value = '';
+    if (priceMaxInput) priceMaxInput.value = '';
     if (sortSelect) sortSelect.value = 'new';
 
     document.querySelectorAll('#cat-chips .filter-chip').forEach(c => c.classList.remove('active'));
