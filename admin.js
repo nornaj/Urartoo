@@ -721,6 +721,7 @@
       if (peRegionEl && stoneRegion) peRegionEl.value = stoneRegion;
 
       this.closeStoneEditor();
+      this.renderStonesSec();
 
       window.dispatchEvent(new CustomEvent('urartoo:stones-updated', { detail: newStoneObj }));
 
@@ -891,15 +892,207 @@
       }
     },
 
+
+    /* ═══ PRODUCT SUBTAB NAVIGATION ═══ */
+    switchProductSubtab(subtab) {
+      document.querySelectorAll('.admin-subtab').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.subtab === subtab);
+      });
+      const productsContent = document.getElementById('admin-subtab-products-content');
+      const trashContent = document.getElementById('admin-subtab-trash-content');
+      const stonesContent = document.getElementById('admin-subtab-stones-content');
+      if (productsContent) productsContent.style.display = subtab === 'products' ? '' : 'none';
+      if (trashContent) trashContent.style.display = subtab === 'trash' ? '' : 'none';
+      if (stonesContent) stonesContent.style.display = subtab === 'stones' ? '' : 'none';
+      if (subtab === 'trash') this.renderTrashSec();
+      if (subtab === 'stones') this.renderStonesSec();
+    },
+
+    /* ═══ TRASH MANAGEMENT ═══ */
+    renderTrashSec() {
+      const tbody = document.getElementById('admin-trash-tbody');
+      const emptyMsg = document.getElementById('admin-trash-empty');
+      if (!tbody) return;
+      let trash = [];
+      try { trash = JSON.parse(localStorage.getItem('urartoo_trash_v1')) || []; } catch (e) {}
+      if (trash.length === 0) {
+        tbody.innerHTML = '';
+        if (emptyMsg) emptyMsg.style.display = '';
+        return;
+      }
+      if (emptyMsg) emptyMsg.style.display = 'none';
+      tbody.innerHTML = trash.map((item, idx) => {
+        const img = item.img || item.image || 'Images/bracelet.webp';
+        const name = item.name || 'Ապరանք';
+        const cat = item.cat || item.category || '-';
+        const deletedAt = item._deletedAt || '-';
+        return '<tr>' +
+          '<td><img src="' + img + '" alt="' + name + '" style="width:44px; height:44px; object-fit:cover; border-radius:6px; border:1px solid #E2E0D8;"></td>' +
+          '<td style="font-weight:600;">' + name + '</td>' +
+          '<td>' + cat + '</td>' +
+          '<td style="font-size:12px; color:var(--tuff);">' + deletedAt + '</td>' +
+          '<td style="display:flex; gap:6px;">' +
+            '<button class="trash-restore-btn" onclick="window.WooCommerceAdmin.restoreProduct(' + idx + ')">␩ Վերականգնել</button>' +
+            '<button class="trash-delete-btn" onclick="window.WooCommerceAdmin.permanentlyDeleteProduct(' + idx + ')">Ջնջել Ընդմիշտ</button>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
+    },
+
+    async restoreProduct(trashIdx) {
+      let trash = [];
+      try { trash = JSON.parse(localStorage.getItem('urartoo_trash_v1')) || []; } catch (e) {}
+      if (trashIdx < 0 || trashIdx >= trash.length) return;
+      const product = trash.splice(trashIdx, 1)[0];
+      delete product._deletedAt;
+      localStorage.setItem('urartoo_trash_v1', JSON.stringify(trash));
+      if (window.NovaSanity) {
+        await window.NovaSanity.saveProduct(product);
+      }
+      this.renderTrashSec();
+      this.renderProductsSec();
+      addAuditLog('Վերականգնվեց աղբամանից: ' + product.name);
+      if (this.showToast) {
+        this.showToast('✅ «' + product.name + '» վերականգնվեց։', 'success', 3500);
+      }
+    },
+
+    permanentlyDeleteProduct(trashIdx) {
+      let trash = [];
+      try { trash = JSON.parse(localStorage.getItem('urartoo_trash_v1')) || []; } catch (e) {}
+      if (trashIdx < 0 || trashIdx >= trash.length) return;
+      const product = trash.splice(trashIdx, 1)[0];
+      localStorage.setItem('urartoo_trash_v1', JSON.stringify(trash));
+      if (window.NovaSanity && product._sanityId) {
+        window.NovaSanity.deleteProduct(product._sanityId);
+      }
+      this.renderTrashSec();
+      addAuditLog('Ընդմիշտ ջնջվեց: ' + product.name);
+      if (this.showToast) {
+        this.showToast('🗑 «' + product.name + '» ընդմիշտ ջնջվեց։', 'danger', 3500);
+      }
+    },
+
+    emptyTrash() {
+      if (!confirm('Վստահավե՞ք։ Աղբամանի բոլոր ապրանքները ընդմիշտ կջնջվեն։')) return;
+      localStorage.setItem('urartoo_trash_v1', '[]');
+      this.renderTrashSec();
+      addAuditLog('Աղբամանը դատարկվեց');
+    },
+
+    /* ═══ STONES MANAGEMENT ═══ */
+    renderStonesSec() {
+      const grid = document.getElementById('admin-stones-grid');
+      const emptyMsg = document.getElementById('admin-stones-empty');
+      if (!grid) return;
+      const defaultStones = [
+        { name: '\u0546\u057C\u0576\u0561\u0584\u0561\u0580', color: '#7B2D3B', isDefault: true },
+        { name: '\u0555\u0562\u057D\u056B\u0564\u056B\u0561\u0576', color: '#17181A', isDefault: true },
+        { name: '\u0553\u056B\u0580\u0578\u0582\u0566', color: '#2E8C8C', isDefault: true },
+        { name: '\u0540\u0561\u057D\u057A\u056B\u057D', color: '#A4442B', isDefault: true },
+        { name: '\u0535\u0572\u0576\u0563\u0561\u0584\u0561\u0580', color: '#1B1D1C', isDefault: true },
+        { name: '\u0531\u0563\u0561\u0569', color: '#C2A379', isDefault: true },
+        { name: '\u0554\u057E\u0561\u0580\u0581', color: '#6B5B4E', isDefault: true }
+      ];
+      let customStones = [];
+      try { customStones = JSON.parse(localStorage.getItem('urartoo_stones_db_v1')) || []; } catch (e) {}
+      const mergedMap = new Map();
+      defaultStones.forEach(s => mergedMap.set(s.name, s));
+      customStones.forEach(s => mergedMap.set(s.name, { ...s, isDefault: false }));
+      const allStones = Array.from(mergedMap.values());
+      if (allStones.length === 0) {
+        grid.innerHTML = '';
+        if (emptyMsg) emptyMsg.style.display = '';
+        return;
+      }
+      if (emptyMsg) emptyMsg.style.display = 'none';
+      grid.innerHTML = allStones.map(s => {
+        return '<div class="admin-stone-card">' +
+          '<div class="admin-stone-swatch" style="background:' + s.color + ';"></div>' +
+          '<div class="admin-stone-info">' +
+            '<div class="admin-stone-name">' + s.name + (s.isDefault ? '<span class="stone-default-badge">Լռելյալ</span>' : '') + '</div>' +
+            '<div class="admin-stone-color-hex">' + s.color + '</div>' +
+          '</div>' +
+          '<div class="admin-stone-actions">' +
+            '<button class="stone-btn-edit" onclick="window.WooCommerceAdmin.editStone(\'' + s.name.replace(/'/g, "\\'") + '\')">✎ Խմբագրել</button>' +
+            (!s.isDefault ? '<button class="stone-btn-delete" onclick="window.WooCommerceAdmin.deleteStone(\'' + s.name.replace(/'/g, "\\'") + '\')">🗑</button>' : '') +
+          '</div>' +
+        '</div>';
+      }).join('');
+    },
+
+    editStone(stoneName) {
+      const defaultStones = [
+        { name: '\u0546\u057C\u0576\u0561\u0584\u0561\u0580', color: '#7B2D3B' },
+        { name: '\u0555\u0562\u057D\u056B\u0564\u056B\u0561\u0576', color: '#17181A' },
+        { name: '\u0553\u056B\u0580\u0578\u0582\u0566', color: '#2E8C8C' },
+        { name: '\u0540\u0561\u057D\u057A\u056B\u057D', color: '#A4442B' },
+        { name: '\u0535\u0572\u0576\u0563\u0561\u0584\u0561\u0580', color: '#1B1D1C' },
+        { name: '\u0531\u0563\u0561\u0569', color: '#C2A379' },
+        { name: '\u0554\u057E\u0561\u0580\u0581', color: '#6B5B4E' }
+      ];
+      let customStones = [];
+      try { customStones = JSON.parse(localStorage.getItem('urartoo_stones_db_v1')) || []; } catch (e) {}
+      const allStones = [...defaultStones, ...customStones];
+      const stone = allStones.find(s => s.name === stoneName);
+      if (!stone) return;
+      const modal = document.getElementById('stone-editor-modal');
+      if (!modal) return;
+      const nameEl = document.getElementById('se-name');
+      const colorEl = document.getElementById('se-color');
+      const colorHexEl = document.getElementById('se-color-hex');
+      const colorPreview = document.getElementById('se-color-preview');
+      const previewName = document.getElementById('se-preview-name');
+      const previewHex = document.getElementById('se-preview-hex');
+      const modalTitle = document.getElementById('stone-modal-title');
+      if (nameEl) nameEl.value = stone.name;
+      if (colorEl) colorEl.value = stone.color;
+      if (colorHexEl) colorHexEl.value = stone.color;
+      if (colorPreview) colorPreview.style.background = stone.color;
+      if (previewName) previewName.textContent = stone.name;
+      if (previewHex) previewHex.textContent = stone.color;
+      if (modalTitle) modalTitle.textContent = 'Խմբագրել Քարը';
+      modal.style.setProperty('display', 'flex', 'important');
+      modal.style.setProperty('visibility', 'visible', 'important');
+      modal.style.setProperty('opacity', '1', 'important');
+      modal.style.setProperty('pointer-events', 'auto', 'important');
+      document.body.style.overflow = 'hidden';
+    },
+
+    deleteStone(stoneName) {
+      if (!confirm('Ջնջե՞լ «' + stoneName + '» քարը։')) return;
+      let customStones = [];
+      try { customStones = JSON.parse(localStorage.getItem('urartoo_stones_db_v1')) || []; } catch (e) {}
+      customStones = customStones.filter(s => s.name !== stoneName);
+      localStorage.setItem('urartoo_stones_db_v1', JSON.stringify(customStones));
+      this.renderStonesSec();
+      this.populateStoneDropdown();
+      window.dispatchEvent(new CustomEvent('urartoo:stones-updated'));
+      addAuditLog('Ջնջվեց քարը: ' + stoneName);
+      if (this.showToast) {
+        this.showToast('🗑 «' + stoneName + '» քարը ջնջվեց։', 'danger', 3500);
+      }
+    },
+
     async deleteProduct(productId) {
       let prodName = 'Ապրանք';
+      let product = null;
       if (window.NovaSanity) {
-        const products = await window.NovaSanity.getProducts();
-        const found = products.find(p => String(p._sanityId) === String(productId) || String(p.id) === String(productId));
-        if (found) prodName = found.name;
+        const products = window.NovaSanity.getProducts();
+        product = products.find(p => String(p._sanityId) === String(productId) || String(p.id) === String(productId));
+        if (product) prodName = product.name;
       }
 
       const loadingToast = this.showToast(`Ջնջվում է «${prodName}»...`, 'loading', 0);
+
+      // Soft-delete: move to trash before removing
+      if (product) {
+        let trash = [];
+        try { trash = JSON.parse(localStorage.getItem('urartoo_trash_v1')) || []; } catch (e) {}
+        product._deletedAt = new Date().toLocaleDateString('hy-AM');
+        trash.push({ ...product });
+        localStorage.setItem('urartoo_trash_v1', JSON.stringify(trash));
+      }
 
       if (window.NovaSanity) {
         await window.NovaSanity.deleteProduct(productId);
@@ -908,7 +1101,7 @@
       }
 
       if (loadingToast) {
-        loadingToast.update(`Ապրանք «${prodName}» ջնջվեց։`, 'danger', 4000);
+        loadingToast.update(`«${prodName}» տեղափոխվեց աղբաման։`, 'warning', 4000);
       }
     },
 

@@ -131,6 +131,21 @@
 
           <!-- SECTION 2: PRODUCT INVENTORY MANAGER -->
           <section id="admin-sec-products" class="admin-sec" style="display:none;">
+              <!-- PRODUCT SUBTAB BAR -->
+              <div class="admin-subtab-bar" id="admin-products-subtab-bar">
+                <button class="admin-subtab active" data-subtab="products" onclick="window.WooCommerceAdmin.switchProductSubtab('products')">
+                  📦 Ապրանքներ
+                </button>
+                <button class="admin-subtab" data-subtab="trash" onclick="window.WooCommerceAdmin.switchProductSubtab('trash')">
+                  🗑 Աղբաման
+                </button>
+                <button class="admin-subtab" data-subtab="stones" onclick="window.WooCommerceAdmin.switchProductSubtab('stones')">
+                  💎 Քարեր
+                </button>
+              </div>
+
+              <!-- PRODUCTS SUBTAB CONTENT -->
+              <div id="admin-subtab-products-content" class="admin-subtab-content">
             <div class="admin-card">
               <div class="admin-card-header" style="flex-wrap:wrap; gap:16px;">
                 <div>
@@ -188,6 +203,56 @@
               <!-- Mobile Product Cards Grid -->
               <div id="admin-products-mobile-cards" class="admin-mobile-cards-grid"></div>
             </div>
+              </div>
+              <!-- TRASH SUBTAB CONTENT -->
+              <div id="admin-subtab-trash-content" class="admin-subtab-content" style="display:none;">
+                <div class="admin-card">
+                  <div class="admin-card-header">
+                    <div>
+                      <h3 class="admin-card-title" style="margin:0 0 6px;">🗑 Վերջերս Ջնջված Ապրանքներ</h3>
+                      <p style="margin:0; font-size:13px; color:var(--tuff);">Վերականգնեք կամ ընդմիշտ ջնջեք ապրանքները։</p>
+                    </div>
+                    <button type="button" class="filter-clear-btn" style="color:red; border-color:red;" onclick="window.WooCommerceAdmin.emptyTrash()">Ջնջել Բոլորը</button>
+                  </div>
+                  <div style="overflow-x:auto;">
+                    <table class="admin-table">
+                      <thead>
+                        <tr>
+                          <th>Նկար</th>
+                          <th>Անվանում</th>
+                          <th>Տեսակ</th>
+                          <th>Ջնջման Ամսաթիվ</th>
+                          <th>Գործողություններ</th>
+                        </tr>
+                      </thead>
+                      <tbody id="admin-trash-tbody"></tbody>
+                    </table>
+                  </div>
+                  <div id="admin-trash-empty" style="display:none; text-align:center; padding:40px 20px; color:var(--tuff);">
+                    <p style="font-size:16px; margin:0 0 6px;">✅ Աղբամանը դատարկ է։</p>
+                    <p style="font-size:13px; margin:0;">Ջնջված ապրանքներ չկան։</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- STONES SUBTAB CONTENT -->
+              <div id="admin-subtab-stones-content" class="admin-subtab-content" style="display:none;">
+                <div class="admin-card">
+                  <div class="admin-card-header" style="flex-wrap:wrap; gap:16px;">
+                    <div>
+                      <h3 class="admin-card-title" style="margin:0 0 6px;">💎 Քարերի Կառավարում</h3>
+                      <p style="margin:0; font-size:13px; color:var(--tuff);">Բոլոր քարերը և դրանց տվյալները։</p>
+                    </div>
+                    <button type="button" class="btn-primary" onclick="window.WooCommerceAdmin.openStoneEditor()" style="padding:10px 18px; font-size:13px; font-weight:700; background:var(--gold); color:var(--green); border:none;">+ ԱՎԵԼԱՑՆԵԼ ՔԱՐ</button>
+                  </div>
+                  <div id="admin-stones-grid" class="admin-stones-grid"></div>
+                  <div id="admin-stones-empty" style="display:none; text-align:center; padding:40px 20px; color:var(--tuff);">
+                    <p style="font-size:16px; margin:0 0 6px;">Քարեր չկան։</p>
+                    <p style="font-size:13px; margin:0;">Սեղմեք «+ Ավելացնել Քար» կոճակը։</p>
+                  </div>
+                </div>
+              </div>
+
           </section>
 
           <!-- SECTION 3: CLIENTS & CUSTOMERS DIRECTORY -->
