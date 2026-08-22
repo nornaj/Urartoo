@@ -653,6 +653,7 @@
     },
 
     openStoneEditor() {
+      this._editingStoneName = null; // New stone, not editing
       console.log('[Urartoo] openStoneEditor called');
       const modal = document.getElementById('stone-editor-modal');
       if (!modal) {
@@ -687,7 +688,7 @@
       const regionInput = document.getElementById('se-region');
 
       if (!nameInput || !nameInput.value.trim()) {
-        alert('Խնդրում ենք մուտքագրել քարի անվանումը։');
+        if (this.showToast) this.showToast('Խնդրում ենք մուտքագրել քարի անվանումը։', 'danger', 3000);
         return;
       }
 
@@ -700,14 +701,18 @@
         customStones = JSON.parse(localStorage.getItem('urartoo_stones_db_v1')) || [];
       } catch (e) {}
 
-      const existingIdx = customStones.findIndex(s => s.name.toLowerCase() === stoneName.toLowerCase());
+      const originalName = this._editingStoneName || null;
       const newStoneObj = { name: stoneName, color: stoneColor, region: stoneRegion };
 
-      if (existingIdx >= 0) {
-        customStones[existingIdx] = newStoneObj;
+      // If editing an existing stone, remove old entry first (by original name)
+      if (originalName) {
+        customStones = customStones.filter(s => s.name.toLowerCase() !== originalName.toLowerCase());
       } else {
-        customStones.push(newStoneObj);
+        // Check if name already exists (for new stones)
+        customStones = customStones.filter(s => s.name.toLowerCase() !== stoneName.toLowerCase());
       }
+      customStones.push(newStoneObj);
+      this._editingStoneName = null; // Reset
 
       try {
         localStorage.setItem('urartoo_stones_db_v1', JSON.stringify(customStones));
@@ -1048,18 +1053,18 @@
         return '<div class="admin-stone-card">' +
           '<div class="admin-stone-swatch" style="background:' + s.color + ';"></div>' +
           '<div class="admin-stone-info">' +
-            '<div class="admin-stone-name">' + s.name + (s.isDefault ? '<span class="stone-default-badge">Լռելյալ</span>' : '') + '</div>' +
-            '<div class="admin-stone-color-hex">' + s.color + '</div>' +
+            '<div class="admin-stone-name">' + s.name + '</div>' +
           '</div>' +
           '<div class="admin-stone-actions">' +
             '<button class="stone-btn-edit" onclick="window.WooCommerceAdmin.editStone(\'' + s.name.replace(/'/g, "\\'") + '\')">✎ Խմբագրել</button>' +
-            (!s.isDefault ? '<button class="stone-btn-delete" onclick="window.WooCommerceAdmin.deleteStone(\'' + s.name.replace(/'/g, "\\'") + '\')">🗑</button>' : '') +
+            '<button class="stone-btn-delete" onclick="window.WooCommerceAdmin.deleteStone(\'' + s.name.replace(/'/g, "\\'") + '\')">🗑</button>' +
           '</div>' +
         '</div>';
       }).join('');
     },
 
     editStone(stoneName) {
+      this._editingStoneName = stoneName; // Track original name for updates
       const defaultStones = [
         { name: '\u0546\u057C\u0576\u0561\u0584\u0561\u0580', color: '#7B2D3B' },
         { name: '\u0555\u0562\u057D\u056B\u0564\u056B\u0561\u0576', color: '#17181A' },
@@ -1098,7 +1103,6 @@
     },
 
     deleteStone(stoneName) {
-      if (!confirm('Ջնջե՞լ «' + stoneName + '» քարը։')) return;
       let customStones = [];
       try { customStones = JSON.parse(localStorage.getItem('urartoo_stones_db_v1')) || []; } catch (e) {}
       customStones = customStones.filter(s => s.name !== stoneName);
