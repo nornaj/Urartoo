@@ -8,15 +8,67 @@
   const CART_KEY = 'urartoo_cart_v1';
   const WISHLIST_KEY = 'urartoo_wishlist_v1';
 
-  const STONE_DOTS = {
-    'Նռնաքար': '#7B2D3B',
-    'Օբսիդիան': '#17181A',
-    'Փիրուզ': '#2E8C8C',
-    'Հասպիս': '#A4442B',
-    'Եղնգաքար': '#1B1D1C',
-    'Ագաթ': '#C2A379',
-    'Քվարց': '#6B5B4E'
-  };
+  // Default stones + merge custom stones from admin panel
+  const DEFAULT_STONES = [
+    { name: 'Նռնաքար', color: '#7B2D3B' },
+    { name: 'Օբսիդիան', color: '#17181A' },
+    { name: 'Փիրուզ', color: '#2E8C8C' },
+    { name: 'Հասպիս', color: '#A4442B' },
+    { name: 'Եղնգաքար', color: '#1B1D1C' },
+    { name: 'Ագաթ', color: '#C2A379' },
+    { name: 'Քվարց', color: '#6B5B4E' }
+  ];
+
+  function getAllStones() {
+    const mergedMap = new Map();
+    DEFAULT_STONES.forEach(s => mergedMap.set(s.name, s));
+    try {
+      const custom = JSON.parse(localStorage.getItem('urartoo_stones_db_v1')) || [];
+      custom.forEach(s => { if (s.name) mergedMap.set(s.name, s); });
+    } catch (e) {}
+    return Array.from(mergedMap.values());
+  }
+
+  function getStoneDots() {
+    const dots = {};
+    getAllStones().forEach(s => { dots[s.name] = s.color; });
+    return dots;
+  }
+
+  let STONE_DOTS = getStoneDots();
+
+  // Dynamically render stone filter chips
+  function renderStoneChips() {
+    const container = document.getElementById('stone-chips');
+    if (!container) return;
+    STONE_DOTS = getStoneDots();
+    const stones = getAllStones();
+    container.innerHTML = '<button class="filter-chip active" data-stone="all">Բոլորը</button>' +
+      stones.map(s =>
+        '<button class="filter-chip" data-stone="' + s.name + '">' +
+          '<span class="stone-color-dot" style="background:' + s.color + ';"></span>' + s.name +
+        '</button>'
+      ).join('');
+
+    // Re-bind click handlers
+    container.querySelectorAll('.filter-chip').forEach(btn => {
+      btn.addEventListener('click', function () {
+        container.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        activeStone = btn.dataset.stone;
+        filterAndSort();
+      });
+    });
+
+    // Restore active state
+    if (activeStone !== 'all') {
+      const activeBtn = container.querySelector('[data-stone="' + activeStone + '"]');
+      if (activeBtn) {
+        container.querySelector('[data-stone="all"]').classList.remove('active');
+        activeBtn.classList.add('active');
+      }
+    }
+  }
 
   function getProductsList() {
     if (window.NovaSanity && window.NovaSanity._ready) {
@@ -202,14 +254,12 @@
     });
   });
 
-  // Stone chip clicks
-  document.querySelectorAll('#stone-chips .filter-chip').forEach(btn => {
-    btn.addEventListener('click', function () {
-      document.querySelectorAll('#stone-chips .filter-chip').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active');
-      activeStone = btn.dataset.stone;
-      filterAndSort();
-    });
+  // Build stone chips dynamically (includes custom stones from admin)
+  renderStoneChips();
+
+  // Listen for stones updates from admin panel
+  window.addEventListener('urartoo:stones-updated', function () {
+    renderStoneChips();
   });
 
   // Inputs
