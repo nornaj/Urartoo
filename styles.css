@@ -4876,7 +4876,7 @@ select, .admin-card select, .admin-input-group select {
 /* Stones Grid */
 .admin-stones-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 16px;
   padding-top: 16px;
 }
@@ -4885,10 +4885,10 @@ select, .admin-card select, .admin-input-group select {
   background: #FFFFFF;
   border: 1px solid var(--pumice, #D0CEC5);
   border-radius: 10px;
-  padding: 20px;
+  padding: 14px 18px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
@@ -4898,25 +4898,28 @@ select, .admin-card select, .admin-input-group select {
 }
 
 .admin-stone-swatch {
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
   flex-shrink: 0;
   border: 1px solid rgba(0, 0, 0, 0.12);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 .admin-stone-info {
   flex: 1;
-  min-width: 0;
+  min-width: 100px;
 }
 
 .admin-stone-name {
   font-family: var(--font-serif, Cormorant, serif);
-  font-size: 17px;
+  font-size: 16.5px;
   font-weight: 600;
   color: var(--ink, #17181A);
-  margin: 0 0 2px;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .admin-stone-color-hex {
@@ -4928,16 +4931,19 @@ select, .admin-card select, .admin-input-group select {
 
 .admin-stone-actions {
   display: flex;
+  align-items: center;
   gap: 6px;
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 .admin-stone-actions button {
-  padding: 6px 12px;
+  padding: 6px 10px;
   font-size: 12px;
   font-weight: 600;
   border-radius: 5px;
   cursor: pointer;
+  white-space: nowrap;
   transition: all 0.2s ease;
   font-family: var(--font, 'Instrument Sans', sans-serif);
 }
