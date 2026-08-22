@@ -46,9 +46,9 @@
   ];
 
   const notes = [
-    { meta: 'Սեպտեմբեր 2025 · Գուտանասար', title: 'Երեք օր հրաբխի վրա՝ մեկ լավ ապակու կտորի համար', img: '' },
-    { meta: 'Հուլիս 2025 · Վայոց Ձոր', title: 'Ինչու է գետի նռնաքարը հղկվում այլ կերպ, քան հանքինը', img: '' },
-    { meta: 'Մայիս 2025 · Երևան', title: 'Անհամաչափ քարի տեղադրումը արծաթում', img: '' }
+    { id: 'gutanasar-obsidian', meta: 'Սեպտեմբեր 2025 · Գուտանասար', title: 'Երեք օր հրաբխի վրա՝ մեկ լավ ապակու կտորի համար', img: '' },
+    { id: 'garnet-river', meta: 'Հուլիս 2025 · Վայոց Ձոր', title: 'Ինչու է գետի նռնաքարը հղկվում այլ կերպ, քան հանքինը', img: '' },
+    { id: 'symmetrical-setting', meta: 'Մայիս 2025 · Երևան', title: 'Անհամաչափ քարի տեղադրումը արծաթում', img: '' }
   ];
 
   const trustItems = [
@@ -494,7 +494,7 @@
   var notesGrid = document.getElementById('notes-grid');
   if (notesGrid) {
     notesGrid.innerHTML = notes.map(function (n) {
-      return '<a href="#note" class="note-card">' +
+      return '<a href="journal-post.html?id=' + n.id + '" class="note-card">' +
         '<div class="note-img">' +
           '<div class="note-img-inner">' +
             (n.img
