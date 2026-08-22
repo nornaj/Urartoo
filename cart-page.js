@@ -95,7 +95,7 @@
 
     if (checkoutBtnClick) {
       e.preventDefault();
-      openCheckoutModal();
+      window.location.href = 'checkout.html';
       return;
     }
 
@@ -315,9 +315,201 @@
   var checkoutBtn = document.getElementById('cart-checkout-btn');
   if (checkoutBtn) {
     checkoutBtn.addEventListener('click', function () {
-      openCheckoutModal();
+      window.location.href = 'checkout.html';
     });
   }
 
   renderCart();
+})();
+
+// ═══ CHECKOUT PAGE INIT ═══
+// If we're on checkout.html, automatically initialize checkout on page load
+(function() {
+  if (!window.location.pathname.includes('checkout.html')) return;
+
+  var cart = [];
+  try { cart = JSON.parse(localStorage.getItem('urartoo_cart_v1')) || []; } catch (e) {}
+
+  var emptyState = document.getElementById('checkout-empty-state');
+  var checkoutLayout = document.getElementById('checkout-layout');
+  var formEl = document.getElementById('checkout-form');
+
+  if (cart.length === 0) {
+    if (emptyState) emptyState.style.display = '';
+    if (checkoutLayout) checkoutLayout.style.display = 'none';
+    if (formEl) formEl.style.display = 'none';
+    return;
+  }
+
+  if (emptyState) emptyState.style.display = 'none';
+
+  // Auto-fill from logged-in user
+  var user = null;
+  try { user = JSON.parse(localStorage.getItem('urartoo_user_session_v1')); } catch (e) {}
+
+  var userBadge = document.getElementById('checkout-user-badge');
+  var badgeText = document.getElementById('checkout-user-info-text');
+
+  if (user) {
+    if (userBadge) userBadge.classList.remove('hidden');
+    if (badgeText) badgeText.textContent = '\u2713 \u0544\u0578\u0582\u057F\u0584 \u0563\u0578\u0580\u056E\u057E\u0561\u056E \u0567 \u0578\u0580\u057A\u0565\u057D: ' + (user.name || user.email) + ' (' + user.email + ')';
+    if (user.name && document.getElementById('chk-name')) document.getElementById('chk-name').value = user.name;
+    if (user.email && document.getElementById('chk-email')) document.getElementById('chk-email').value = user.email;
+    if (user.phone && document.getElementById('chk-phone')) document.getElementById('chk-phone').value = user.phone;
+    if (user.address) {
+      if (user.address.city && document.getElementById('chk-city')) document.getElementById('chk-city').value = user.address.city;
+      if (user.address.street && document.getElementById('chk-street')) document.getElementById('chk-street').value = user.address.street;
+    }
+  } else {
+    if (userBadge) userBadge.classList.add('hidden');
+  }
+
+  // Render order summary items
+  var previewEl = document.getElementById('chk-items-preview');
+  var subtotalEl = document.getElementById('chk-subtotal');
+  var grandTotalEl = document.getElementById('chk-grand-total-val');
+
+  function parsePrice(p) {
+    if (typeof p === 'number') return p;
+    return Number(String(p).replace(/[^0-9.]/g, '')) || 0;
+  }
+
+  var subtotal = 0;
+  if (previewEl) {
+    previewEl.innerHTML = cart.map(function (item) {
+      var numPrice = parsePrice(item.price);
+      var lineTotal = numPrice * (item.qty || 1);
+      subtotal += lineTotal;
+      return '<div class="chk-summary-item">' +
+        '<img class="chk-summary-item-img" src="' + (item.img || item.image || 'Images/bracelet.webp') + '" alt="' + item.name + '">' +
+        '<div class="chk-summary-item-info">' +
+          '<div class="chk-summary-item-name">' + item.name + '</div>' +
+          '<div class="chk-summary-item-qty">x' + (item.qty || 1) + '</div>' +
+        '</div>' +
+        '<div class="chk-summary-item-price">$' + lineTotal + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  if (subtotalEl) subtotalEl.textContent = '$' + subtotal;
+  if (grandTotalEl) grandTotalEl.textContent = '$' + subtotal;
+
+  // Card number formatter
+  var cardNumInput = document.getElementById('chk-card-num');
+  if (cardNumInput) {
+    cardNumInput.addEventListener('input', function (e) {
+      var val = e.target.value.replace(/\D/g, '').substring(0, 16);
+      var parts = [];
+      for (var i = 0; i < val.length; i += 4) {
+        parts.push(val.substring(i, i + 4));
+      }
+      e.target.value = parts.join(' ');
+    });
+  }
+
+  // Card expiry formatter
+  var cardExpInput = document.getElementById('chk-card-exp');
+  if (cardExpInput) {
+    cardExpInput.addEventListener('input', function (e) {
+      var val = e.target.value.replace(/\D/g, '').substring(0, 4);
+      if (val.length >= 2) {
+        e.target.value = val.substring(0, 2) + '/' + val.substring(2);
+      } else {
+        e.target.value = val;
+      }
+    });
+  }
+
+  // Override handleCheckoutSubmit for the checkout page
+  window.handleCheckoutSubmit = function (e) {
+    if (e && e.preventDefault) e.preventDefault();
+
+    var cart = [];
+    try { cart = JSON.parse(localStorage.getItem('urartoo_cart_v1')) || []; } catch (er) {}
+    if (cart.length === 0) return;
+
+    var name = document.getElementById('chk-name').value.trim();
+    var email = document.getElementById('chk-email').value.trim();
+    var phone = document.getElementById('chk-phone').value.trim();
+    var city = document.getElementById('chk-city').value.trim();
+    var street = document.getElementById('chk-street').value.trim();
+    var fullAddress = street + (city ? (', ' + city) : '');
+
+    var submitBtn = document.getElementById('btn-chk-submit');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = '\u23F3 \u053F\u0561\u057F\u0561\u0580\u057E\u0578\u0582\u0574 \u0567 \u057E\u0573\u0561\u0580\u0578\u0582\u0574\u0568...';
+    }
+
+    setTimeout(function () {
+      var subtotal = cart.reduce(function (s, i) { return s + (Number(i.price) || 0) * (i.qty || 1); }, 0);
+
+      var newOrder = null;
+      if (window.WooCommerceAdmin && typeof window.WooCommerceAdmin.addOrder === 'function') {
+        newOrder = window.WooCommerceAdmin.addOrder(
+          { name: name, email: email, phone: phone, address: fullAddress },
+          cart,
+          subtotal
+        );
+      } else {
+        var orders = [];
+        try { orders = JSON.parse(localStorage.getItem('urartoo_orders_v1')) || []; } catch (err) {}
+        newOrder = {
+          id: 'UR-' + Math.floor(1000 + Math.random() * 9000),
+          date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+          customer: name,
+          email: email,
+          phone: phone,
+          address: fullAddress,
+          total: subtotal,
+          status: 'pending',
+          items: cart
+        };
+        orders.unshift(newOrder);
+        localStorage.setItem('urartoo_orders_v1', JSON.stringify(orders));
+      }
+
+      // Append to user profile
+      var user = null;
+      try { user = JSON.parse(localStorage.getItem('urartoo_user_session_v1')); } catch (err) {}
+      if (user) {
+        if (!user.orders) user.orders = [];
+        user.orders.unshift(newOrder);
+        localStorage.setItem('urartoo_user_session_v1', JSON.stringify(user));
+        try {
+          var usersDB = JSON.parse(localStorage.getItem('urartoo_users_db_v1')) || [];
+          var uIdx = usersDB.findIndex(function(u) { return u.email === user.email; });
+          if (uIdx > -1) {
+            if (!usersDB[uIdx].orders) usersDB[uIdx].orders = [];
+            usersDB[uIdx].orders.unshift(newOrder);
+            localStorage.setItem('urartoo_users_db_v1', JSON.stringify(usersDB));
+          }
+        } catch (err) {}
+      }
+
+      // Empty cart
+      localStorage.setItem('urartoo_cart_v1', '[]');
+
+      // Show success state
+      document.getElementById('checkout-page-content').style.display = 'none';
+      var successPage = document.getElementById('checkout-success-state');
+      if (successPage) {
+        successPage.classList.add('show');
+        document.getElementById('succ-order-id').textContent = newOrder.id;
+        document.getElementById('succ-cust-name').textContent = name;
+        document.getElementById('succ-cust-email').textContent = email;
+        document.getElementById('succ-cust-phone').textContent = phone;
+        document.getElementById('succ-cust-address').textContent = fullAddress;
+        document.getElementById('succ-order-total').textContent = '$' + subtotal;
+      }
+
+      // Update cart badge
+      document.querySelectorAll('[data-cart-count]').forEach(function(el) { el.textContent = '0'; });
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '\uD83D\uDD12 \u054E\u0543\u0531\u054C\u0535\u053C \u0535\u054E \u0533\u054C\u0531\u0546\u0551\u0535\u053C \u054A\u0531\u054F\u054E\u0535\u054C\u0538';
+      }
+    }, 1200);
+  };
 })();

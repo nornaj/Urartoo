@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Urartoo — Պատվdelays</title>
+  <meta name="description" content="Ուրարտու — Պատվերի ձևակերպում։ Լրացրեք տվյալները և վճարեք ապահով։">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;0,600&family=Noto+Serif+Armenian:wght@300;400;500;600&family=Noto+Sans+Armenian:wght@300;400;500;600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ═══ CHECKOUT PAGE SPECIFIC STYLES ═══ */
+    .checkout-page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 60px 24px 80px;
+    }
+
+    .checkout-page-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .checkout-page-title {
+      font-family: var(--font-serif, Cormorant, serif);
+      font-size: 38px;
+      font-weight: 400;
+      color: var(--ink, #17181A);
+      margin: 0 0 8px;
+    }
+
+    .checkout-page-subtitle {
+      font-size: 14px;
+      color: var(--tuff, #888);
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .checkout-breadcrumb {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 40px;
+      font-size: 13px;
+      color: var(--tuff, #888);
+    }
+
+    .checkout-breadcrumb a {
+      color: var(--tuff);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .checkout-breadcrumb a:hover {
+      color: var(--amber, #C2A379);
+    }
+
+    .checkout-breadcrumb .bc-sep {
+      color: var(--pumice, #D0CEC5);
+    }
+
+    .checkout-breadcrumb .bc-current {
+      color: var(--ink, #17181A);
+      font-weight: 600;
+    }
+
+    /* User badge for logged-in users */
+    .checkout-user-notice {
+      background: #E8F5E9;
+      border: 1px solid #C8E6C9;
+      border-radius: 8px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 32px;
+      font-size: 13.5px;
+      color: #2D6B4F;
+    }
+
+    .checkout-user-notice.hidden { display: none; }
+
+    .checkout-user-notice .notice-icon {
+      width: 24px;
+      height: 24px;
+      background: #2D6B4F;
+      color: #FFF;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* Main checkout layout */
+    .checkout-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 40px;
+      align-items: start;
+    }
+
+    /* Form sections */
+    .checkout-form-col {}
+
+    .chk-page-section {
+      background: #FFFFFF;
+      border: 1px solid var(--pumice, #D0CEC5);
+      border-radius: 10px;
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .chk-page-section-title {
+      font-family: var(--font, 'Instrument Sans', sans-serif);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink, #17181A);
+      margin: 0 0 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--pumice, #D0CEC5);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chk-page-section-title .sec-num {
+      width: 26px;
+      height: 26px;
+      background: var(--ink, #17181A);
+      color: #FFF;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .chk-page-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--tuff, #888);
+      margin-bottom: 6px;
+    }
+
+    .chk-page-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--pumice, #D0CEC5);
+      border-radius: 6px;
+      font-family: var(--font, 'Instrument Sans', sans-serif);
+      font-size: 14px;
+      color: var(--ink, #17181A);
+      background: #FFF;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .chk-page-input:focus {
+      border-color: var(--amber, #C2A379);
+      box-shadow: 0 0 0 3px rgba(194, 163, 121, 0.15);
+    }
+
+    .chk-page-input::placeholder {
+      color: #B8B5AC;
+    }
+
+    .chk-page-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .chk-page-field {
+      margin-bottom: 16px;
+    }
+
+    .chk-page-field:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Card number styling */
+    .chk-page-input.card-num {
+      font-family: var(--mono, 'Courier New', monospace);
+      letter-spacing: 0.12em;
+      font-size: 15px;
+    }
+
+    .chk-page-input.uppercase {
+      text-transform: uppercase;
+    }
+
+    /* Order summary sidebar */
+    .checkout-summary-col {
+      position: sticky;
+      top: 100px;
+    }
+
+    .chk-page-summary {
+      background: var(--sand, #F4F3EF);
+      border: 1px solid var(--pumice, #D0CEC5);
+      border-radius: 10px;
+      padding: 28px;
+    }
+
+    .chk-page-summary-title {
+      font-family: var(--font, 'Instrument Sans', sans-serif);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink, #17181A);
+      margin: 0 0 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--pumice, #D0CEC5);
+    }
+
+    .chk-summary-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .chk-summary-item:last-child {
+      border-bottom: none;
+    }
+
+    .chk-summary-item-img {
+      width: 52px;
+      height: 52px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 1px solid #E2E0D8;
+      flex-shrink: 0;
+    }
+
+    .chk-summary-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .chk-summary-item-name {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--ink, #17181A);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .chk-summary-item-qty {
+      font-size: 12px;
+      color: var(--tuff, #888);
+    }
+
+    .chk-summary-item-price {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink, #17181A);
+      flex-shrink: 0;
+    }
+
+    .chk-page-totals {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--pumice, #D0CEC5);
+    }
+
+    .chk-page-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      font-size: 13.5px;
+      color: var(--tuff, #888);
+    }
+
+    .chk-page-total-row.grand {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--ink, #17181A);
+      padding: 12px 0 0;
+      margin-top: 8px;
+      border-top: 2px solid var(--ink, #17181A);
+    }
+
+    .chk-page-total-row.grand span:last-child {
+      color: var(--amber, #C2A379);
+    }
+
+    .chk-page-submit-btn {
+      display: block;
+      width: 100%;
+      padding: 16px 24px;
+      margin-top: 24px;
+      background: var(--green, #2D6B4F);
+      color: #FFF;
+      border: none;
+      border-radius: 8px;
+      font-family: var(--font, 'Instrument Sans', sans-serif);
+      font-size: 13.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+
+    .chk-page-submit-btn:hover {
+      background: #1F5038;
+    }
+
+    .chk-page-submit-btn:active {
+      transform: scale(0.98);
+    }
+
+    .chk-page-submit-btn:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
+
+    .chk-page-security {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 14px;
+      font-size: 11.5px;
+      color: var(--tuff, #888);
+    }
+
+    /* Empty cart notice on checkout page */
+    .checkout-empty {
+      text-align: center;
+      padding: 80px 24px;
+    }
+
+    .checkout-empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .checkout-empty h2 {
+      font-family: var(--font-serif, Cormorant, serif);
+      font-size: 28px;
+      font-weight: 400;
+      margin: 0 0 8px;
+    }
+
+    .checkout-empty p {
+      color: var(--tuff, #888);
+      font-size: 14px;
+      margin: 0 0 24px;
+    }
+
+    .checkout-empty a {
+      display: inline-block;
+      padding: 12px 28px;
+      background: var(--ink, #17181A);
+      color: #FFF;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* Success page overlay */
+    .checkout-success-page {
+      display: none;
+      text-align: center;
+      padding: 80px 24px;
+    }
+
+    .checkout-success-page.show {
+      display: block;
+    }
+
+    .success-check-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #E8F5E9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+
+    .success-order-details {
+      background: var(--sand, #F4F3EF);
+      border: 1px solid var(--pumice, #D0CEC5);
+      border-radius: 10px;
+      padding: 24px;
+      max-width: 460px;
+      margin: 24px auto 0;
+      text-align: left;
+    }
+
+    .success-detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 13.5px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .success-detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .success-detail-row span:first-child {
+      color: var(--tuff, #888);
+    }
+
+    .success-detail-row span:last-child {
+      font-weight: 600;
+      color: var(--ink, #17181A);
+    }
+
+    .success-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 32px;
+    }
+
+    .success-actions a {
+      padding: 12px 24px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-decoration: none;
+      text-transform: uppercase;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    @media (max-width: 820px) {
+      .checkout-layout {
+        grid-template-columns: 1fr;
+      }
+      .checkout-summary-col {
+        position: static;
+        order: -1;
+      }
+      .chk-page-row {
+        grid-template-columns: 1fr;
+      }
+      .checkout-page-title {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ STICKY HEADER ═══ -->
+  <header class="hdr-sticky" id="sticky-header">
+    <button class="burger" aria-label="Մենյու" aria-expanded="false" data-sticky-menu-toggle>
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" data-sticky-menu>
+      <a href="shop.html" class="nav-link">Խանուտ</a>
+      <a href="journal.html" class="nav-link">Օրագիր</a>
+      <a href="services.html" class="nav-link">Ծdelays</a>
+      <a href="contact.html" class="nav-link">Կapdelays</a>
+    </nav>
+    <a href="index.html" class="logo">
+      <img src="Images/Urartoo-Logo.webp" alt="Urartoo">
+    </a>
+    <div class="hdr-utils">
+      <a href="account.html" class="util-link nav-link nav-account-icon" aria-label="Իdelays" title="Իdelays">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="user-icon-svg"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <a href="cart.html" class="util-link nav-link nav-cart-icon" aria-label="Զdelays" title="Զdelays">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="cart-icon-svg">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+        <span class="cart-badge-count" data-cart-count>0</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ═══ STATIC HEADER ═══ -->
+  <header class="hdr-static" id="top">
+    <button class="burger" aria-label="Մenyu" aria-expanded="false" data-hero-menu-toggle>
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" data-hero-menu>
+      <a href="shop.html" class="nav-link">Խանուտ</a>
+      <a href="journal.html" class="nav-link">Օdelays</a>
+      <a href="services.html" class="nav-link">Ծdelays</a>
+      <a href="contact.html" class="nav-link">Կapdelays</a>
+    </nav>
+    <a href="index.html" class="logo">Urart<span class="logo-oo">oo</span></a>
+    <div class="hdr-utils">
+      <a href="account.html" class="util-link nav-link nav-account-icon" aria-label="Իdelays" title="Իdelays">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="user-icon-svg"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <a href="cart.html" class="util-link nav-link nav-cart-icon" aria-label="Զամբյուղ" title="Զամբյուղ">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="cart-icon-svg">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+        <span class="cart-badge-count" data-cart-count>0</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ═══ CHECKOUT PAGE CONTENT ═══ -->
+  <div class="checkout-page" id="checkout-page-content">
+
+    <!-- Breadcrumb -->
+    <div class="checkout-breadcrumb">
+      <a href="shop.html">Խանուտ</a>
+      <span class="bc-sep">›</span>
+      <a href="cart.html">Զdelays</a>
+      <span class="bc-sep">›</span>
+      <span class="bc-current">Պատվերի Ամփոփում</span>
+    </div>
+
+    <div class="checkout-page-header">
+      <h1 class="checkout-page-title">Պատվերի Ամփոփում</h1>
+      <p class="checkout-page-subtitle">Լրացրեք ձեր տվյալները, առաքման հասցեն և վճարման եղանակը։</p>
+    </div>
+
+    <!-- User badge -->
+    <div id="checkout-user-badge" class="checkout-user-notice hidden">
+      <span class="notice-icon">✓</span>
+      <span id="checkout-user-info-text">Մուտք գործված է որպես: ...</span>
+    </div>
+
+    <!-- Empty cart state -->
+    <div id="checkout-empty-state" class="checkout-empty" style="display:none;">
+      <div class="checkout-empty-icon">🛒</div>
+      <h2>Զամբյուղը դատարկ է</h2>
+      <p>Ավելացրեք զարդեր ձեր զամբյուղին։</p>
+      <a href="shop.html">ՎԵՐԱԴԱՌՆԱԼ ԽԱՆՈՒՏ</a>
+    </div>
+
+    <!-- Checkout form layout -->
+    <form id="checkout-form" onsubmit="handleCheckoutSubmit(event)">
+      <div class="checkout-layout" id="checkout-layout">
+
+        <!-- LEFT: Form fields -->
+        <div class="checkout-form-col">
+
+          <!-- Section 1: Customer Info -->
+          <div class="chk-page-section">
+            <div class="chk-page-section-title">
+              <span class="sec-num">1</span>
+              Գնորդի Տվյալներ
+            </div>
+            <div class="chk-page-field">
+              <label class="chk-page-label" for="chk-name">Անուն, Ազգանուն (Ամբողջական)</label>
+              <input type="text" id="chk-name" class="chk-page-input" required placeholder="Անահիտ Սարգսյան">
+            </div>
+            <div class="chk-page-row">
+              <div class="chk-page-field">
+                <label class="chk-page-label" for="chk-email">Էլ։ փոստի հասցե</label>
+                <input type="email" id="chk-email" class="chk-page-input" required placeholder="anahit@example.com">
+              </div>
+              <div class="chk-page-field">
+                <label class="chk-page-label" for="chk-phone">Հեռախոսահամար</label>
+                <input type="tel" id="chk-phone" class="chk-page-input" required placeholder="+374 91 234567">
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Delivery Address -->
+          <div class="chk-page-section">
+            <div class="chk-page-section-title">
+              <span class="sec-num">2</span>
+              Առաքման Հասցե
+            </div>
+            <div class="chk-page-row">
+              <div class="chk-page-field">
+                <label class="chk-page-label" for="chk-city">Քաղաք / Մարզ</label>
+                <input type="text" id="chk-city" class="chk-page-input" required placeholder="Երևան">
+              </div>
+              <div class="chk-page-field">
+                <label class="chk-page-label" for="chk-street">Փողոց, Շենք, Բնակարան (Կոնկրետ հասցե)</label>
+                <input type="text" id="chk-street" class="chk-page-input" required placeholder="Աբովյան փող։ 12, բն։ 4">
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Payment -->
+          <div class="chk-page-section">
+            <div class="chk-page-section-title">
+              <span class="sec-num">3</span>
+              Վճարման Բանկային Քարտ
+            </div>
+            <div class="chk-page-field">
+              <label class="chk-page-label" for="chk-card-name">Քարտապանի Անուն Ազգանուն</label>
+              <input type="text" id="chk-card-name" class="chk-page-input uppercase" required placeholder="ANAHIT SARGSYAN">
+            </div>
+            <div class="chk-page-field">
+              <label class="chk-page-label" for="chk-card-num">Քարտի Համար (16 նիշ)</label>
+              <input type="text" id="chk-card-num" class="chk-page-input card-num" required placeholder="4532 8910 2345 6789" maxlength="19">
+            </div>
+            <div class="chk-page-row">
+              <div class="chk-page-field">
+                <label class="chk-page-label" for="chk-card-exp">Գործողության Ժամկետ</label>
+                <input type="text" id="chk-card-exp" class="chk-page-input" required placeholder="MM/YY" maxlength="5">
+              </div>
+              <div class="chk-page-field">
+                <label class="chk-page-label" for="chk-card-cvc">CVC / CVV</label>
+                <input type="password" id="chk-card-cvc" class="chk-page-input" required placeholder="•••" maxlength="4">
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: Order Summary -->
+        <div class="checkout-summary-col">
+          <div class="chk-page-summary">
+            <div class="chk-page-summary-title">Պատվերի Ամփոփում</div>
+            <div id="chk-items-preview">
+              <!-- JS renders cart items -->
+            </div>
+            <div class="chk-page-totals">
+              <div class="chk-page-total-row">
+                <span>Ենթամենը</span>
+                <span id="chk-subtotal">$0</span>
+              </div>
+              <div class="chk-page-total-row">
+                <span>Առաքում</span>
+                <span style="color:var(--green); font-weight:700;">Անվճար</span>
+              </div>
+              <div class="chk-page-total-row grand">
+                <span>Վճարման ենթակա</span>
+                <span id="chk-grand-total-val">$0</span>
+              </div>
+            </div>
+            <button type="submit" id="btn-chk-submit" class="chk-page-submit-btn">
+              🔒 ՎՃԱՌԵԼ ԵՎ ԳՌԱՆՑԵԼ ՊԱՏՎԵՌԸ
+            </button>
+            <div class="chk-page-security">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Ապահով \u057Eճարում SSL կոդավորմանով
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </form>
+  </div>
+
+  <!-- ═══ SUCCESS STATE ═══ -->
+  <div class="checkout-page checkout-success-page" id="checkout-success-state">
+    <div class="success-check-circle">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2D6B4F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    </div>
+    <h1 class="checkout-page-title" style="margin-bottom:8px;">ՇՆՈՐՀԱԿԱԼՈՒՏՅՈՒՆ!</h1>
+    <p class="checkout-page-subtitle">Ձեր պատվերը հաջողությամբ գրանցվեց։</p>
+
+    <div class="success-order-details">
+      <div class="success-detail-row">
+        <span>Պատվեր #</span>
+        <span id="succ-order-id">UR-1001</span>
+      </div>
+      <div class="success-detail-row">
+        <span>Ստացող:</span>
+        <span id="succ-cust-name">-</span>
+      </div>
+      <div class="success-detail-row">
+        <span>Էլ։ փոստ:</span>
+        <span id="succ-cust-email">-</span>
+      </div>
+      <div class="success-detail-row">
+        <span>Հեռախոս:</span>
+        <span id="succ-cust-phone">-</span>
+      </div>
+      <div class="success-detail-row">
+        <span>Առաքման հասցե:</span>
+        <span id="succ-cust-address">-</span>
+      </div>
+      <div class="success-detail-row" style="border-top:2px solid var(--ink); margin-top:8px; padding-top:12px;">
+        <span>Վճարված ընդամենը:</span>
+        <span style="color:var(--amber); font-size:17px; font-weight:700;" id="succ-order-total">$0</span>
+      </div>
+    </div>
+
+    <div class="success-actions">
+      <a href="shop.html" class="btn-primary" style="text-decoration:none; padding:12px 24px; font-size:13px;">ՎԵՌԱԴԱՌՆԱԼ ԽԱՆՈՒՏ</a>
+      <a href="account.html" class="btn-primary" style="background:var(--charcoal); text-decoration:none; padding:12px 24px; font-size:13px;">ԻՄ ՀԱՇԻՎԸ</a>
+    </div>
+  </div>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-col footer-about">
+        <a href="index.html" class="footer-logo">Urart<span class="logo-oo">oo</span></a>
+        <p class="footer-tagline">Հայկական արվեստների ձեռագործ զարդեր։</p>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Կատալոգ</div>
+        <a href="shop.html">Բոլոր զարդերը</a>
+        <a href="shop.html?cat=Մատանիներ">Մատանիներ</a>
+        <a href="shop.html?cat=Վզնոցներ">Վզնոցներ</a>
+        <a href="shop.html?cat=Ապարանջաններ">Ապարանջաններ</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Բրենդը</div>
+        <a href="index.html#maker">Վարպետը</a>
+        <a href="index.html#stones">Քարերը</a>
+        <a href="services.html">Ծառայություններ</a>
+        <a href="journal.html">Օրագիր</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Սպասարկում</div>
+        <a href="services.html#shipping">Առաքում և վերադարձ</a>
+        <a href="services.html#care">Խնամք և չափսեր</a>
+        <a href="contact.html">Կապ</a>
+        <a href="#instagram">Instagram</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Urartoo · Երևան, Հայաստան</span>
+      <span class="footer-legal">
+        <a href="#terms">Պայմաններ</a>
+        <a href="#privacy">Գաղտնիություն</a>
+      </span>
+    </div>
+  </footer>
+
+<script src="admin.js"></script>
+<script src="script.js"></script>
+<script src="cart-page.js"></script>
+</body>
+</html>
