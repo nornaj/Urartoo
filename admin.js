@@ -966,7 +966,7 @@
       if (emptyMsg) emptyMsg.style.display = 'none';
       tbody.innerHTML = trash.map((item, idx) => {
         const img = item.img || item.image || 'Images/bracelet.webp';
-        const name = item.name || 'Ապరանք';
+        const name = item.name || 'Ապրանք';
         const cat = item.cat || item.category || '-';
         const deletedAt = item._deletedAt || '-';
         return '<tr>' +
@@ -974,10 +974,10 @@
           '<td style="font-weight:600;">' + name + '</td>' +
           '<td>' + cat + '</td>' +
           '<td style="font-size:12px; color:var(--tuff);">' + deletedAt + '</td>' +
-          '<td style="display:flex; gap:6px;">' +
-            '<button class="trash-restore-btn" onclick="window.WooCommerceAdmin.restoreProduct(' + idx + ')">␩ Վերականգնել</button>' +
+          '<td><div style="display:flex; gap:6px; align-items:center;">' +
+            '<button class="trash-restore-btn" onclick="window.WooCommerceAdmin.restoreProduct(' + idx + ')">Վերականգնել</button>' +
             '<button class="trash-delete-btn" onclick="window.WooCommerceAdmin.permanentlyDeleteProduct(' + idx + ')">Ջնջել Ընդմիշտ</button>' +
-          '</td>' +
+          '</div></td>' +
         '</tr>';
       }).join('');
     },
