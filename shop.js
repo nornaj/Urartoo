@@ -80,8 +80,8 @@
   let activeCat = 'all';
   let activeStone = 'all';
   let searchQuery = '';
-  let minPrice = 100;
-  let maxPrice = 600;
+  let minPrice = 0;
+  let maxPrice = 99999;
   let activeSort = 'new';
 
   // Read URL parameters if coming from Homepage stone/category cards
@@ -140,9 +140,7 @@
   const priceMaxInput = document.getElementById('price-max');
   const sortSelect = document.getElementById('sort-select');
 
-  // Initialize price range from actual HTML input values
-  if (priceMinInput && priceMinInput.value) minPrice = Number(priceMinInput.value) || 0;
-  if (priceMaxInput && priceMaxInput.value) maxPrice = Number(priceMaxInput.value) || 10000;
+  // Price inputs: only apply when user actively types (not from default HTML values)
   const clearBtn = document.getElementById('clear-filters-btn');
   const mobileFilterBtn = document.getElementById('mobile-filter-btn');
   const mobileDrawer = document.getElementById('shop-sidebar');
@@ -237,6 +235,8 @@
     if (searchInput) searchInput.value = '';
     if (priceMinInput) priceMinInput.value = '';
     if (priceMaxInput) priceMaxInput.value = '';
+    minPrice = 0;
+    maxPrice = 99999;
     if (sortSelect) sortSelect.value = 'new';
 
     document.querySelectorAll('#cat-chips .filter-chip').forEach(c => c.classList.remove('active'));
@@ -276,14 +276,14 @@
 
   if (priceMinInput) {
     priceMinInput.addEventListener('input', function (e) {
-      minPrice = Number(e.target.value) || 0;
+      minPrice = e.target.value ? (Number(e.target.value) || 0) : 0;
       filterAndSort();
     });
   }
 
   if (priceMaxInput) {
     priceMaxInput.addEventListener('input', function (e) {
-      maxPrice = Number(e.target.value) || 10000;
+      maxPrice = e.target.value ? (Number(e.target.value) || 99999) : 99999;
       filterAndSort();
     });
   }
@@ -311,9 +311,16 @@
     if (addBtn) {
       var id = addBtn.dataset.add;
       var product = getProductsList().find(function (p) {
-        return String(p.id) === String(id) || String(p._sanityId) === String(id);
+        return String(p.id) === String(id) || String(p._sanityId) === String(id) || (p._sanityId && String(p._sanityId) === String(id));
       });
-      if (!product || product.sold || product.stock === 0) return;
+      // Fallback: try to find by _sanityId prefix match
+      if (!product) {
+        product = getProductsList().find(function (p) {
+          return id && (String(p.id).includes(id) || (p._sanityId && String(p._sanityId).includes(id)));
+        });
+      }
+      if (!product || product.sold) return;
+      if (product.stock !== undefined && product.stock !== null && product.stock === 0) return;
 
       // Read current cart from localStorage
       var cart = [];
