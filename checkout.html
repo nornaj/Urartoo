@@ -3,12 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Urartoo — Պատվdelays</title>
+  <title>Urartoo — Պատվերի ձևակերպում</title>
   <meta name="description" content="Ուրարտու — Պատվերի ձևակերպում։ Լրացրեք տվյալները և վճարեք ապահով։">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;0,600&family=Noto+Serif+Armenian:wght@300;400;500;600&family=Noto+Sans+Armenian:wght@300;400;500;600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/png" href="Images/Favicon.png">
+  <link rel="apple-touch-icon" href="Images/Favicon.png">
   <style>
     /* ═══ CHECKOUT PAGE SPECIFIC STYLES ═══ */
     .checkout-page {
@@ -37,7 +39,8 @@
       margin: 0 auto;
       line-height: 1.6;
     }
-/* User badge for logged-in users */
+
+    /* User badge for logged-in users */
     .checkout-user-notice {
       background: #E8F5E9;
       border: 1px solid #C8E6C9;
@@ -74,9 +77,6 @@
       gap: 40px;
       align-items: start;
     }
-
-    /* Form sections */
-    .checkout-form-col {}
 
     .chk-page-section {
       background: #FFFFFF;
@@ -135,6 +135,7 @@
       color: var(--ink, #17181A);
       background: #FFF;
       outline: none;
+      box-sizing: border-box;
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
@@ -161,7 +162,6 @@
       margin-bottom: 0;
     }
 
-    /* Card number styling */
     .chk-page-input.card-num {
       font-family: var(--mono, 'Courier New', monospace);
       letter-spacing: 0.12em;
@@ -436,54 +436,25 @@
       }
     }
   </style>
-  <link rel="icon" type="image/png" href="Images/Favicon.png">
-  <link rel="apple-touch-icon" href="Images/Favicon.png">
 </head>
 <body>
 
-  <!-- ═══ STICKY HEADER ═══ -->
+  <!-- ═══ 1. STICKY LIGHT HEADER ═══ -->
   <header class="hdr-sticky" id="sticky-header">
     <button class="burger" aria-label="Մենյու" aria-expanded="false" data-sticky-menu-toggle>
       <span></span><span></span><span></span>
     </button>
     <nav class="nav" data-sticky-menu>
-      <a href="shop.html" class="nav-link">Խանուտ</a>
+      <a href="shop.html" class="nav-link">Խանութ</a>
       <a href="journal.html" class="nav-link">Օրագիր</a>
-      <a href="services.html" class="nav-link">Ծdelays</a>
-      <a href="contact.html" class="nav-link">Կapdelays</a>
+      <a href="services.html" class="nav-link">Ծառայություններ</a>
+      <a href="contact.html" class="nav-link">Կապ</a>
     </nav>
     <a href="index.html" class="logo">
       <img src="Images/Urartoo-Logo.webp" alt="Urartoo">
     </a>
     <div class="hdr-utils">
-      <a href="account.html" class="util-link nav-link nav-account-icon" aria-label="Իdelays" title="Իdelays">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="user-icon-svg"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      </a>
-      <a href="cart.html" class="util-link nav-link nav-cart-icon" aria-label="Զdelays" title="Զdelays">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="cart-icon-svg">
-          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-          <line x1="3" y1="6" x2="21" y2="6"/>
-          <path d="M16 10a4 4 0 0 1-8 0"/>
-        </svg>
-        <span class="cart-badge-count" data-cart-count>0</span>
-      </a>
-    </div>
-  </header>
-
-  <!-- ═══ STATIC HEADER ═══ -->
-  <header class="hdr-static" id="top">
-    <button class="burger" aria-label="Մenyu" aria-expanded="false" data-hero-menu-toggle>
-      <span></span><span></span><span></span>
-    </button>
-    <nav class="nav" data-hero-menu>
-      <a href="shop.html" class="nav-link">Խանուտ</a>
-      <a href="journal.html" class="nav-link">Օdelays</a>
-      <a href="services.html" class="nav-link">Ծdelays</a>
-      <a href="contact.html" class="nav-link">Կapdelays</a>
-    </nav>
-    <a href="index.html" class="logo">Urart<span class="logo-oo">oo</span></a>
-    <div class="hdr-utils">
-      <a href="account.html" class="util-link nav-link nav-account-icon" aria-label="Իdelays" title="Իdelays">
+      <a href="account.html" class="util-link nav-link nav-account-icon" aria-label="Իմ հաշիվը" title="Իմ հաշիվը">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="user-icon-svg"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </a>
       <a href="cart.html" class="util-link nav-link nav-cart-icon" aria-label="Զամբյուղ" title="Զամբյուղ">
@@ -497,12 +468,40 @@
     </div>
   </header>
 
-  <!-- ═══ CHECKOUT PAGE CONTENT ═══ -->
+  <!-- ═══ 2. STATIC HEADER ═══ -->
+  <header class="hdr-static" id="top">
+    <button class="burger" aria-label="Մենյու" aria-expanded="false" data-hero-menu-toggle>
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" data-hero-menu>
+      <a href="shop.html" class="nav-link">Խանութ</a>
+      <a href="journal.html" class="nav-link">Օրագիր</a>
+      <a href="services.html" class="nav-link">Ծառայություններ</a>
+      <a href="contact.html" class="nav-link">Կապ</a>
+    </nav>
+    <a href="index.html" class="logo">
+      <img src="Images/Urartoo-Logo.webp" alt="Urartoo">
+    </a>
+    <div class="hdr-utils">
+      <a href="account.html" class="util-link nav-link nav-account-icon" aria-label="Իմ հաշիվը" title="Իմ հաշիվը">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="user-icon-svg"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <a href="cart.html" class="util-link nav-link nav-cart-icon" aria-label="Զամբյուղ" title="Զամբյուղ">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="cart-icon-svg">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+        <span class="cart-badge-count" data-cart-count>0</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ═══ 3. CHECKOUT PAGE CONTENT ═══ -->
   <div class="checkout-page" id="checkout-page-content">
 
-    <!-- Breadcrumb -->
-        <div class="checkout-page-header">
-      <h1 class="checkout-page-title">Պատվերի Ամփոփում</h1>
+    <div class="checkout-page-header">
+      <h1 class="checkout-page-title">Պատվերի ձևակերպում</h1>
       <p class="checkout-page-subtitle">Լրացրեք ձեր տվյալները, առաքման հասցեն և վճարման եղանակը։</p>
     </div>
 
@@ -517,7 +516,7 @@
       <div class="checkout-empty-icon">🛒</div>
       <h2>Զամբյուղը դատարկ է</h2>
       <p>Ավելացրեք զարդեր ձեր զամբյուղին։</p>
-      <a href="shop.html">ՎԵՐԱԴԱՌՆԱԼ ԽԱՆՈՒՏ</a>
+      <a href="shop.html">ՎԵՐԱԴԱՌՆԱԼ ԽԱՆՈՒԹ</a>
     </div>
 
     <!-- Checkout form layout -->
@@ -531,7 +530,7 @@
           <div class="chk-page-section">
             <div class="chk-page-section-title">
               <span class="sec-num">1</span>
-              Գնորդի Տվյալներ
+              Գնորդի տվյալներ
             </div>
             <div class="chk-page-field">
               <label class="chk-page-label" for="chk-name">Անուն, Ազգանուն (Ամբողջական)</label>
@@ -539,7 +538,7 @@
             </div>
             <div class="chk-page-row">
               <div class="chk-page-field">
-                <label class="chk-page-label" for="chk-email">Էլ։ փոստի հասցե</label>
+                <label class="chk-page-label" for="chk-email">Էլ․ փոստի հասցե</label>
                 <input type="email" id="chk-email" class="chk-page-input" required placeholder="anahit@example.com">
               </div>
               <div class="chk-page-field">
@@ -553,7 +552,7 @@
           <div class="chk-page-section">
             <div class="chk-page-section-title">
               <span class="sec-num">2</span>
-              Առաքման Հասցե
+              Առաքման հասցե
             </div>
             <div class="chk-page-row">
               <div class="chk-page-field">
@@ -562,7 +561,7 @@
               </div>
               <div class="chk-page-field">
                 <label class="chk-page-label" for="chk-street">Փողոց, Շենք, Բնակարան</label>
-                <input type="text" id="chk-street" class="chk-page-input" required placeholder="Աբովյան փող։ 12, բն։ 4">
+                <input type="text" id="chk-street" class="chk-page-input" required placeholder="Աբովյան փող․ 12, բն․ 4">
               </div>
             </div>
           </div>
@@ -571,19 +570,19 @@
           <div class="chk-page-section">
             <div class="chk-page-section-title">
               <span class="sec-num">3</span>
-              Վճարման Բանկային Քարտ
+              Վճարման բանկային քարտ
             </div>
             <div class="chk-page-field">
-              <label class="chk-page-label" for="chk-card-name">Քարտապանի Անուն Ազգանուն</label>
+              <label class="chk-page-label" for="chk-card-name">Քարտապանի անուն ազգանուն</label>
               <input type="text" id="chk-card-name" class="chk-page-input uppercase" required placeholder="ANAHIT SARGSYAN">
             </div>
             <div class="chk-page-field">
-              <label class="chk-page-label" for="chk-card-num">Քարտի Համար (16 նիշ)</label>
+              <label class="chk-page-label" for="chk-card-num">Քարտի համար (16 նիշ)</label>
               <input type="text" id="chk-card-num" class="chk-page-input card-num" required placeholder="4532 8910 2345 6789" maxlength="19">
             </div>
             <div class="chk-page-row">
               <div class="chk-page-field">
-                <label class="chk-page-label" for="chk-card-exp">Գործողության Ժամկետ</label>
+                <label class="chk-page-label" for="chk-card-exp">Գործողության ժամկետ</label>
                 <input type="text" id="chk-card-exp" class="chk-page-input" required placeholder="MM/YY" maxlength="5">
               </div>
               <div class="chk-page-field">
@@ -598,7 +597,7 @@
         <!-- RIGHT: Order Summary -->
         <div class="checkout-summary-col">
           <div class="chk-page-summary">
-            <div class="chk-page-summary-title">Պատվերի Ամփոփում</div>
+            <div class="chk-page-summary-title">Պատվերի ամփոփում</div>
             <div id="chk-items-preview">
               <!-- JS renders cart items -->
             </div>
@@ -609,7 +608,7 @@
               </div>
               <div class="chk-page-total-row">
                 <span>Առաքում</span>
-                <span style="color:var(--green); font-weight:700;">Անվճար</span>
+                <span style="color:var(--green, #2D6B4F); font-weight:700;">Անվճար</span>
               </div>
               <div class="chk-page-total-row grand">
                 <span>Վճարման ենթակա</span>
@@ -617,11 +616,11 @@
               </div>
             </div>
             <button type="submit" id="btn-chk-submit" class="chk-page-submit-btn">
-              🔒 ՎՃԱՌԵԼ ԵՎ ԳՌԱՆՑԵԼ ՊԱՏՎԵՌԸ
+              🔒 ՎՃԱՐԵԼ ԵՎ ԳՐԱՆՑԵԼ ՊԱՏՎԵՐԸ
             </button>
             <div class="chk-page-security">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              Ապահով \u057Eճարում SSL կոդավորմանով
+              Ապահով վճարում SSL կոդավորմամբ
             </div>
           </div>
         </div>
@@ -630,12 +629,12 @@
     </form>
   </div>
 
-  <!-- ═══ SUCCESS STATE ═══ -->
+  <!-- ═══ 4. SUCCESS STATE ═══ -->
   <div class="checkout-page checkout-success-page" id="checkout-success-state">
     <div class="success-check-circle">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2D6B4F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
     </div>
-    <h1 class="checkout-page-title" style="margin-bottom:8px;">ՇՆՈՐՀԱԿԱԼՈՒՏՅՈՒՆ!</h1>
+    <h1 class="checkout-page-title" style="margin-bottom:8px;">Շնորհակալություն</h1>
     <p class="checkout-page-subtitle">Ձեր պատվերը հաջողությամբ գրանցվեց։</p>
 
     <div class="success-order-details">
@@ -648,7 +647,7 @@
         <span id="succ-cust-name">-</span>
       </div>
       <div class="success-detail-row">
-        <span>Էլ։ փոստ:</span>
+        <span>Էլ․ փոստ:</span>
         <span id="succ-cust-email">-</span>
       </div>
       <div class="success-detail-row">
@@ -666,24 +665,24 @@
     </div>
 
     <div class="success-actions">
-      <a href="shop.html" class="btn-primary" style="text-decoration:none; padding:12px 24px; font-size:13px;">ՎԵՌԱԴԱՌՆԱԼ ԽԱՆՈՒՏ</a>
-      <a href="account.html" class="btn-primary" style="background:var(--charcoal); text-decoration:none; padding:12px 24px; font-size:13px;">ԻՄ ՀԱՇԻՎԸ</a>
+      <a href="shop.html" class="btn-primary" style="text-decoration:none; padding:12px 24px; font-size:13px;">ՎԵՐԱԴԱՌՆԱԼ ԽԱՆՈՒԹ</a>
+      <a href="account.html" class="btn-primary" style="background:var(--charcoal, #2B2C2D); text-decoration:none; padding:12px 24px; font-size:13px;">ԻՄ ՀԱՇԻՎԸ</a>
     </div>
   </div>
 
-  <!-- ═══ FOOTER ═══ -->
-  <footer class="footer">
+  <!-- ═══ 5. SITE FOOTER ═══ -->
+  <footer class="site-footer">
     <div class="footer-grid">
-      <div class="footer-col footer-about">
-        <a href="index.html" class="footer-logo">Urart<span class="logo-oo">oo</span></a>
-        <p class="footer-tagline">Հայկական արվեստների ձեռագործ զարդեր։</p>
+      <div class="footer-brand">
+        <img src="Images/Urartoo-Logo.webp" alt="Urartoo" class="footer-logo">
+        <p>Հայաստանի տարածքում հավաքված քարեր՝ հղկված և տեղադրված մեկ վարպետի կողմից Երևանում։</p>
       </div>
       <div class="footer-col">
-        <div class="footer-col-title">Կատալոգ</div>
-        <a href="shop.html">Բոլոր զարդերը</a>
+        <div class="footer-col-title">Խանութ</div>
         <a href="shop.html?cat=Մատանիներ">Մատանիներ</a>
         <a href="shop.html?cat=Վզնոցներ">Վզնոցներ</a>
         <a href="shop.html?cat=Ապարանջաններ">Ապարանջաններ</a>
+        <a href="shop.html">Բոլոր զարդերը</a>
       </div>
       <div class="footer-col">
         <div class="footer-col-title">Բրենդը</div>
