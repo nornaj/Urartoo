@@ -80,8 +80,8 @@
   let activeCat = 'all';
   let activeStone = 'all';
   let searchQuery = '';
-  let minPrice = 0;
-  let maxPrice = 10000;
+  let minPrice = 100;
+  let maxPrice = 600;
   let activeSort = 'new';
 
   // Read URL parameters if coming from Homepage stone/category cards
@@ -139,6 +139,10 @@
   const priceMinInput = document.getElementById('price-min');
   const priceMaxInput = document.getElementById('price-max');
   const sortSelect = document.getElementById('sort-select');
+
+  // Initialize price range from actual HTML input values
+  if (priceMinInput && priceMinInput.value) minPrice = Number(priceMinInput.value) || 0;
+  if (priceMaxInput && priceMaxInput.value) maxPrice = Number(priceMaxInput.value) || 10000;
   const clearBtn = document.getElementById('clear-filters-btn');
   const mobileFilterBtn = document.getElementById('mobile-filter-btn');
   const mobileDrawer = document.getElementById('shop-sidebar');
@@ -148,15 +152,15 @@
   function filterAndSort() {
     const productsList = getProductsList();
     let list = productsList.filter(function (p) {
-      if (activeCat !== 'all' && p.cat !== activeCat) return false;
-      if (activeStone !== 'all' && p.stone !== activeStone) return false;
+      if (activeCat !== 'all' && (p.cat || p.category) !== activeCat) return false;
+      if (activeStone !== 'all' && (p.stone || '') !== activeStone) return false;
       if (p.price < minPrice || p.price > maxPrice) return false;
       if (searchQuery) {
         var q = searchQuery.toLowerCase();
-        var match = p.name.toLowerCase().includes(q) ||
-                    p.stone.toLowerCase().includes(q) ||
-                    (p.region && p.region.toLowerCase().includes(q)) ||
-                    p.cat.toLowerCase().includes(q);
+        var match = (p.name || '').toLowerCase().includes(q) ||
+                    (p.stone || '').toLowerCase().includes(q) ||
+                    (p.region || p.stoneOrigin || '').toLowerCase().includes(q) ||
+                    (p.cat || p.category || '').toLowerCase().includes(q);
         if (!match) return false;
       }
       return true;
@@ -306,7 +310,7 @@
 
     if (addBtn) {
       var id = addBtn.dataset.add;
-      var product = allProducts.find(function (p) {
+      var product = getProductsList().find(function (p) {
         return String(p.id) === String(id) || String(p._sanityId) === String(id);
       });
       if (!product || product.sold || product.stock === 0) return;
@@ -371,25 +375,39 @@
     }
 
     if (saveBtn) {
-      var id2 = Number(saveBtn.dataset.save);
+      var id2 = saveBtn.dataset.save;
       savedItems[id2] = !savedItems[id2];
 
       // Rebuild wishlist array from savedItems and persist
       var wishlistIds = [];
       for (var key in savedItems) {
-        if (savedItems[key]) wishlistIds.push(Number(key));
+        if (savedItems[key]) wishlistIds.push(key);
       }
       localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlistIds));
       filterAndSort();
     }
   });
 
+  // Initial render - try immediately, then re-render when Sanity data arrives
   filterAndSort();
-  window.addEventListener('sanityCatalogReady', filterAndSort);
-  window.addEventListener('urartoo:products-updated', filterAndSort);
+
+  window.addEventListener('sanityCatalogReady', function() {
+    STONE_DOTS = getStoneDots();
+    filterAndSort();
+  });
+  window.addEventListener('urartoo:products-updated', function() {
+    STONE_DOTS = getStoneDots();
+    filterAndSort();
+  });
 
   if (window.NovaSanity && !window.NovaSanity._ready) {
-    window.NovaSanity.init().then(filterAndSort);
+    window.NovaSanity.init().then(function() {
+      STONE_DOTS = getStoneDots();
+      filterAndSort();
+    });
+  } else if (window.NovaSanity && window.NovaSanity._ready) {
+    // Already ready, just render
+    filterAndSort();
   }
 
 })();
