@@ -266,7 +266,7 @@
       }
 
       if (tbody) {
-        tbody.innerHTML = filtered.map(p => {
+        tbody.innerHTML = filtered.map((p, idx) => {
           const isSold = p.sold || p.stock === 0;
           const statusBadge = isSold
             ? '<span class="admin-status-badge badge-failed">Վաճառված</span>'
@@ -275,6 +275,7 @@
           const imgSrc = p.img || p.image || 'Images/bracelet.webp';
           const pId = p._sanityId || p.id;
           const currentStock = p.stock !== undefined ? p.stock : (p.sold ? 0 : 1);
+          const pSku = p.sku || ('UR-' + String(idx + 1).padStart(3, '0'));
 
           return `<tr>
             <td style="text-align:center;">
@@ -289,7 +290,7 @@
               <strong>${p.name}</strong><br>
               <small style="color:var(--tuff);">${p.material || '925 արծաթ'}</small>
             </td>
-            <td><code style="font-family:var(--mono);">${p.sku || 'UR-100'}</code></td>
+            <td><code style="font-family:var(--mono);">${pSku}</code></td>
             <td>${p.cat || p.category || 'Մատանիներ'}</td>
             <td>${p.stone || 'Նռնաքար'} (${p.region || p.stoneOrigin || 'Վայոց Ձոր'})</td>
             <td><strong style="font-family:var(--mono);color:var(--amber);">${p.price}֏</strong></td>
@@ -308,7 +309,7 @@
       }
 
       if (mobileCardsContainer) {
-        mobileCardsContainer.innerHTML = filtered.map(p => {
+        mobileCardsContainer.innerHTML = filtered.map((p, idx) => {
           const isSold = p.sold || p.stock === 0;
           const statusBadge = isSold
             ? '<span class="admin-status-badge badge-failed" style="font-size:11px;">Վաճառված</span>'
@@ -317,6 +318,7 @@
           const imgSrc = p.img || p.image || 'Images/bracelet.webp';
           const pId = p._sanityId || p.id;
           const currentStock = p.stock !== undefined ? p.stock : (p.sold ? 0 : 1);
+          const pSku = p.sku || ('UR-' + String(idx + 1).padStart(3, '0'));
 
           return `<div class="admin-prod-mobile-card">
             <div class="admin-prod-mobile-header">
@@ -324,7 +326,7 @@
               <img src="${imgSrc}" class="admin-prod-mobile-img" alt="${p.name}">
               <div class="admin-prod-mobile-meta">
                 <div class="admin-prod-mobile-title">${p.name}</div>
-                <div style="font-size:12px; color:var(--tuff); font-family:var(--mono);">${p.sku || 'UR-100'} • ${p.cat || p.category || 'Մատանիներ'}</div>
+                <div style="font-size:12px; color:var(--tuff); font-family:var(--mono);">${pSku} • ${p.cat || p.category || 'Մատանիներ'}</div>
                 <div class="admin-prod-mobile-badges">
                   ${statusBadge}
                   <span style="font-size:11px; background:#F4F3EF; padding:2px 8px; border-radius:2px; color:var(--tuff);">${p.stone || 'Նռնաքար'} (${p.region || 'Վայոց Ձոր'})</span>
@@ -762,6 +764,7 @@
         const found = products.find(p => p._sanityId === productId || p.id === productId);
 
         if (found) {
+          this._currentEditingSku = found.sku || null;
           document.getElementById('pe-name').value = found.name || '';
           document.getElementById('pe-price').value = found.price || 300;
           if (document.getElementById('pe-stock')) {

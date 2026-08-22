@@ -277,13 +277,34 @@
     },
 
     _transformSanityProducts(docs) {
-      return docs.map(doc => {
+      let maxSequential = 0;
+      // First pass: find highest existing UR-XXX
+      docs.forEach(doc => {
+        if (doc.sku) {
+          const m = String(doc.sku).match(/^UR-(\d+)$/);
+          if (m) {
+            const n = parseInt(m[1], 10);
+            if (n > maxSequential) maxSequential = n;
+          }
+        }
+      });
+
+      return docs.map((doc, idx) => {
         const mainImg = doc.image || doc.img || 'Images/bracelet.webp';
         const imgList = (doc.images && doc.images.length > 0) ? doc.images : [mainImg];
+        
+        let resolvedSku = doc.sku;
+        if (!resolvedSku || resolvedSku === 'UR-100' || !resolvedSku.startsWith('UR-')) {
+          maxSequential++;
+          resolvedSku = 'UR-' + String(maxSequential).padStart(3, '0');
+        }
+
         return {
           id: doc.id ? (isNaN(doc.id) ? doc.id : Number(doc.id)) : doc._id,
           _sanityId: doc._id,
           name: doc.name || '',
+          brand: doc.brand || 'Urartoo',
+          sku: resolvedSku,
           cat: doc.category || 'Մատանիներ',
           category: doc.category || 'Մատանիներ',
           stone: doc.stone || 'Նռնաքար',
