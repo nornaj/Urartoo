@@ -653,8 +653,12 @@
     },
 
     openStoneEditor() {
+      console.log('[Urartoo] openStoneEditor called');
       const modal = document.getElementById('stone-editor-modal');
-      if (!modal) return;
+      if (!modal) {
+        console.error('[Urartoo] stone-editor-modal element not found!');
+        return;
+      }
 
       if (document.getElementById('se-name')) document.getElementById('se-name').value = '';
       if (document.getElementById('se-color')) document.getElementById('se-color').value = '#7B2D3B';
@@ -662,12 +666,20 @@
       if (document.getElementById('se-color-preview')) document.getElementById('se-color-preview').style.background = '#7B2D3B';
       if (document.getElementById('se-region')) document.getElementById('se-region').value = '';
 
-      modal.style.display = 'flex';
+      modal.style.setProperty('display', 'flex', 'important');
+      modal.style.setProperty('visibility', 'visible', 'important');
+      modal.style.setProperty('opacity', '1', 'important');
+      modal.style.setProperty('pointer-events', 'auto', 'important');
+      document.body.style.overflow = 'hidden';
+      console.log('[Urartoo] stone-editor-modal should now be visible');
     },
 
     closeStoneEditor() {
       const modal = document.getElementById('stone-editor-modal');
-      if (modal) modal.style.display = 'none';
+      if (modal) {
+        modal.style.setProperty('display', 'none', 'important');
+      }
+      document.body.style.overflow = '';
     },
 
     saveStoneFromEditor() {
