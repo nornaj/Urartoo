@@ -1,0 +1,222 @@
+<x-dc>
+
+
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+
+
+</helmet>
+
+<div style="font-family: 'Instrument Sans', sans-serif; background: #FAF8F5; color: #0C0E0D; min-height: 100vh;">
+
+  <header style="position: sticky; top: 0; z-index: 40; background: rgba(250,248,245,0.94); backdrop-filter: blur(10px); box-shadow: 0 1px 0 #E2DCD2; padding: 16px max(24px, calc((100% - 1280px) / 2)); display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: 28px;">
+    <nav style="display: flex; gap: 26px; font-size: 13px; font-weight: 500; white-space: nowrap;">
+      <a href="Shop.dc.html">Shop</a>
+      <a href="Services.dc.html">Services</a>
+      <a href="Home.dc.html#maker">The maker</a>
+      <a href="Journal.dc.html" style="color: #8A6508;">Journal</a>
+    </nav>
+    <a href="Home.dc.html" style="justify-self: center; display: block;">
+      <img src=""[BASE64_IMAGE]"" alt="Urartoo" style="height: 30px; width: auto; display: block;">
+    </a>
+    <div style="justify-self: end; display: flex; align-items: center; gap: 22px; font-size: 13px; font-weight: 500;">
+      <a href="#search">Search</a>
+      <a href="#account">Account</a>
+      <a href="#cart">Cart (0)</a>
+    </div>
+  </header>
+
+  <article style="padding: 44px max(24px, calc((100% - 1280px) / 2)) 0;">
+    <div style="display: flex; align-items: center; gap: 16px; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #6E6A5F; margin-bottom: 18px;">
+      <span>September 2025</span>
+      <span style="width: 4px; height: 4px; background: #B8860B;"></span>
+      <span>Gutanasar</span>
+      <span style="width: 4px; height: 4px; background: #B8860B;"></span>
+      <span>9 min read</span>
+    </div>
+
+    <h1 style="font-family: Cormorant, serif; font-weight: 400; font-size: clamp(32px, 4.4vw, 60px); line-height: 1.04; letter-spacing: -0.025em; margin: 0 0 20px; max-width: 22ch;">Three days on a volcano for one good piece of glass</h1>
+    <p style="font-size: 18px; line-height: 1.65; color: #2C2F2E; margin: 0 0 32px; max-width: 60ch;">Obsidian is everywhere on Gutanasar and almost none of it is usable. What separates a piece worth carrying down from the thousand pieces left behind is a thing you learn with your hands, not your eyes.</p>
+
+    <div style="aspect-ratio: 21/9; background: #EDE7DE; display: flex; align-items: center; justify-content: center; margin-bottom: 56px;">
+      <span style="font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; line-height: 1.8; color: rgba(12,14,13,0.3); max-width: 220px; text-align: center;">hero photograph · obsidian scree on the north slope of Gutanasar, low afternoon light</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 72px; align-items: start;">
+
+      <div style="min-width: 0;">
+        <sc-for list="{{ blocks }}" as="b" hint-placeholder-count="10">
+          <div style="{{ b.wrap }}">
+            <sc-if value="{{ b.isHeading }}" hint-placeholder-val="{{ false }}">
+              <h2 id="{{ b.id }}" style="font-family: Cormorant, serif; font-weight: 400; font-size: 30px; line-height: 1.16; letter-spacing: -0.02em; margin: 0;">{{ b.text }}</h2>
+            </sc-if>
+            <sc-if value="{{ b.isPara }}" hint-placeholder-val="{{ true }}">
+              <p style="font-size: 16.5px; line-height: 1.78; color: #2C2F2E; margin: 0; max-width: 66ch;">{{ b.text }}</p>
+            </sc-if>
+            <sc-if value="{{ b.isPull }}" hint-placeholder-val="{{ false }}">
+              <blockquote style="border-left: 2px solid #B8860B; margin: 0; padding: 4px 0 4px 28px;">
+                <span style="display: block; font-family: Cormorant, serif; font-size: 26px; font-weight: 400; line-height: 1.35; letter-spacing: -0.015em; max-width: 34ch;">{{ b.text }}</span>
+              </blockquote>
+            </sc-if>
+            <sc-if value="{{ b.isFigure }}" hint-placeholder-val="{{ false }}">
+              <figure style="margin: 0;">
+                <div style="aspect-ratio: 3/2; background: #EDE7DE; display: flex; align-items: center; justify-content: center;">
+                  <span style="font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; line-height: 1.8; color: rgba(12,14,13,0.3); max-width: 200px; text-align: center;">{{ b.text }}</span>
+                </div>
+                <figcaption style="font-size: 12.5px; line-height: 1.6; color: #6E6A5F; margin-top: 12px;">{{ b.caption }}</figcaption>
+              </figure>
+            </sc-if>
+          </div>
+        </sc-for>
+
+        <div style="border-top: 1px solid #0C0E0D; margin-top: 56px; padding-top: 24px; display: flex; align-items: center; gap: 18px;">
+          <div style="width: 54px; height: 54px; background: #EDE7DE; flex: 0 0 auto;"></div>
+          <div>
+            <div style="font-size: 15px; font-weight: 500;">Written at the bench</div>
+            <div style="font-size: 13.5px; line-height: 1.6; color: #6E6A5F; margin-top: 4px; max-width: 52ch;">Field notes from the person who finds, cuts and sets every Urartoo piece. Yerevan, Armenia.</div>
+          </div>
+        </div>
+      </div>
+
+      <aside style="{{ asideStyle }}">
+        <div style="border-top: 1px solid #0C0E0D; padding-top: 18px;">
+          <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #6E6A5F; margin-bottom: 16px;">Contents</div>
+          <nav style="display: flex; flex-direction: column;">
+            <sc-for list="{{ toc }}" as="t" hint-placeholder-count="5">
+              <a href="{{ t.href }}" sc-camel-on-mouse-enter="{{ t.enter }}" sc-camel-on-mouse-leave="{{ t.leave }}" style="{{ t.style }}">
+                <span style="{{ t.markStyle }}"></span>
+                <span>{{ t.label }}</span>
+              </a>
+            </sc-for>
+          </nav>
+        </div>
+
+        <div style="border-top: 1px solid #E2DCD2; margin-top: 28px; padding-top: 18px;">
+          <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #6E6A5F; margin-bottom: 14px;">Share</div>
+          <div style="display: flex; gap: 8px;">
+            <sc-for list="{{ shares }}" as="sh" hint-placeholder-count="4">
+              <button sc-camel-on-click="{{ sh.click }}" sc-camel-on-mouse-enter="{{ sh.enter }}" sc-camel-on-mouse-leave="{{ sh.leave }}" aria-label="{{ sh.aria }}" style="{{ sh.style }}">
+                <span style="{{ sh.iconStyle }}"></span>
+              </button>
+            </sc-for>
+          </div>
+          <div style="font-size: 12px; color: #6E6A5F; margin-top: 12px; min-height: 18px;">{{ shareStatus }}</div>
+        </div>
+
+        <div style="background: #FFFFFF; margin-top: 28px; padding: 22px;">
+          <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #6E6A5F; margin-bottom: 12px;">From this trip</div>
+          <div style="aspect-ratio: 1/1; background: #EDE7DE; display: flex; align-items: center; justify-content: center; margin-bottom: 14px;">
+            <span style="font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 9.5px; line-height: 1.8; color: rgba(12,14,13,0.3); max-width: 150px; text-align: center;">obsidian pendant, finished piece</span>
+          </div>
+          <div style="font-size: 14.5px; font-weight: 500; line-height: 1.4;">Gutanasar Obsidian Pendant</div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 8px;">
+            <span style="font-size: 12.5px; color: #6E6A5F;">One of one</span>
+            <span style="font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px;">$265</span>
+          </div>
+          <a href="Shop.dc.html" style="display: block; text-align: center; background: #0C0E0D; color: #E8E2DA; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; padding: 13px 0; margin-top: 16px; transition: background 0.3s ease;" style-hover="background: #B8860B; color: #0C0E0D;">View the piece</a>
+        </div>
+      </aside>
+
+    </div>
+  </article>
+
+  <section style="padding: 96px max(24px, calc((100% - 1280px) / 2)) 0;">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 24px; margin-bottom: 28px;">
+      <h2 style="font-family: Cormorant, serif; font-weight: 400; font-size: clamp(26px, 2.6vw, 38px); line-height: 1.1; letter-spacing: -0.02em; margin: 0;">Latest notes</h2>
+      <a href="Journal.dc.html" style="font-size: 13px; font-weight: 500; border-bottom: 1px solid #D0D0CC; padding-bottom: 3px;">All notes</a>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px;">
+      <sc-for list="{{ related }}" as="r" hint-placeholder-count="3">
+        <a href="Single Blog.dc.html" sc-camel-on-mouse-enter="{{ r.enter }}" sc-camel-on-mouse-leave="{{ r.leave }}" style="display: block; cursor: pointer;">
+          <div style="position: relative; overflow: hidden; aspect-ratio: 16/10; background: #EDE7DE;">
+            <div style="{{ r.imgStyle }}">
+              <span style="font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 9.5px; line-height: 1.8; color: rgba(12,14,13,0.3); max-width: 180px; text-align: center;">{{ r.shot }}</span>
+            </div>
+          </div>
+          <div style="font-size: 12px; color: #6E6A5F; margin: 14px 0 8px;">{{ r.meta }}</div>
+          <div style="font-size: 16px; font-weight: 500; line-height: 1.4; max-width: 28ch;">{{ r.title }}</div>
+        </a>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="padding: 96px max(24px, calc((100% - 1280px) / 2)) 0;">
+    <div style="display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 56px; align-items: start;">
+      <div>
+        <h2 style="font-family: Cormorant, serif; font-weight: 400; font-size: clamp(26px, 2.6vw, 38px); line-height: 1.1; letter-spacing: -0.02em; margin: 0 0 14px;">Questions</h2>
+        <p style="font-size: 15px; line-height: 1.7; color: #2C2F2E; margin: 0 0 20px; max-width: 40ch;">The things people write in after reading a field note.</p>
+        <a href="Contact.dc.html" style="font-size: 13px; font-weight: 500; border-bottom: 1px solid #D0D0CC; padding-bottom: 3px;">Ask something else</a>
+      </div>
+      <div>
+        <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="5">
+          <div style="border-top: 1px solid #E2DCD2;">
+            <button sc-camel-on-click="{{ f.toggle }}" style="{{ f.rowStyle }}">
+              <span style="font-size: 16px; font-weight: 500; line-height: 1.45; text-align: left;">{{ f.q }}</span>
+              <span style="{{ f.iconStyle }}">
+                <svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#0C0E0D" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
+              </span>
+            </button>
+            <div style="{{ f.panelStyle }}">
+              <p style="min-height: 0; font-size: 15px; line-height: 1.75; color: #2C2F2E; margin: 0; padding: 0 44px 22px 0; max-width: 62ch;">{{ f.a }}</p>
+            </div>
+          </div>
+        </sc-for>
+        <div style="border-top: 1px solid #E2DCD2;"></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding: 96px max(24px, calc((100% - 1280px) / 2)) 96px;">
+    <div style="background: #1B1D1C; color: #E8E2DA; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 40px; align-items: center; padding: 52px 48px;">
+      <div>
+        <div style="font-family: Cormorant, serif; font-size: 32px; font-weight: 400; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 12px; max-width: 24ch;">Every stone in these notes ends up as one piece.</div>
+        <p style="font-size: 15px; line-height: 1.7; color: rgba(232,226,218,0.7); margin: 0; max-width: 54ch;">Forty-one pieces are in the shop right now. When one sells it is gone, because there was only ever one.</p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+        <a href="Shop.dc.html" style="background: #B8860B; color: #0C0E0D; padding: 16px 34px; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; cursor: pointer; transition: background 0.3s ease;" style-hover="background: #7B2D3B; color: #FAF8F5;">Shop all pieces</a>
+        <a href="Journal.dc.html" style="color: #E8E2DA; font-size: 13px; font-weight: 500; border-bottom: 1px solid rgba(232,226,218,0.35); padding-bottom: 3px; white-space: nowrap;">Read more notes</a>
+      </div>
+    </div>
+  </section>
+
+  <footer style="background: #1B1D1C; color: #E8E2DA; padding: 64px max(24px, calc((100% - 1280px) / 2)) 28px;">
+    <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px; padding-bottom: 48px;">
+      <div>
+        <img src=""[BASE64_IMAGE]"" alt="Urartoo" style="height: 28px; width: auto; display: block; margin-bottom: 16px; filter: invert(1) brightness(1.08);">
+        <p style="font-size: 13.5px; line-height: 1.7; color: rgba(232,226,218,0.55); margin: 0; max-width: 28ch;">Stones gathered across Armenia, cut and set by one maker in Yerevan.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 11px; font-size: 13.5px;">
+        <div style="font-size: 10px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: #A8A296; margin-bottom: 5px;">Shop</div>
+        <a href="Shop.dc.html" style="color: rgba(232,226,218,0.72);">Rings</a>
+        <a href="Shop.dc.html" style="color: rgba(232,226,218,0.72);">Necklaces</a>
+        <a href="Shop.dc.html" style="color: rgba(232,226,218,0.72);">Bracelets</a>
+        <a href="Shop.dc.html" style="color: rgba(232,226,218,0.72);">Earrings</a>
+        <a href="Shop.dc.html" style="color: rgba(232,226,218,0.72);">All pieces</a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 11px; font-size: 13.5px;">
+        <div style="font-size: 10px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: #A8A296; margin-bottom: 5px;">The house</div>
+        <a href="Home.dc.html#maker" style="color: rgba(232,226,218,0.72);">The maker</a>
+        <a href="Home.dc.html#stones" style="color: rgba(232,226,218,0.72);">The stones</a>
+        <a href="Services.dc.html" style="color: rgba(232,226,218,0.72);">Services</a>
+        <a href="Journal.dc.html" style="color: rgba(232,226,218,0.72);">Field notes</a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 11px; font-size: 13.5px;">
+        <div style="font-size: 10px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: #A8A296; margin-bottom: 5px;">Service</div>
+        <a href="#shipping" style="color: rgba(232,226,218,0.72);">Shipping &amp; returns</a>
+        <a href="#care" style="color: rgba(232,226,218,0.72);">Care &amp; sizing</a>
+        <a href="Contact.dc.html" style="color: rgba(232,226,218,0.72);">Contact</a>
+        <a href="#instagram" style="color: rgba(232,226,218,0.72);">Instagram</a>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 24px; border-top: 1px solid rgba(232,226,218,0.1); font-size: 11.5px; color: rgba(232,226,218,0.45); flex-wrap: wrap;">
+      <span>© 2026 Urartoo · Yerevan, Armenia</span>
+      <span style="display: flex; gap: 24px;">
+        <a href="#terms" style="color: rgba(232,226,218,0.45);">Terms</a>
+        <a href="#privacy" style="color: rgba(232,226,218,0.45);">Privacy</a>
+      </span>
+    </div>
+  </footer>
+
+</div>
+</x-dc>

@@ -1,0 +1,10 @@
+
+  html { scroll-behavior: smooth; scroll-padding-top: 96px; }
+  html, body { margin: 0; padding: 0; background: #FAF8F5; overflow-x: hidden; }
+  a { color: #0C0E0D; text-decoration: none; }
+  a:hover { color: #8A6508; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+  ::selection { background: #B8860B; color: #FAF8F5; }

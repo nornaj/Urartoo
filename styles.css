@@ -3965,18 +3965,20 @@ select, .admin-card select, .admin-input-group select {
   left: 0;
   min-width: 100%;
   width: max-content;
-  max-width: 320px;
-  background: #1C1D1F;
-  color: #FFFFFF;
+  max-width: 340px;
+  background: #FFFFFF;
+  color: #17181A;
   border-radius: 8px;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(194, 163, 121, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #D8D5CB;
   padding: 6px;
   z-index: 99999;
   opacity: 0;
   visibility: hidden;
   transform: translateY(-6px);
   transition: all 0.2s ease;
+  max-height: 260px;
+  overflow-y: auto;
 }
 
 .ura-custom-select.active .ura-select-menu {
@@ -4292,7 +4294,7 @@ select, .admin-card select, .admin-input-group select {
   border-radius: 5px;
   font-size: 13.5px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
+  color: #17181A;
   cursor: pointer;
   transition: all 0.15s ease;
   display: flex;
@@ -4301,13 +4303,13 @@ select, .admin-card select, .admin-input-group select {
 }
 
 .ura-select-option:hover {
-  background: rgba(194, 163, 121, 0.2);
-  color: #E2C99B;
+  background: #F4F3EF;
+  color: #17181A;
 }
 
 .ura-select-option.selected {
   background: #C2A379;
-  color: #111111;
+  color: #FFFFFF;
   font-weight: 700;
 }
 
