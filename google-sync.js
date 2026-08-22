@@ -58,6 +58,7 @@
         else if (h.includes('Jewelry Type') || h.includes('տեսակ')) row.category = val;
         else if (h.includes('Substance') || h.includes('Նյութ')) row.substance = val;
         else if (h.includes('Image') || h.includes('Նկար') || h.includes('Photo') || h.includes('Picture')) row.image = val;
+        else if (h.includes('Stock') || h.includes('Քանակ') || h.includes('Qty') || h.includes('Quantity')) row.stock = val;
         else row[h] = val;
       });
       if (row.title) rows.push(row);
@@ -172,6 +173,52 @@
     return null;
   }
 
+
+  /**
+   * Helper: Ensures a stone exists in the stones database.
+   * If the stone name is found (case-insensitive), returns the exact stored name.
+   * If not found, creates a new stone entry with a default color and returns the name.
+   */
+  function ensureStoneExists(stoneName) {
+    if (!stoneName || !stoneName.trim()) return 'Նռնաքար';
+    const trimmed = stoneName.trim();
+
+    // Get all existing stones (defaults + custom)
+    const defaultStones = [
+      { name: 'Նռնաքար', color: '#7B2D3B' },
+      { name: 'Օբսիդիան', color: '#17181A' },
+      { name: 'Փիրուզ', color: '#2E8C8C' },
+      { name: 'Հասպիս', color: '#A4442B' },
+      { name: 'Եղնգաքար', color: '#1B1D1C' },
+      { name: 'Ագաթ', color: '#C2A379' },
+      { name: 'Քվարց', color: '#6B5B4E' }
+    ];
+
+    let customStones = [];
+    try {
+      customStones = JSON.parse(localStorage.getItem('urartoo_stones_db_v1')) || [];
+    } catch (e) {}
+
+    // Check if stone already exists (case-insensitive match)
+    const allStones = [...defaultStones, ...customStones];
+    const found = allStones.find(s => s.name.toLowerCase() === trimmed.toLowerCase());
+    if (found) return found.name; // Return the exact stored name (preserves casing)
+
+    // Stone doesn't exist — create it with a generated color
+    const hue = Math.floor(Math.random() * 360);
+    const newColor = `hsl(${hue}, 45%, 40%)`;
+    const newStone = { name: trimmed, color: newColor };
+    customStones.push(newStone);
+    try {
+      localStorage.setItem('urartoo_stones_db_v1', JSON.stringify(customStones));
+    } catch (e) {}
+
+    // Notify other parts of the app
+    window.dispatchEvent(new CustomEvent('urartoo:stones-updated', { detail: newStone }));
+    console.log(`[GoogleSync] Auto-created new stone: "${trimmed}" with color ${newColor}`);
+    return trimmed;
+  }
+
   const GoogleSync = {
     /**
      * Fetches products from Google Sheet CSV
@@ -265,12 +312,12 @@
           sku: `UR-GS-${i + 1}`,
           cat: row.category || 'Մատանիներ',
           category: row.category || 'Մատանիներ',
-          stone: row.stone || 'Նռնաքար',
+          stone: ensureStoneExists(row.stone),
           region: row.location || 'Վայոց Ձոր',
           stoneOrigin: row.location || 'Վայոց Ձոր',
           material: row.substance || '925 արծաթ',
           price: numericPrice,
-          stock: 1,
+          stock: (row.stock !== undefined && row.stock !== '') ? (Number(String(row.stock).replace(/[^0-9]/g, '')) || 1) : 1,
           sold: false,
           featured: true,
           tagline: row.description || '',
