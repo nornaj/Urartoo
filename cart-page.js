@@ -72,18 +72,18 @@
           '<img src="' + item.img + '" alt="' + item.name + '" loading="lazy">' +
         '</a>' +
         '<a href="product.html?id=' + item.id + '" class="cart-item-name">' + item.name + '</a>' +
-        '<span class="cart-item-price">$' + itemPrice + '</span>' +
+        '<span class="cart-item-price">' + itemPrice + '֏' + '</span>' +
         '<div class="cart-item-qty">' +
           '<button class="qty-btn" data-qty-minus="' + idx + '">-</button>' +
           '<span class="qty-val">' + (item.qty || 1) + '</span>' +
           '<button class="qty-btn" data-qty-plus="' + idx + '">+</button>' +
         '</div>' +
-        '<span class="cart-item-subtotal">$' + lineTotal + '</span>' +
+        '<span class="cart-item-subtotal">' + lineTotal + '֏' + '</span>' +
       '</div>';
     }).join('');
 
-    subtotalEl.textContent = '$' + subtotal;
-    totalEl.textContent = '$' + subtotal;
+    subtotalEl.textContent = subtotal + '֏';
+    totalEl.textContent = subtotal + '֏';
   }
 
   // Event delegation for cart actions
@@ -173,13 +173,13 @@
         subtotal += lineTotal;
         return '<div class="chk-item-row">' +
           '<span>' + item.name + ' (x' + (item.qty || 1) + ')</span>' +
-          '<strong>$' + lineTotal + '</strong>' +
+          '<strong>' + lineTotal + '֏' + '</strong>' +
         '</div>';
       }).join('');
     }
 
-    if (subtotalEl) subtotalEl.textContent = '$' + subtotal;
-    if (grandTotalEl) grandTotalEl.textContent = '$' + subtotal;
+    if (subtotalEl) subtotalEl.textContent = subtotal + '֏';
+    if (grandTotalEl) grandTotalEl.textContent = subtotal + '֏';
 
     modal.classList.add('open');
     modal.style.display = 'flex';
@@ -300,7 +300,7 @@
         document.getElementById('succ-cust-email').textContent = email;
         document.getElementById('succ-cust-phone').textContent = phone;
         document.getElementById('succ-cust-address').textContent = fullAddress;
-        document.getElementById('succ-order-total').textContent = '$' + subtotal;
+        document.getElementById('succ-order-total').textContent = subtotal + '֏';
         succModal.classList.add('open');
       }
 
@@ -386,13 +386,13 @@
           '<div class="chk-summary-item-name">' + item.name + '</div>' +
           '<div class="chk-summary-item-qty">x' + (item.qty || 1) + '</div>' +
         '</div>' +
-        '<div class="chk-summary-item-price">$' + lineTotal + '</div>' +
+        '<div class="chk-summary-item-price">' + lineTotal + '֏' + '</div>' +
       '</div>';
     }).join('');
   }
 
-  if (subtotalEl) subtotalEl.textContent = '$' + subtotal;
-  if (grandTotalEl) grandTotalEl.textContent = '$' + subtotal;
+  if (subtotalEl) subtotalEl.textContent = subtotal + '֏';
+  if (grandTotalEl) grandTotalEl.textContent = subtotal + '֏';
 
   // Card number formatter
   var cardNumInput = document.getElementById('chk-card-num');
@@ -500,7 +500,7 @@
         document.getElementById('succ-cust-email').textContent = email;
         document.getElementById('succ-cust-phone').textContent = phone;
         document.getElementById('succ-cust-address').textContent = fullAddress;
-        document.getElementById('succ-order-total').textContent = '$' + subtotal;
+        document.getElementById('succ-order-total').textContent = subtotal + '֏';
       }
 
       // Update cart badge

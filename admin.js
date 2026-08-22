@@ -292,7 +292,7 @@
             <td><code style="font-family:var(--mono);">${p.sku || 'UR-100'}</code></td>
             <td>${p.cat || p.category || 'Մատանիներ'}</td>
             <td>${p.stone || 'Նռնաքար'} (${p.region || p.stoneOrigin || 'Վայոց Ձոր'})</td>
-            <td><strong style="font-family:var(--mono);color:var(--amber);">$${p.price}</strong></td>
+            <td><strong style="font-family:var(--mono);color:var(--amber);">${p.price}֏</strong></td>
             <td style="text-align:center;">
               <input type="number" min="0" value="${currentStock}" onchange="window.WooCommerceAdmin.updateQuickStock('${pId}', this.value)" style="width:65px; padding:6px 8px; border:1px solid var(--pumice); border-radius:4px; font-weight:700; font-family:var(--mono); text-align:center; outline:none; background:#FFF;">
             </td>
@@ -334,7 +334,7 @@
                   <input type="number" min="0" value="${currentStock}" onchange="window.WooCommerceAdmin.updateQuickStock('${pId}', this.value)" style="width:55px; padding:4px 6px; border:1px solid var(--pumice); border-radius:4px; font-weight:700; font-family:var(--mono); text-align:center; font-size:12px; background:#FFF;">
                 </div>
               </div>
-              <div class="admin-prod-mobile-price">$${p.price}</div>
+              <div class="admin-prod-mobile-price">${p.price}֏</div>
             </div>
             <div class="admin-prod-mobile-actions">
               <button class="filter-clear-btn" onclick="window.WooCommerceAdmin.openProductEditor('${pId}')">✏️ Խմբագրել</button>
@@ -918,7 +918,7 @@
 
       if (window.NovaSanity) {
         await window.NovaSanity.saveProduct(prodData);
-        addAuditLog(`Պահպանվեց ապրանք: «${name}» ($${price})`);
+        addAuditLog(`Պահպանվեց ապրանք: «${name}» (${price}֏)`);
       }
 
       if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '💾 ՊԱՀՊԱՆԵԼ'; }
@@ -1201,9 +1201,9 @@
       const aovEl = document.getElementById('admin-aov-val');
       const stockEl = document.getElementById('admin-stock-count-val');
 
-      if (revEl) revEl.textContent = `$${totalRev}`;
+      if (revEl) revEl.textContent = `${totalRev}֏`;
       if (countEl) countEl.textContent = ordersCount;
-      if (aovEl) aovEl.textContent = `$${avgOrder}`;
+      if (aovEl) aovEl.textContent = `${avgOrder}֏`;
       if (stockEl) stockEl.textContent = stockCount;
 
       // Category Sales Chart
@@ -1230,7 +1230,7 @@
             return `<div>
               <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
                 <span><strong>${cat}</strong></span>
-                <span style="font-family:var(--mono);">$${amount}</span>
+                <span style="font-family:var(--mono);">${amount}֏</span>
               </div>
               <div style="width:100%;height:8px;background:#E8E5DF;border-radius:4px;overflow:hidden;">
                 <div style="width:${pct}%;height:100%;background:var(--green);border-radius:4px;transition:width 0.4s ease;"></div>
@@ -1270,7 +1270,7 @@
                 ${i.cat || 'Մատանիներ'} ${i.stone ? ('• ' + i.stone) : ''}
               </div>
               <div style="font-size:11.5px; color:var(--charcoal);">
-                <span style="color:var(--amber); font-family:var(--mono); font-weight:700;">$${itemPrice}</span> × ${itemQty} = <strong style="font-family:var(--mono); color:var(--ink);">$${itemSubtotal}</strong>
+                <span style="color:var(--amber); font-family:var(--mono); font-weight:700;">${itemPrice}֏</span> × ${itemQty} = <strong style="font-family:var(--mono); color:var(--ink);">${itemSubtotal}֏</strong>
               </div>
             </div>
           </div>`;
@@ -1288,7 +1288,7 @@
           <td style="font-size:12px; color:var(--tuff); white-space:nowrap;">${o.date}</td>
           <td style="min-width:180px;">${custInfoHtml}</td>
           <td style="min-width:240px;">${itemsHtml}</td>
-          <td><strong style="font-family:var(--mono); color:var(--amber); font-size:14.5px;">$${o.total}</strong></td>
+          <td><strong style="font-family:var(--mono); color:var(--amber); font-size:14.5px;">${o.total}֏</strong></td>
           <td>
             <span class="admin-status-badge ${badgeClass}">${statusText}</span>
           </td>
@@ -1353,7 +1353,7 @@
       };
       orders.unshift(newOrder);
       saveOrders(orders);
-      addAuditLog(`Գրանցվել է նոր պատվեր #${newOrder.id} ($${newOrder.total}) - ${newOrder.customer}`);
+      addAuditLog(`Գրանցվել է նոր պատվեր #${newOrder.id} (${newOrder.total}֏) - ${newOrder.customer}`);
 
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('urartoo:orders-updated', { detail: newOrder }));
@@ -1465,7 +1465,7 @@
 
       const totalLtv = clients.reduce((sum, c) => sum + c.totalSpent, 0);
       const avgLtv = clients.length > 0 ? Math.round(totalLtv / clients.length) : 0;
-      if (ltvEl) ltvEl.textContent = `$${avgLtv}`;
+      if (ltvEl) ltvEl.textContent = `${avgLtv}֏`;
 
       if (!tbody) return;
 
@@ -1493,7 +1493,7 @@
           </td>
           <td style="font-size:13px; color:var(--charcoal); font-weight:500;">✉️ ${c.email}</td>
           <td><span class="admin-status-badge ${c.ordersCount > 0 ? 'badge-processing' : 'badge-pending'}">${c.ordersCount} պատվեր</span></td>
-          <td style="font-family:var(--mono); font-weight:700; color:var(--amber); font-size:14px;">$${c.totalSpent}</td>
+          <td style="font-family:var(--mono); font-weight:700; color:var(--amber); font-size:14px;">${c.totalSpent}֏</td>
           <td style="font-size:12px; color:var(--tuff);">${c.lastOrderDate || '—'}</td>
           <td><span class="admin-status-badge ${badgeClass}">${statusText}</span></td>
         </tr>`;

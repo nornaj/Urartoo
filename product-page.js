@@ -83,7 +83,7 @@
 
     // Product info
     if (document.getElementById('pdp-title')) document.getElementById('pdp-title').textContent = product.name;
-    if (document.getElementById('pdp-price')) document.getElementById('pdp-price').textContent = '$' + product.price;
+    if (document.getElementById('pdp-price')) document.getElementById('pdp-price').textContent = product.price + '֏';
     if (document.getElementById('pdp-stone')) {
       document.getElementById('pdp-stone').innerHTML = '<span class="pdp-stone-dot" style="background:' + (STONE_DOTS[product.stone] || '#2C2F2E') + '"></span>' + (product.stone || 'Նռնաքար');
     }
@@ -196,7 +196,7 @@
           '</div>' +
           '<div class="pdp-rel-body">' +
             '<span class="pdp-rel-name">' + p.name + '</span>' +
-            '<span class="pdp-rel-price">$' + p.price + '</span>' +
+            '<span class="pdp-rel-price">' + p.price + '֏</span>' +
             '<span class="pdp-rel-stone"><span class="stone-dot" style="background:' + dot + '"></span>' + (p.stone || 'Նռնաքար') + '</span>' +
           '</div>' +
         '</a>';

@@ -52,7 +52,7 @@
   ];
 
   const trustItems = [
-    { label: 'Անվճար առաքում $300-ից սկսած', d: 'M2 8h13v8H2zM15 11h4l3 3v2h-7zM6 19a1.6 1.6 0 100-3.2 1.6 1.6 0 000 3.2zM18 19a1.6 1.6 0 100-3.2 1.6 1.6 0 000 3.2z' },
+    { label: 'Անվճար առաքում 300֏-ից սկսած', d: 'M2 8h13v8H2zM15 11h4l3 3v2h-7zM6 19a1.6 1.6 0 100-3.2 1.6 1.6 0 000 3.2zM18 19a1.6 1.6 0 100-3.2 1.6 1.6 0 000 3.2z' },
     { label: 'Ծագման վկայականը ներառված է', d: 'M6 3h9l4 4v14H6zM9 11h8M9 15h5M15 3v4h4' },
     { label: '30 օրյա վերադարձ', d: 'M4 10a8 8 0 0113.6-3.6L21 9M21 4v5h-5M20 14a8 8 0 01-13.6 3.6L3 15M3 20v-5h5' },
     { label: 'Անվճար չափսի փոփոխում առաջին տարում', d: 'M12 8a6 6 0 100 12 6 6 0 000-12zM9.5 6.5L12 3l2.5 3.5' }
@@ -254,7 +254,7 @@
       var isSold = p.sold || p.stock === 0;
       var isAdded = !!cartMap[String(pId)] || !!cartMap[String(p._sanityId)] || !!added[pId];
       var isSaved = !!saved[pId];
-      var formattedPrice = typeof p.price === 'number' ? ('$' + p.price) : p.price;
+      var formattedPrice = typeof p.price === 'number' ? (p.price + '֏') : p.price;
 
       var heartSvg = '<svg width="15" height="15" viewBox="0 0 24 24" fill="' +
         (isSaved ? '#2D6B4F' : 'none') + '" stroke="' +
@@ -653,7 +653,7 @@
         '<p>Զամբյուղը դատարկ է։</p>' +
         '<a href="shop.html" class="btn-primary" style="display:inline-block; margin-top:16px; padding:10px 20px; text-decoration:none; font-size:12px;">Ուսումնասիրել տեսականին</a>' +
       '</div>';
-      if (totalPriceEl) totalPriceEl.textContent = '$0';
+      if (totalPriceEl) totalPriceEl.textContent = '0֏';
       return;
     }
 
@@ -668,13 +668,13 @@
         '</div>' +
         '<div style="flex:1;">' +
           '<div style="font-size:13.5px; font-weight:600; color:var(--obsidian); margin-bottom:4px;">' + item.name + '</div>' +
-          '<div style="font-size:12.5px; color:var(--amber); font-family:var(--mono);">' + (item.qty || 1) + ' × $' + item.price + '</div>' +
+          '<div style="font-size:12.5px; color:var(--amber); font-family:var(--mono);">' + (item.qty || 1) + ' × ' + item.price + '֏' + '</div>' +
         '</div>' +
         '<button onclick="removeCartItem(' + index + ')" style="background:none; border:none; color:var(--tuff); font-size:18px; cursor:pointer;">×</button>' +
       '</div>';
     }).join('');
 
-    if (totalPriceEl) totalPriceEl.textContent = '$' + total;
+    if (totalPriceEl) totalPriceEl.textContent = total + '֏';
   }
 
   window.removeCartItem = function (index) {
@@ -706,7 +706,7 @@
         cart,
         subtotal
       );
-      alert('Շնորհակալություն։ Ձեր պատվերը #' + newOrder.id + ' հաջողությամբ գրանցվել է ($' + subtotal + ')։');
+      alert('Շնորհակալություն։ Ձեր պատվերը #' + newOrder.id + ' հաջողությամբ գրանցվել է (' + subtotal + '֏)։');
     } else {
       alert('Շնորհակալություն։ Պատվերը գրանցված է։');
     }

@@ -557,11 +557,11 @@
             '<span class="order-status-badge ' + statusClass + '">' + (o.statusText || o.status) + '</span>' +
           '</div>' +
           '<div class="order-items-list">' +
-            o.items.map(it => '<div class="order-sub-item"><span>' + it.name + ' × ' + it.qty + '</span><span>$' + it.price + '</span></div>').join('') +
+            o.items.map(it => '<div class="order-sub-item"><span>' + it.name + ' × ' + it.qty + '</span><span>' + it.price + '֏' + '</span></div>').join('') +
           '</div>' +
           '<div class="order-card-footer">' +
             '<span>Ընդհանուր գումար:</span>' +
-            '<span style="color:var(--amber); font-family:var(--mono);">$' + o.total + '</span>' +
+            '<span style="color:var(--amber); font-family:var(--mono);">' + o.total + '֏' + '</span>' +
           '</div>' +
         '</div>';
       }).join('') +
@@ -601,7 +601,7 @@
           '</div>' +
           '<div class="wishlist-card-body">' +
             '<div class="wishlist-card-name">' + p.name + '</div>' +
-            '<div class="wishlist-card-price">$' + p.price + '</div>' +
+            '<div class="wishlist-card-price">' + p.price + '֏' + '</div>' +
             '<div class="wishlist-actions">' +
               '<button class="btn-wish-add" onclick="addWishlistItemToCart(' + p.id + ')">Ավելացնել զամբյուղ</button>' +
               '<button class="btn-wish-remove" onclick="removeWishlistItem(' + p.id + ')">×</button>' +

@@ -214,7 +214,7 @@
         '</div>' +
         '<div class="card-head">' +
           '<span class="card-name">' + p.name + '</span>' +
-          '<span class="card-price">$' + p.price + '</span>' +
+          '<span class="card-price">' + p.price + '֏' + '</span>' +
         '</div>' +
         '<div class="card-meta">' +
           '<span class="stone-dot" style="background:' + dot + '"></span>' +
