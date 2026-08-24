@@ -56,51 +56,55 @@
     if (_switchingTab) return;
     _switchingTab = true;
 
-    const validTabs = ['orders', 'products', 'clients', 'journal'];
-    const activeTab = validTabs.includes(tabName) ? tabName : 'orders';
-
-    console.log('[Admin] switchAdminTab →', activeTab);
-
-    validTabs.forEach(t => {
-      const btn = document.getElementById(`tab-btn-${t}`);
-      const sec = document.getElementById(`admin-sec-${t}`);
-      const isActive = (t === activeTab);
-
-      if (btn) {
-        if (isActive) {
-          btn.classList.add('active');
-          btn.style.color = 'var(--gold)';
-          btn.style.background = 'rgba(255,255,255,0.05)';
-          btn.style.borderLeft = '4px solid var(--gold)';
-        } else {
-          btn.classList.remove('active');
-          btn.style.color = 'rgba(255,255,255,0.75)';
-          btn.style.background = 'none';
-          btn.style.borderLeft = 'none';
-        }
-      }
-
-      if (sec) {
-        sec.style.setProperty('display', isActive ? 'block' : 'none', 'important');
-      }
-    });
-
     try {
-      if (window.history && window.history.replaceState) {
-        window.history.replaceState(null, null, `#${activeTab}`);
+      const validTabs = ['orders', 'products', 'clients', 'journal'];
+      const activeTab = validTabs.includes(tabName) ? tabName : 'orders';
+
+      console.log('[Admin] switchAdminTab →', activeTab);
+
+      validTabs.forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        const sec = document.getElementById(`admin-sec-${t}`);
+        const isActive = (t === activeTab);
+
+        if (btn) {
+          if (isActive) {
+            btn.classList.add('active');
+            btn.style.color = 'var(--gold)';
+            btn.style.background = 'rgba(255,255,255,0.05)';
+            btn.style.borderLeft = '4px solid var(--gold)';
+          } else {
+            btn.classList.remove('active');
+            btn.style.color = 'rgba(255,255,255,0.75)';
+            btn.style.background = 'none';
+            btn.style.borderLeft = 'none';
+          }
+        }
+
+        if (sec) {
+          sec.style.setProperty('display', isActive ? 'block' : 'none', 'important');
+        }
+      });
+
+      try {
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState(null, null, `#${activeTab}`);
+        }
+      } catch (e) {}
+
+      if (window.WooCommerceAdmin) {
+        window.WooCommerceAdmin.activeTab = activeTab;
+        if (activeTab === 'products') window.WooCommerceAdmin.renderProductsSec();
+        else if (activeTab === 'clients') window.WooCommerceAdmin.renderClientsSec();
+        else if (activeTab === 'journal') window.WooCommerceAdmin.renderJournalSec();
+        else if (activeTab === 'settings') window.WooCommerceAdmin.renderSettingsSec();
+        else window.WooCommerceAdmin.renderOrdersSec();
       }
-    } catch (e) {}
-
-    if (window.WooCommerceAdmin) {
-      window.WooCommerceAdmin.activeTab = activeTab;
-      if (activeTab === 'products') window.WooCommerceAdmin.renderProductsSec();
-      else if (activeTab === 'clients') window.WooCommerceAdmin.renderClientsSec();
-      else if (activeTab === 'journal') window.WooCommerceAdmin.renderJournalSec();
-      else if (activeTab === 'settings') window.WooCommerceAdmin.renderSettingsSec();
-      else window.WooCommerceAdmin.renderOrdersSec();
+    } catch (err) {
+      console.error('[Admin] switchAdminTab error:', err);
+    } finally {
+      _switchingTab = false;
     }
-
-    _switchingTab = false;
   };
 
   const WooCommerceAdmin = {
