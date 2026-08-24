@@ -71,6 +71,9 @@
             <button type="button" class="admin-nav-item" id="tab-btn-clients" data-tab="clients" onclick="window.switchAdminTab('clients')" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:rgba(255,255,255,0.75); background:none; border:none; text-align:left; cursor:pointer; width:100%;">
               <span>👥</span> <span>Հաճախորդներ</span>
             </button>
+            <button type="button" class="admin-nav-item" id="tab-btn-journal" data-tab="journal" onclick="window.switchAdminTab('journal')" style="display:flex; align-items:center; gap:12px; padding:14px 24px; font-size:14px; font-weight:500; color:rgba(255,255,255,0.75); background:none; border:none; text-align:left; cursor:pointer; width:100%;">
+              <span>📝</span> <span>Օրագիր / Բլոգ</span>
+            </button>
           </div>
         </aside>
 
@@ -301,6 +304,73 @@
             </div>
           </section>
 
+          <!-- SECTION 4: JOURNAL / BLOG POSTS MANAGER -->
+          <section id="admin-sec-journal" class="admin-sec" style="display:none;">
+            <div class="admin-stats-grid">
+              <div class="admin-stat-card">
+                <div class="admin-stat-label">Ընդհանուր Նշումներ</div>
+                <div class="admin-stat-val" id="admin-journal-count-val">0</div>
+              </div>
+              <div class="admin-stat-card">
+                <div class="admin-stat-label">Գլխավոր Նշում (Lead)</div>
+                <div class="admin-stat-val" id="admin-journal-featured-val" style="font-size:16px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">-</div>
+              </div>
+              <div class="admin-stat-card">
+                <div class="admin-stat-label">Թեմաների Քանակ</div>
+                <div class="admin-stat-val" id="admin-journal-topics-val">4</div>
+              </div>
+              <div class="admin-stat-card">
+                <div class="admin-stat-label">Կայքի Կարգավիճակ</div>
+                <div class="admin-stat-val" style="font-size:16px; color:#2D6B4F; font-weight:700;">🟢 Ակտիվ</div>
+              </div>
+            </div>
+
+            <div class="admin-card">
+              <div class="admin-card-header" style="flex-wrap:wrap; gap:16px;">
+                <div>
+                  <h3 class="admin-card-title" style="margin:0 0 6px;">📝 Օրագիր / Դաշտային Նշումներ</h3>
+                  <p style="margin:0; font-size:13px; color:var(--tuff);">Կառավարեք Ձեր հոդվածները, մեդիան և single post ACF դաշտերը։</p>
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                  <button type="button" class="btn-primary" onclick="window.WooCommerceAdmin.openBlogEditor(null)" style="padding:10px 20px; font-size:13px; font-weight:700; white-space:nowrap; background:var(--gold); color:var(--green); border:none; cursor:pointer;">+ ԱՎԵԼԱՑՆԵԼ ՆՈՐ ՆՇՈՒՄ</button>
+                </div>
+              </div>
+
+              <!-- Filter Bar & Search -->
+              <div style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; align-items:center;">
+                <input type="text" id="admin-journal-search" class="admin-input" placeholder="Որոնել ըստ վերնագրի կամ վայրի..." oninput="window.WooCommerceAdmin.renderJournalSec()" style="max-width:320px;">
+                <select id="admin-journal-filter-topic" class="admin-input" onchange="window.WooCommerceAdmin.renderJournalSec()" style="max-width:200px;">
+                  <option value="all">Բոլոր Թեմաները</option>
+                  <option value="Քարահավաք">Քարահավաք</option>
+                  <option value="Աշխատանոց">Աշխատանոց</option>
+                  <option value="Գեմոլոգիա">Գեմոլոգիա</option>
+                  <option value="Ստուդիա">Ստուդիա</option>
+                </select>
+              </div>
+
+              <!-- Journal Posts Table -->
+              <div style="overflow-x:auto;">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th style="width:70px;">ՆԿԱՐ</th>
+                      <th>ՎԵՐՆԱԳԻՐ / ՆՇՈՒՄ</th>
+                      <th>ԹԵՄԱ</th>
+                      <th>ԱՄՍԱԹԻՎ</th>
+                      <th>ՎԱՅՐ</th>
+                      <th style="text-align:center; width:80px;">ԳԼԽԱՎՈՐ</th>
+                      <th style="text-align:right; width:160px;">ԳՈՐԾՈՂՈՒԹՅՈՒՆՆԵՐ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-journal-tbody"></tbody>
+                </table>
+              </div>
+
+              <!-- Mobile Cards Grid -->
+              <div id="admin-journal-mobile-cards" class="admin-mobile-cards-grid"></div>
+            </div>
+          </section>
+
         </main>
       </div>
     </div>
@@ -445,6 +515,241 @@
       </div>
     </div>
   </div>
+
+  <!-- ═══ ACF / SCF BLOG POST FULL-PAGE EDITOR MODAL OVERLAY ═══ -->
+  <div id="blog-editor-modal" class="product-editor-page" style="display:none;">
+    <div class="pe-topbar" style="background:#191B1A; border-bottom:1px solid #333;">
+      <div style="display:flex; align-items:center; gap:16px;">
+        <button type="button" onclick="window.WooCommerceAdmin.closeBlogEditor()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;" title="Փակել">✕</button>
+        <div class="pe-topbar-title" id="blog-modal-title" style="color:var(--gold);">📝 Խմբագրել Դաշտային Նշումը (ACF Editor)</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <a id="btn-blog-preview" href="journal-post.html" target="_blank" class="admin-btn" style="padding:8px 18px; font-size:13px; background:rgba(255,255,255,0.1); color:#FFF; border:1px solid rgba(255,255,255,0.25); text-decoration:none; display:inline-flex; align-items:center; gap:6px;">👁 Նախադիտել Կայքում</a>
+        <button type="button" class="admin-btn" id="btn-blog-save" onclick="window.WooCommerceAdmin.saveBlogFromEditor()" style="padding:10px 24px; font-size:13.5px; background:var(--gold); color:var(--green); font-weight:700; border:none; cursor:pointer;">💾 ՊԱՀՊԱՆԵԼ</button>
+      </div>
+    </div>
+
+    <div class="pe-content">
+      <!-- MAIN COLUMN: SCF FIELDS -->
+      <div class="pe-main" style="flex:1; max-width:880px;">
+        
+        <!-- ACF BOX 1: HERO / THUMBNAIL (Matches Reference Screenshot Top) -->
+        <div class="scf-metabox">
+          <div class="scf-metabox-header" onclick="this.parentElement.classList.toggle('collapsed')">
+            <span class="scf-metabox-title">🖼 Գլխավոր Լուսանկար (Thumbnail / Hero Image)</span>
+            <span class="scf-metabox-toggle-icon">▲</span>
+          </div>
+          <div class="scf-metabox-body">
+            <div class="scf-thumbnail-wrapper" id="be-hero-preview-wrapper">
+              <img id="be-hero-preview" src="" alt="Thumbnail" class="scf-thumbnail-img" style="display:none;">
+              <div id="be-hero-placeholder" style="color:var(--tuff); font-size:13px; text-align:center; padding:32px 16px;">
+                <span style="font-size:32px; display:block; margin-bottom:8px;">📷</span>
+                <span>Լուսանկար ընտրված չէ (Ընտրեք ֆայլ կամ մուտքագրեք URL)</span>
+              </div>
+              <div class="scf-thumbnail-overlay">
+                <label class="scf-thumb-action-btn" style="cursor:pointer;" title="Ընտրել նոր նկար (ավտոմատ WebP &lt; 200KB)">
+                  <span>📁 Փոխարինել Նկարը</span>
+                  <input type="file" id="be-hero-file" accept="image/*" onchange="window.WooCommerceAdmin.handleBlogThumbnailUpload(event)" style="display:none;">
+                </label>
+                <button type="button" class="scf-thumb-action-btn" onclick="window.WooCommerceAdmin.clearBlogThumbnail()" title="Հեռացնել նկարը" style="color:#FF7B7B;">✕ Հեռացնել</button>
+              </div>
+            </div>
+
+            <div style="margin-top:14px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+              <div>
+                <label for="be-hero-url" style="font-size:12px; font-weight:600; color:var(--tuff); display:block; margin-bottom:4px;">Լուսանկարի CDN URL</label>
+                <input type="text" id="be-hero-url" class="admin-input" placeholder="Images/stone-quarry.webp կամ https://cdn.sanity.io/..." oninput="window.WooCommerceAdmin.updateBlogThumbnailFromUrl(this.value)">
+              </div>
+              <div>
+                <label for="be-hero-caption" style="font-size:12px; font-weight:600; color:var(--tuff); display:block; margin-bottom:4px;">Լուսանկարի Նկարագրություն (Caption)</label>
+                <input type="text" id="be-hero-caption" class="admin-input" placeholder="օր․ գլխավոր լուսանկար · օբսիդիանի լանջը Գուտանասարի վրա">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACF BOX 2: ARTICLE TITLE & HEADER META GRID (Matches Reference Title & Date) -->
+        <div class="scf-metabox">
+          <div class="scf-metabox-header" onclick="this.parentElement.classList.toggle('collapsed')">
+            <span class="scf-metabox-title">🏷 Վերնագիր և Հիմնական Տվյալներ (Title &amp; Meta)</span>
+            <span class="scf-metabox-toggle-icon">▲</span>
+          </div>
+          <div class="scf-metabox-body">
+            <div class="admin-form-group" style="margin-bottom:16px;">
+              <label for="be-title" style="font-weight:700; font-size:13.5px; color:#2C3338; margin-bottom:6px; display:block;">Հոդվածի Վերնագիր (Title / H1) *</label>
+              <input type="text" id="be-title" class="admin-input" required placeholder="օր․ Երեք օր հրաբխի վրա՝ մեկ լավ ապակու կտորի համար" style="font-size:16px; font-weight:600;">
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+              <div class="admin-form-group">
+                <label for="be-date" style="font-weight:600; font-size:12.5px; color:#2C3338; margin-bottom:6px; display:block;">Ամսաթիվ (Date &amp; Time)</label>
+                <input type="text" id="be-date" class="admin-input" placeholder="օր․ Սեպտեմբեր 2025">
+              </div>
+              <div class="admin-form-group">
+                <label for="be-location" style="font-weight:600; font-size:12.5px; color:#2C3338; margin-bottom:6px; display:block;">Վայր / Տարածաշրջան (Location)</label>
+                <input type="text" id="be-location" class="admin-input" placeholder="օր․ Գուտանասար / Վայոց Ձոր / Սյունիք">
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+              <div class="admin-form-group">
+                <label for="be-readtime" style="font-weight:600; font-size:12.5px; color:#2C3338; margin-bottom:6px; display:block;">Ընթերցանության Ժամանակ (Read Time)</label>
+                <input type="text" id="be-readtime" class="admin-input" placeholder="օր․ 9 րոպե">
+              </div>
+              <div class="admin-form-group">
+                <label for="be-slug" style="font-weight:600; font-size:12.5px; color:#2C3338; margin-bottom:6px; display:block;">URL Slug (Անգլերեն նույնականացուցիչ)</label>
+                <input type="text" id="be-slug" class="admin-input" placeholder="օր․ gutanasar-obsidian">
+              </div>
+            </div>
+
+            <div class="admin-form-group" style="margin-top:16px;">
+              <label for="be-lead" style="font-weight:600; font-size:12.5px; color:#2C3338; margin-bottom:6px; display:block;">Ներածական / Ենթավերնագիր (Lead / Excerpt)</label>
+              <textarea id="be-lead" class="admin-input" rows="3" placeholder="Գուտանասարի օբսիդիանը կոտրվում է տասից ինն անգամ սխալ..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACF BOX 3: DESCRIPTION & RICH CONTENT EDITOR (Matches Reference Visual/Text Box) -->
+        <div class="scf-metabox">
+          <div class="scf-metabox-header" onclick="this.parentElement.classList.toggle('collapsed')">
+            <span class="scf-metabox-title">📝 Բովանդակություն (Description / Content)</span>
+            <span class="scf-metabox-toggle-icon">▲</span>
+          </div>
+          <div class="scf-metabox-body" style="padding:14px;">
+            <div class="scf-editor-box">
+              <!-- Topbar: [Add Media] and [Visual | Text] tabs -->
+              <div class="scf-editor-topbar">
+                <div>
+                  <label class="scf-add-media-btn">
+                    <span>📷 Add Media / Ավելացնել Նկար</span>
+                    <input type="file" id="be-media-file-input" accept="image/*" onchange="window.WooCommerceAdmin.handleBlogAddMedia(event)" style="display:none;">
+                  </label>
+                </div>
+                <div class="scf-mode-tabs">
+                  <button type="button" class="scf-mode-tab active" id="btn-editor-mode-visual" onclick="window.WooCommerceAdmin.switchBlogEditorMode('visual')">Visual</button>
+                  <button type="button" class="scf-mode-tab" id="btn-editor-mode-text" onclick="window.WooCommerceAdmin.switchBlogEditorMode('text')">Text</button>
+                </div>
+              </div>
+
+              <!-- Formatting Toolbar -->
+              <div class="scf-toolbar" id="scf-editor-toolbar">
+                <select class="scf-tool-select" onchange="window.WooCommerceAdmin.execBlogFormat(this.value); this.value='p';">
+                  <option value="p">Պարբերություն (Paragraph)</option>
+                  <option value="h2">Վերնագիր 2 (Heading 2 / TOC)</option>
+                  <option value="h3">Վերնագիր 3 (Heading 3)</option>
+                </select>
+                <div class="scf-tool-sep"></div>
+                <button type="button" class="scf-tool-btn" onclick="window.WooCommerceAdmin.execBlogCommand('bold')" title="Թավ (Bold)"><b>B</b></button>
+                <button type="button" class="scf-tool-btn" onclick="window.WooCommerceAdmin.execBlogCommand('italic')" title="Շեղ (Italic)"><i>I</i></button>
+                <div class="scf-tool-sep"></div>
+                <button type="button" class="scf-tool-btn" onclick="window.WooCommerceAdmin.execBlogCommand('insertUnorderedList')" title="Կետերով ցուցակ (Bullet List)">•≡</button>
+                <button type="button" class="scf-tool-btn" onclick="window.WooCommerceAdmin.execBlogCommand('insertOrderedList')" title="Համարակալված ցուցակ (Numbered List)">1≡</button>
+                <button type="button" class="scf-tool-btn" onclick="window.WooCommerceAdmin.execBlogBlockquote()" title="Մեջբերում (Blockquote)">❝</button>
+                <div class="scf-tool-sep"></div>
+                <button type="button" class="scf-tool-btn" onclick="window.WooCommerceAdmin.execBlogCommand('justifyLeft')" title="Ձախ">⫷</button>
+                <button type="button" class="scf-tool-btn" onclick="window.WooCommerceAdmin.execBlogCommand('justifyCenter')" title="Կենտրոն">≡</button>
+                <button type="button" class="scf-tool-btn" onclick="window.WooCommerceAdmin.execBlogCommand('justifyRight')" title="Աջ">⫸</button>
+                <div class="scf-tool-sep"></div>
+                <button type="button" class="scf-tool-btn" onclick="window.WooCommerceAdmin.execBlogLink()" title="Հղում (Link)">🔗</button>
+                <button type="button" class="scf-tool-btn" onclick="window.WooCommerceAdmin.execBlogCommand('insertHorizontalRule')" title="Բաժանիչ գիծ">—</button>
+              </div>
+
+              <!-- Visual Editable Area -->
+              <div id="be-content-visual" class="scf-editor-content" contenteditable="true" data-placeholder="Գրեք Ձեր դաշտային նշումը այստեղ..." oninput="window.WooCommerceAdmin.syncBlogVisualToText()"></div>
+
+              <!-- Text HTML Area (Hidden in visual mode) -->
+              <textarea id="be-content-text" class="scf-editor-html" style="display:none;" oninput="window.WooCommerceAdmin.syncBlogTextToVisual()" placeholder="<p>Գրեք HTML կոդը այստեղ...</p>"></textarea>
+            </div>
+            <div style="margin-top:8px; font-size:11.5px; color:var(--tuff);">💡 <b>Հուշում:</b> «Heading 2» վերնագրերը ավտոմատ կերպով կառուցում են կայքի աջ կողմի <b>Բովանդակության (Table of Contents)</b> ցանկը։</div>
+          </div>
+        </div>
+
+        <!-- ACF BOX 4: FAQs REPEATER ACCORDION -->
+        <div class="scf-metabox">
+          <div class="scf-metabox-header" onclick="this.parentElement.classList.toggle('collapsed')">
+            <span class="scf-metabox-title">❓ Հարցեր և Պատասխաններ (FAQs Accordion)</span>
+            <span class="scf-metabox-toggle-icon">▲</span>
+          </div>
+          <div class="scf-metabox-body">
+            <div id="be-faqs-container">
+              <!-- Rendered dynamically -->
+            </div>
+            <button type="button" class="admin-btn" onclick="window.WooCommerceAdmin.addBlogFaqRow()" style="padding:8px 16px; font-size:12.5px; background:#F0F6FC; color:#2271B1; border:1px dashed #2271B1; cursor:pointer; width:100%; border-radius:6px; font-weight:600;">+ Ավելացնել Նոր Հարց (Add FAQ)</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SIDEBAR COLUMN: TAXONOMY, FEATURED JEWELRY & PUBLISH -->
+      <div class="pe-sidebar" style="width:340px;">
+        
+        <!-- SIDEBAR BOX 1: PUBLISH & STATUS -->
+        <div class="scf-metabox">
+          <div class="scf-metabox-header">
+            <span class="scf-metabox-title">⚙️ Կարգավիճակ</span>
+          </div>
+          <div class="scf-metabox-body">
+            <div class="admin-form-group" style="margin-bottom:14px;">
+              <label for="be-topic" style="font-weight:600; font-size:12.5px; display:block; margin-bottom:6px;">Թեմա (Topic / Tag) *</label>
+              <select id="be-topic" class="admin-input">
+                <option value="Քարահավաք">Քարահավաք</option>
+                <option value="Աշխատանոց">Աշխատանոց</option>
+                <option value="Գեմոլոգիա">Գեմոլոգիա</option>
+                <option value="Ստուդիա">Ստուդիա</option>
+              </select>
+            </div>
+
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:#FAF8F5; border:1px solid #EAE8E2; border-radius:6px; margin-bottom:16px;">
+              <div>
+                <div style="font-weight:600; font-size:13px; color:#2C3338;">Գլխավոր Նշում (Featured)</div>
+                <div style="font-size:11px; color:var(--tuff);">Ցուցադրել մեծ բաններով Օրագրում</div>
+              </div>
+              <input type="checkbox" id="be-featured" style="width:18px; height:18px; cursor:pointer;">
+            </div>
+
+            <button type="button" class="btn-primary" onclick="window.WooCommerceAdmin.saveBlogFromEditor()" style="width:100%; padding:12px; font-weight:700; background:var(--gold); color:var(--green); border:none; cursor:pointer; font-size:14px;">💾 ՊԱՀՊԱՆԵԼ ՓՈՓՈԽՈՒԹՅՈՒՆՆԵՐԸ</button>
+          </div>
+        </div>
+
+        <!-- SIDEBAR BOX 2: "FROM THIS TRIP" FEATURED JEWELRY PIECE -->
+        <div class="scf-metabox">
+          <div class="scf-metabox-header">
+            <span class="scf-metabox-title">💎 Այս Ուղևորությունից (Associated Jewelry)</span>
+          </div>
+          <div class="scf-metabox-body">
+            <p style="font-size:12px; color:var(--tuff); margin-top:0; margin-bottom:12px;">Ընտրեք ապրանքացանկից այն զարդը, որը պատրաստվել է այս ուղևորության քարից։</p>
+            
+            <div class="admin-form-group" style="margin-bottom:12px;">
+              <label for="be-featprod-select" style="font-size:12px; font-weight:600; display:block; margin-bottom:4px;">Ընտրել Ապրանքացանկից</label>
+              <select id="be-featprod-select" class="admin-input" onchange="window.WooCommerceAdmin.handleBlogFeaturedProductSelect(this.value)">
+                <option value="">-- Չկցել ապրանք --</option>
+              </select>
+            </div>
+
+            <div class="admin-form-group" style="margin-bottom:10px;">
+              <label for="be-featprod-title" style="font-size:11.5px; font-weight:600; display:block; margin-bottom:4px;">Զարդի Անվանում</label>
+              <input type="text" id="be-featprod-title" class="admin-input" placeholder="Գուտանասարի օբսիդիանով կախազարդ">
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+              <div>
+                <label for="be-featprod-price" style="font-size:11.5px; font-weight:600; display:block; margin-bottom:4px;">Գին ($)</label>
+                <input type="text" id="be-featprod-price" class="admin-input" placeholder="$265">
+              </div>
+              <div>
+                <label for="be-featprod-badge" style="font-size:11.5px; font-weight:600; display:block; margin-bottom:4px;">Նշում (Badge)</label>
+                <input type="text" id="be-featprod-badge" class="admin-input" placeholder="Եզակի (1 of 1)">
+              </div>
+            </div>
+
+            <div class="admin-form-group">
+              <label for="be-featprod-img" style="font-size:11.5px; font-weight:600; display:block; margin-bottom:4px;">Նկարի URL</label>
+              <input type="text" id="be-featprod-img" class="admin-input" placeholder="Images/ring.webp">
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 

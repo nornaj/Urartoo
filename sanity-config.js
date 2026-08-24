@@ -21,63 +21,129 @@
 
   const INITIAL_SEED_JOURNAL = [
     {
-      id: "post-1",
+      id: "gutanasar-obsidian",
+      slug: "three-days-on-a-volcano-for-one-good-piece-of-glass",
       topic: "Քարահավաք",
       date: "Սեպտեմբեր 2025",
-      readTime: "6 րոպե",
+      location: "Գուտանասար",
+      readTime: "9 րոպե",
       title: "Երեք օր հրաբխի վրա՝ մեկ լավ ապակու կտորի համար",
-      excerpt: "Գուտանասարի օբսիդիանը կոտրվում է տասից ինն անգամ սխալ։ Ահա թե ինչ տեսք ունի տասներորդը և ինչ արժեցավ այնտեղ հասնելը։",
-      content: "Գուտանասարի լանջերին օբսիդիանի հսկայական շերտեր են։ Սակայն զարդի համար պիտանի է միայն այն կտորը, որը ներսում չունի ճաքեր...",
+      lead: "Գուտանասարի օբսիդիանը կոտրվում է տասից ինն անգամ սխալ։ Ահա թե ինչ տեսք ունի տասներորդը և ինչ արժեցավ այնտեղ հասնելը։",
+      heroImg: "Images/stone-quarry.webp",
+      heroCaption: "գլխավոր լուսանկար · օբսիդիանի լանջը Գուտանասարի վրա առավոտյան",
+      contentHtml: "<p>Գուտանասարը հրաբխային գմբեթ է Երևանից մեկ ժամ հյուսիս, և նրա ողջ հյուսիսային լանջը ծածկված է սև ապակիով։ Ճանապարհից այն թվում է հսկայական հանք՝ այնպիսի վայր, որտեղ պատկերացնում ես քսան րոպեում պարկը լցնելն ու տուն վերադառնալը։ Բայց իրականում դա այդպես չէ։</p><h2>Լանջն է որոշում, ոչ թե դուք</h2><p>Այնպես որ առաջին օրը քար հավաքելը չէ։ Դա քայլելն է, բարձրացնելը և գրեթե բոլորը հետ դնելը։ Ես փնտրում եմ կտորներ, որոնք վերջերս են դուրս եկել փլուզումից։</p><blockquote><span>Առողջ կտորը զանգում է հպելիս։ Ճաքածը թխկում է։ Լանջին մեկ օր աշխատելուց հետո ձեռքերդ ավելի շուտ են իմանում, քան աչքերդ։</span></blockquote><h2>Աշխատանոցի ակոսում</h2><p>Հղկումը կատարվում է թաց և դանդաղ, որովհետև օբսիդիանը վատ է տանում ջերմությունը, իսկ արագ հղկումը կճաքեցնի լանջին կատարյալ քարը։</p>",
+      featuredProduct: {
+        title: "Գուտանասարի օբսիդիանով կախազարդ",
+        price: "$265",
+        badge: "Եզակի (1 of 1)",
+        img: "Images/ring.webp",
+        link: "shop.html"
+      },
+      faqs: [
+        { q: "Կարո՞ղ եմ խնդրել քար որոշակի վայրից։", a: "Այո, ընտրեք տարածաշրջանը և ցանկալի ձևը, ես կփնտրեմ հաջորդ ուղևորության ընթացքում։" },
+        { q: "Ինչպե՞ս իմանամ, որ քարը իսկապես այդ վայրից է։", a: "Յուրաքանչյուր զարդ ուղարկվում է հավաստագրով, որտեղ նշված է հովիտը, գտնելու ամիսը և հանքանյութը։" },
+        { q: "Արդյո՞ք օբսիդիանը բավականաչափ ամուր է ամենօրյա կրման համար։", a: "Կախազարդերի և ականջօղերի համար՝ այո։ Ամեն օր կրվող մատանիների համար նախընտրելի է նռնաքարը կամ հասպիսը։" }
+      ],
       featured: true
     },
     {
-      id: "post-2",
+      id: "garnet-river",
+      slug: "river-garnet-lapidary-vayots-dzor",
       topic: "Գեմոլոգիա",
       date: "Հուլիս 2025",
+      location: "Վայոց Ձոր",
       readTime: "4 րոպե",
       title: "Ինչու է գետի նռնաքարը հղկվում այլ կերպ, քան հանքինը",
-      excerpt: "Գետի ջուրը դարերի ընթացքում արդեն իսկ հղկել է քարի թույլ կողմերը։ Մեզ մնում է գտնել երակը։",
-      content: "Վայոց Ձորի գետերում հայտնաբերված նռնաքարերը բնական ճանապարհով անցել են առաջնային հղկման փուլը...",
+      lead: "Գետի ջուրը դարերի ընթացքում արդեն իսկ հղկել է քարի թույլ կողմերը։ Մեզ մնում է գտնել երակը։",
+      heroImg: "Images/necklace.webp",
+      heroCaption: "գլխավոր լուսանկար · Վայոց Ձորի գետաքարերը",
+      contentHtml: "<p>Վայոց Ձորի գետերում հայտնաբերված նռնաքարերը բնական ճանապարհով անցել են առաջնային հղկման փուլը։ Ջրի հոսքը հեռացրել է բոլոր փխրուն շերտերը։</p><h2>Գետաքարի խտությունը</h2><p>Երբ գետից նռնաքար ես վերցնում, գիտես, որ այն դիմացել է հազարամյա ճնշմանը։</p>",
+      featuredProduct: {
+        title: "Վայոց Ձորի նռնաքարով վզնոց",
+        price: "$310",
+        badge: "Եզակի (1 of 1)",
+        img: "Images/necklace.webp",
+        link: "shop.html"
+      },
+      faqs: [
+        { q: "Որտե՞ղ է հավաքվում այս նռնաքարը։", a: "Վայոց Ձորի լեռնային գետերի հուներից՝ ամռան չոր ամիսներին։" }
+      ],
       featured: false
     },
     {
-      id: "post-3",
+      id: "symmetrical-setting",
+      slug: "setting-asymmetric-stones-in-silver",
       topic: "Աշխատանոց",
       date: "Մայիս 2025",
+      location: "Երևան",
       readTime: "5 րոպե",
       title: "Անհամաչափ քարի տեղադրումը արծաթում",
-      excerpt: "Երբ քարը բնական ձև ունի, շրջանակը պետք է կրկնի նրա հետագիծը, ոչ թե ստիպի դառնալ երկրաչափական։",
-      content: "Ամեն մի քար ունի իր անհատական ձևը...",
+      lead: "Երբ քարը բնական ձև ունի, շրջանակը պետք է կրկնի նրա հետագիծը, ոչ թե ստիպի դառնալ երկրաչափական։",
+      heroImg: "Images/earring.webp",
+      heroCaption: "աշխատանոցի սեղանին · անհամաչափ ձևի քարի շրջանակում",
+      contentHtml: "<p>Ամեն մի քար ունի իր անհատական ձևը։ Փոխանակ քարը կտրելու և ստանդարտ օվալ դարձնելու, մենք արծաթյա բնիկը կառուցում ենք հենց քարի եզրագծով։</p>",
+      featuredProduct: {
+        title: "Անհամաչափ ականջօղեր",
+        price: "$195",
+        badge: "Եզակի (1 of 1)",
+        img: "Images/earring.webp",
+        link: "shop.html"
+      },
+      faqs: [],
       featured: false
     },
     {
-      id: "post-4",
+      id: "silver-patina",
+      slug: "925-sterling-silver-patina-and-finishing",
       topic: "Ստուդիա",
       date: "Ապրիլ 2025",
+      location: "Երևան",
       readTime: "3 րոպե",
       title: "925 արծաթի մշակումը և հնեցումը",
-      excerpt: "Ինչպես է օքսիդացումը ընդգծում հայկական քարերի խորությունն ու բնական փայլը։",
-      content: "Արծաթի օքսիդացումը թույլ է տալիս ստանալ խորը ստվերներ...",
+      lead: "Ինչպես է օքսիդացումը ընդգծում հայկական քարերի խորությունն ու բնական փայլը։",
+      heroImg: "Images/ring.webp",
+      heroCaption: "օքսիդացված արծաթի խորը ստվերները",
+      contentHtml: "<p>Արծաթի օքսիդացումը թույլ է տալիս ստանալ խորը ստվերներ զարդի փորագրությունների մեջ, ինչը կատարյալ հակադրություն է ստեղծում բնական քարի հետ։</p>",
+      featuredProduct: null,
+      faqs: [],
       featured: false
     },
     {
-      id: "post-5",
+      id: "turquoise-copper",
+      slug: "turquoise-from-old-copper-mines-syunik",
       topic: "Քարահավաք",
       date: "Մարտ 2025",
+      location: "Սյունիք",
       readTime: "7 րոպե",
       title: "Սյունիքի հին պղնձի հանքերի փիրուզը",
-      excerpt: "Գարնանը, երբ ձյունը հալվում է, Սյունիքի հին ակոսներում հայտնվում են կապույտ երակներ։",
-      content: "Սյունիքի լեռնային ճանապարհներին...",
+      lead: "Գարնանը, երբ ձյունը հալվում է, Սյունիքի հին ակոսներում հայտնվում են կապույտ երակներ։",
+      heroImg: "Images/bracelet.webp",
+      heroCaption: "Սյունիքի փիրուզի բնական շերտերը",
+      contentHtml: "<p>Սյունիքի լեռնային ճանապարհներին հին պղնձահանքերի մոտ կարելի է գտնել բնական փիրուզի երակներ։</p>",
+      featuredProduct: {
+        title: "Սյունիքի փիրուզով ապարանջան",
+        price: "$340",
+        badge: "Եզակի (1 of 1)",
+        img: "Images/bracelet.webp",
+        link: "shop.html"
+      },
+      faqs: [],
       featured: false
     },
     {
-      id: "post-6",
+      id: "areni-jasper",
+      slug: "areni-red-jasper-iron-veins",
       topic: "Գեմոլոգիա",
       date: "Փետրվար 2025",
+      location: "Արենի",
       readTime: "5 րոպե",
       title: "Արենիի հասպիսի երկաթյա շերտերը",
-      excerpt: "Կարմիր և դեղնավուն շերտերով հասպիսը Հայաստանի ամենատաք քարերից մեկն է։",
-      content: "Արենիի հասպիսը հայտնի է իր տաք երանգներով...",
+      lead: "Կարմիր և դեղնավուն շերտերով հասպիսը Հայաստանի ամենատաք քարերից մեկն է։",
+      heroImg: "Images/stone-quarry.webp",
+      heroCaption: "Արենիի կարմիր հասպիսը",
+      contentHtml: "<p>Արենիի հասպիսը հայտնի է իր տաք երանգներով և բարձր կարծրությամբ։ Հղկելիս այն ստանում է հայելային փայլ։</p>",
+      featuredProduct: null,
+      faqs: [],
       featured: false
     }
   ];
@@ -195,12 +261,22 @@
       const journalGroq = `*[_type == "journalPost"]{
         _id,
         id,
+        slug,
         topic,
         date,
+        location,
         readTime,
         title,
+        titleEn,
         excerpt,
+        lead,
         content,
+        contentHtml,
+        blocks,
+        "heroImg": coalesce(heroImg, mainImage.asset->url, image, imageUrl),
+        heroCaption,
+        featuredProduct,
+        faqs,
         featured
       }`;
 
@@ -250,20 +326,45 @@
           });
 
           this._products = Array.from(mergedMap.values());
+        }
 
-          if (sanityJournal && Array.isArray(sanityJournal) && sanityJournal.length > 0) {
-            this._journalPosts = sanityJournal;
-          } else {
+        // Journal sync & merge
+        let localJournal = [];
+        try {
+          localJournal = JSON.parse(localStorage.getItem('urartoo_journal_posts_v1')) || [];
+        } catch (e) {}
+
+        const journalMap = new Map();
+        // 1. Add initial seed items
+        INITIAL_SEED_JOURNAL.forEach(p => journalMap.set(String(p.id), p));
+        // 2. Add local storage items
+        if (Array.isArray(localJournal)) {
+          localJournal.forEach(p => journalMap.set(String(p.id), p));
+        }
+        // 3. Add cloud items
+        if (sanityJournal && Array.isArray(sanityJournal) && sanityJournal.length > 0) {
+          sanityJournal.forEach(p => {
+            const key = String(p.id || p._id || p.slug);
+            journalMap.set(key, { ...journalMap.get(key), ...p, _sanityId: p._id });
+          });
+        }
+        this._journalPosts = Array.from(journalMap.values());
+
+      } catch (err) {
+        console.warn('Sanity query failed:', err);
+        if (!this._journalPosts || this._journalPosts.length === 0) {
+          try {
+            this._journalPosts = JSON.parse(localStorage.getItem('urartoo_journal_posts_v1')) || INITIAL_SEED_JOURNAL;
+          } catch (e) {
             this._journalPosts = INITIAL_SEED_JOURNAL;
           }
         }
-      } catch (err) {
-        console.warn('Sanity query failed:', err);
       }
 
       if (!this._products) this._products = [];
       this._ready = true;
       this.notifyUpdate();
+      this.notifyJournalUpdate();
       return this._products;
     },
 
@@ -273,6 +374,15 @@
       } catch (e) {}
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('urartoo:products-updated', { detail: this._products }));
+      }
+    },
+
+    notifyJournalUpdate() {
+      try {
+        localStorage.setItem('urartoo_journal_posts_v1', JSON.stringify(this._journalPosts));
+      } catch (e) {}
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('urartoo:journal-updated', { detail: this._journalPosts }));
       }
     },
 
@@ -339,7 +449,92 @@
      * Synchronous getter for journal posts array
      */
     getJournalPosts() {
+      if (!this._journalPosts || this._journalPosts.length === 0) {
+        try {
+          const stored = JSON.parse(localStorage.getItem('urartoo_journal_posts_v1'));
+          if (Array.isArray(stored) && stored.length > 0) this._journalPosts = stored;
+          else this._journalPosts = INITIAL_SEED_JOURNAL;
+        } catch (e) {
+          this._journalPosts = INITIAL_SEED_JOURNAL;
+        }
+      }
       return this._journalPosts || [];
+    },
+
+    /**
+     * Getter for single journal post by ID or Slug
+     */
+    getJournalPostById(idOrSlug) {
+      const posts = this.getJournalPosts();
+      return posts.find(p => String(p.id) === String(idOrSlug) || String(p.slug) === String(idOrSlug) || String(p._sanityId) === String(idOrSlug)) || null;
+    },
+
+    /**
+     * Save / Update Journal Post in Sanity & LocalState
+     */
+    async saveJournalPost(postData) {
+      if (!Array.isArray(this._journalPosts)) this._journalPosts = [];
+      const docId = postData._sanityId || postData.id || `post-${Date.now()}`;
+      
+      const doc = {
+        _id: String(docId),
+        _type: 'journalPost',
+        id: String(postData.id || docId),
+        slug: postData.slug || postData.id || `post-${Date.now()}`,
+        topic: postData.topic || 'Քարահավաք',
+        date: postData.date || '2026',
+        location: postData.location || '',
+        readTime: postData.readTime || '5 րոպե',
+        title: postData.title || '',
+        titleEn: postData.titleEn || '',
+        lead: postData.lead || postData.excerpt || '',
+        excerpt: postData.lead || postData.excerpt || '',
+        heroImg: postData.heroImg || 'Images/stone-quarry.webp',
+        heroCaption: postData.heroCaption || '',
+        contentHtml: postData.contentHtml || '',
+        content: postData.content || postData.contentHtml || '',
+        blocks: postData.blocks || [],
+        featuredProduct: postData.featuredProduct || null,
+        faqs: postData.faqs || [],
+        featured: Boolean(postData.featured)
+      };
+
+      const existingIdx = this._journalPosts.findIndex(p => String(p.id) === String(doc.id) || String(p._sanityId) === String(doc._id));
+      if (existingIdx >= 0) {
+        this._journalPosts[existingIdx] = doc;
+      } else {
+        this._journalPosts.unshift(doc);
+      }
+
+      this.notifyJournalUpdate();
+
+      try {
+        await this.mutate([{ createOrReplace: doc }]);
+        return doc;
+      } catch (err) {
+        console.warn('Saved journal post locally. Sanity mutate warning:', err);
+        return doc;
+      }
+    },
+
+    /**
+     * Delete Journal Post
+     */
+    async deleteJournalPost(postId) {
+      if (!Array.isArray(this._journalPosts)) this._journalPosts = [];
+      const found = this._journalPosts.find(p => String(p.id) === String(postId) || String(p._sanityId) === String(postId));
+      const sanityId = found ? (found._sanityId || found.id) : postId;
+
+      this._journalPosts = this._journalPosts.filter(p => String(p.id) !== String(postId) && String(p._sanityId) !== String(postId));
+      this.notifyJournalUpdate();
+
+      try {
+        await this.mutate([{ delete: { id: String(sanityId) } }]);
+        return true;
+      } catch (err) {
+        console.warn('Deleted journal post locally. Sanity delete failed:', err);
+        return true;
+      }
     },
 
     /**

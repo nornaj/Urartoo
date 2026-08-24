@@ -104,15 +104,27 @@
     const params = new URLSearchParams(window.location.search);
     const articleId = params.get('id') || params.get('slug');
 
-    if (articleId && BLOG_ARTICLES[articleId]) {
-      currentArticle = BLOG_ARTICLES[articleId];
+    let allPosts = [];
+    if (window.NovaSanity && typeof window.NovaSanity.getJournalPosts === 'function') {
+      allPosts = window.NovaSanity.getJournalPosts();
+    }
+
+    if (articleId) {
+      const foundInSanity = allPosts.find(p => String(p.id) === String(articleId) || String(p.slug) === String(articleId) || String(p._sanityId) === String(articleId));
+      if (foundInSanity) {
+        currentArticle = foundInSanity;
+      } else if (BLOG_ARTICLES[articleId]) {
+        currentArticle = BLOG_ARTICLES[articleId];
+      }
+    } else if (allPosts.length > 0) {
+      currentArticle = allPosts.find(p => p.featured) || allPosts[0];
     }
 
     renderArticleMeta();
     renderArticleBody();
     renderTableOfContents();
     renderFeaturedProduct();
-    renderRelatedNotes();
+    renderRelatedNotes(allPosts);
     renderFaqAccordion();
 
     setupShareEvents();
@@ -135,7 +147,7 @@
     if (postLocation) postLocation.textContent = currentArticle.location;
     if (postReadTime) postReadTime.textContent = currentArticle.readTime;
     if (postTitle) postTitle.textContent = currentArticle.title;
-    if (postLead) postLead.textContent = currentArticle.lead;
+    if (postLead) postLead.textContent = currentArticle.lead || currentArticle.excerpt || '';
 
     if (currentArticle.heroImg && postHeroImg) {
       postHeroImg.src = currentArticle.heroImg;
@@ -147,32 +159,46 @@
     }
   }
 
-  // Render Body Content Blocks
+  // Render Body Content Blocks / Rich HTML
   function renderArticleBody() {
     const postBody = document.getElementById('post-body');
     if (!postBody) return;
 
     let html = '';
-    currentArticle.blocks.forEach(block => {
-      if (block.type === 'h2') {
-        html += `<div class="journal-post-block"><h2 id="${block.id}">${escapeHtml(block.text)}</h2></div>`;
-      } else if (block.type === 'p') {
-        html += `<div class="journal-post-block"><p>${escapeHtml(block.text)}</p></div>`;
-      } else if (block.type === 'blockquote') {
-        html += `<div class="journal-post-block"><blockquote><span>${escapeHtml(block.text)}</span></blockquote></div>`;
-      } else if (block.type === 'figure') {
-        html += `
-          <div class="journal-post-block">
-            <figure>
-              <div class="journal-post-figure-img">
-                ${block.img ? `<img src="${block.img}" alt="${escapeHtml(block.caption || '')}" loading="lazy">` : `<span class="journal-post-hero-placeholder">${escapeHtml(block.text || '')}</span>`}
-              </div>
-              ${block.caption ? `<figcaption class="journal-post-figure-caption">${escapeHtml(block.caption)}</figcaption>` : ''}
-            </figure>
-          </div>
-        `;
-      }
-    });
+
+    if (currentArticle.contentHtml) {
+      // Direct rich HTML from ACF editor: Parse and assign IDs to H2 headings
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = currentArticle.contentHtml;
+      const h2s = tempDiv.querySelectorAll('h2');
+      h2s.forEach((h, idx) => {
+        if (!h.id) h.id = `section-${idx + 1}`;
+      });
+      html = tempDiv.innerHTML;
+    } else if (Array.isArray(currentArticle.blocks) && currentArticle.blocks.length > 0) {
+      currentArticle.blocks.forEach(block => {
+        if (block.type === 'h2') {
+          html += `<div class="journal-post-block"><h2 id="${block.id}">${escapeHtml(block.text)}</h2></div>`;
+        } else if (block.type === 'p') {
+          html += `<div class="journal-post-block"><p>${escapeHtml(block.text)}</p></div>`;
+        } else if (block.type === 'blockquote') {
+          html += `<div class="journal-post-block"><blockquote><span>${escapeHtml(block.text)}</span></blockquote></div>`;
+        } else if (block.type === 'figure') {
+          html += `
+            <div class="journal-post-block">
+              <figure>
+                <div class="journal-post-figure-img">
+                  ${block.img ? `<img src="${block.img}" alt="${escapeHtml(block.caption || '')}" loading="lazy">` : `<span class="journal-post-hero-placeholder">${escapeHtml(block.text || '')}</span>`}
+                </div>
+                ${block.caption ? `<figcaption class="journal-post-figure-caption">${escapeHtml(block.caption)}</figcaption>` : ''}
+              </figure>
+            </div>
+          `;
+        }
+      });
+    } else if (currentArticle.content) {
+      html = `<div class="journal-post-block"><p>${escapeHtml(currentArticle.content)}</p></div>`;
+    }
 
     // Author Bench Box
     html += `
@@ -193,25 +219,44 @@
     const tocNav = document.getElementById('post-toc-nav');
     if (!tocNav) return;
 
-    const headings = currentArticle.blocks.filter(b => b.type === 'h2');
+    const headings = document.querySelectorAll('#post-body h2');
     let html = '';
     headings.forEach((h, idx) => {
       const activeClass = idx === 0 ? 'active' : '';
+      const text = h.textContent.trim();
+      const hId = h.id || `section-${idx + 1}`;
+      h.id = hId;
+
       html += `
-        <a href="#${h.id}" class="journal-toc-link ${activeClass}" data-toc-id="${h.id}">
+        <a href="#${hId}" class="journal-toc-link ${activeClass}" data-toc-id="${hId}">
           <span class="journal-toc-mark"></span>
-          <span>${escapeHtml(h.text)}</span>
+          <span>${escapeHtml(text)}</span>
         </a>
       `;
     });
+
+    if (!html) {
+      const sidebarBox = tocNav.closest('.journal-sidebar-box');
+      if (sidebarBox) sidebarBox.style.display = 'none';
+      return;
+    } else {
+      const sidebarBox = tocNav.closest('.journal-sidebar-box');
+      if (sidebarBox) sidebarBox.style.display = 'block';
+    }
 
     tocNav.innerHTML = html;
   }
 
   // Render Featured Product Card
   function renderFeaturedProduct() {
+    const featCard = document.getElementById('post-featured-card');
     const feat = currentArticle.featuredProduct;
-    if (!feat) return;
+    if (!feat || !feat.title) {
+      if (featCard) featCard.style.display = 'none';
+      return;
+    }
+
+    if (featCard) featCard.style.display = 'block';
 
     const postFeaturedTitle = document.getElementById('post-featured-title');
     const postFeaturedPrice = document.getElementById('post-featured-price');
@@ -221,16 +266,32 @@
     if (postFeaturedTitle) postFeaturedTitle.textContent = feat.title;
     if (postFeaturedPrice) postFeaturedPrice.textContent = feat.price;
     if (postFeaturedImg && feat.img) postFeaturedImg.src = feat.img;
-    if (postFeaturedLink && feat.link) postFeaturedLink.href = feat.link;
+    if (postFeaturedLink) postFeaturedLink.href = feat.link || 'shop.html';
   }
 
   // Render Related Notes Grid
-  function renderRelatedNotes() {
+  function renderRelatedNotes(allPosts = []) {
     const grid = document.getElementById('post-related-grid');
     if (!grid) return;
 
+    let relatedList = [];
+    if (Array.isArray(currentArticle.related) && currentArticle.related.length > 0) {
+      relatedList = currentArticle.related;
+    } else if (Array.isArray(allPosts) && allPosts.length > 1) {
+      // Pick other articles
+      relatedList = allPosts
+        .filter(p => String(p.id) !== String(currentArticle.id) && String(p.slug) !== String(currentArticle.slug))
+        .slice(0, 3)
+        .map(p => ({
+          id: p.slug || p.id,
+          meta: `${p.date || ''} · ${p.location || ''}`,
+          title: p.title,
+          shot: p.heroImg || 'Images/stone-quarry.webp'
+        }));
+    }
+
     let html = '';
-    currentArticle.related.forEach(rel => {
+    relatedList.forEach(rel => {
       html += `
         <a href="journal-post.html?id=${rel.id}" class="lead-note-card" style="text-decoration: none; display: block; cursor: pointer;">
           <div style="position: relative; overflow: hidden; aspect-ratio: 16/10; background: var(--warm-light);">

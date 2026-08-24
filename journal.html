@@ -252,37 +252,40 @@
   const countEl = document.getElementById('journal-count');
 
   function renderPosts() {
-    const rawPosts = (window.NovaSanity && window.NovaSanity._ready)
-      ? window.NovaSanity.getJournalPosts()
-      : [
-          { id: 1, topic: 'Քարահավաք', date: 'Սեպտեմբեր 2025', readTime: '6 րոպե', title: 'Երեք օր հրաբխի վրա՝ մեկ լավ ապակու կտորի համար', excerpt: 'Գուտանասարի օբսիդիանը կոտրվում է տասից ինն անգամ սխալ։ Ահա թե ինչ տեսք ունի տասներորդը։' },
-          { id: 2, topic: 'Գեմոլոգիա', date: 'Հուլիս 2025', readTime: '4 րոպե', title: 'Ինչու է գետի նռնաքարը հղկվում այլ կերպ, քան հանքինը', excerpt: 'Գետի ջուրը դարերի ընթացքում արդեն իսկ հղկել է քարի թույլ կողմերը։ Մեզ մնում է գտնել երակը։' },
-          { id: 3, topic: 'Աշխատանոց', date: 'Մայիս 2025', readTime: '5 րոպե', title: 'Անհամաչափ քարի տեղադրումը արծաթում', excerpt: 'Երբ քարը բնական ձև ունի, շրջանակը պետք է կրկնի նրա հետագիծը, ոչ թե ստիպի դառնալ երկրաչափական։' },
-          { id: 4, topic: 'Ստուդիա', date: 'Ապրիլ 2025', readTime: '3 րոպե', title: '925 արծաթի մշակումը և հնեցումը', excerpt: 'Ինչպես է օքսիդացումը ընդգծում հայկական քարերի խորությունն ու բնական փայլը։' },
-          { id: 5, topic: 'Քարահավաք', date: 'Մարտ 2025', readTime: '7 րոպե', title: 'Սյունիքի հին պղնձի հանքերի փիրուզը', excerpt: 'Գարնանը, երբ ձյունը հալվում է, Սյունիքի հին ակոսներում հայտնվում են կապույտ երակներ։' },
-          { id: 6, topic: 'Գեմոլոգիա', date: 'Փետրվար 2025', readTime: '5 րոպե', title: 'Արենիի հասպիսի երկաթյա շերտերը', excerpt: 'Կարմիր և դեղնավուն շերտերով հասպիսը Հայաստանի ամենատաք քարերից մեկն է։' }
-        ];
+    let rawPosts = [];
+    if (window.NovaSanity && typeof window.NovaSanity.getJournalPosts === 'function') {
+      rawPosts = window.NovaSanity.getJournalPosts();
+    }
+
+    if (!rawPosts || rawPosts.length === 0) {
+      try {
+        rawPosts = JSON.parse(localStorage.getItem('urartoo_journal_posts_v1')) || [];
+      } catch (e) {}
+    }
 
     let filtered = rawPosts.filter(p => currentTopic === 'all' || p.topic === currentTopic);
     if (countEl) countEl.textContent = 'Ցուցադրված է ' + filtered.length + ' նշում';
     if (gridEl) {
-      gridEl.innerHTML = filtered.map(p => `
-        <a href="journal-post.html?id=${p.slug || p.id || 'gutanasar-obsidian'}" class="note-card">
-          <div class="note-img">
-            <div class="note-img-inner">
-              ${p.image ? `<img src="${p.image}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover;">` : `
-              <span class="placeholder-text" style="font-family:var(--mono);font-size:9.5px;line-height:1.8;color:rgba(12,14,13,0.3);max-width:180px;text-align:center;">
-                ${p.topic} · ${p.date}
-              </span>`}
+      gridEl.innerHTML = filtered.map(p => {
+        const imgUrl = p.heroImg || p.image || '';
+        return `
+          <a href="journal-post.html?id=${p.slug || p.id}" class="note-card" style="text-decoration:none; color:inherit; display:block;">
+            <div class="note-img" style="aspect-ratio:16/10; overflow:hidden; background:var(--warm-light);">
+              <div class="note-img-inner" style="width:100%; height:100%;">
+                ${imgUrl ? `<img src="${imgUrl}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover; transition:transform 0.4s ease;" class="journal-card-img">` : `
+                <span class="placeholder-text" style="font-family:var(--mono);font-size:9.5px;line-height:1.8;color:rgba(12,14,13,0.3);max-width:180px;text-align:center; display:flex; align-items:center; justify-content:center; height:100%;">
+                  ${p.topic} · ${p.date}
+                </span>`}
+              </div>
             </div>
-          </div>
-          <div class="note-meta">
-            <span style="color:var(--patina);font-weight:500;">${p.topic}</span> · ${p.date} · ${p.readTime || p.read || ''}
-          </div>
-          <div class="note-title">${p.title}</div>
-          <p style="font-size:14px;line-height:1.65;color:var(--graphite);margin:8px 0 0;">${p.excerpt || ''}</p>
-        </a>
-      `).join('');
+            <div class="note-meta" style="margin-top:12px; font-size:12px; color:var(--tuff);">
+              <span style="color:var(--amber);font-weight:600;">${p.topic || 'Քարահավաք'}</span> · ${p.date || ''} · ${p.readTime || ''}
+            </div>
+            <div class="note-title" style="font-family:var(--font-serif, Cormorant, serif); font-size:20px; font-weight:500; margin-top:6px; color:var(--obsidian); line-height:1.3;">${p.title}</div>
+            <p style="font-size:14px;line-height:1.65;color:var(--graphite);margin:8px 0 0;">${p.lead || p.excerpt || ''}</p>
+          </a>
+        `;
+      }).join('');
     }
   }
 
@@ -304,6 +307,8 @@
       this.disabled = true;
     }
   });
+
+  window.addEventListener('urartoo:journal-updated', () => renderPosts());
 
   if (window.NovaSanity) {
     window.NovaSanity.init().then(() => renderPosts());

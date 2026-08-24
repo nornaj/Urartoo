@@ -52,7 +52,7 @@
   }
 
   window.switchAdminTab = function (tabName) {
-    const validTabs = ['orders', 'products', 'clients'];
+    const validTabs = ['orders', 'products', 'clients', 'journal'];
     const activeTab = validTabs.includes(tabName) ? tabName : 'orders';
 
     validTabs.forEach(t => {
@@ -89,6 +89,7 @@
       window.WooCommerceAdmin.activeTab = activeTab;
       if (activeTab === 'products') window.WooCommerceAdmin.renderProductsSec();
       else if (activeTab === 'clients') window.WooCommerceAdmin.renderClientsSec();
+      else if (activeTab === 'journal') window.WooCommerceAdmin.renderJournalSec();
       else if (activeTab === 'settings') window.WooCommerceAdmin.renderSettingsSec();
       else window.WooCommerceAdmin.renderOrdersSec();
     }
@@ -123,6 +124,10 @@
       const initHash = (window.location.hash || '').replace('#', '').replace('/', '').trim().toLowerCase();
       if (initHash === 'products' || initHash === 'inventory') {
         this.activeTab = 'products';
+      } else if (initHash === 'journal' || initHash === 'blog') {
+        this.activeTab = 'journal';
+      } else if (initHash === 'clients') {
+        this.activeTab = 'clients';
       } else {
         this.activeTab = 'orders';
       }
@@ -139,7 +144,7 @@
       const adminView = document.getElementById('view-admin');
       if (!adminView) return;
 
-      const isAdminRoute = rawHash.includes('admin') || hash === 'products' || hash === 'orders' || path.endsWith('/admin') || path.endsWith('/admin.html') || path.includes('admin');
+      const isAdminRoute = rawHash.includes('admin') || hash === 'products' || hash === 'orders' || hash === 'clients' || hash === 'journal' || hash === 'blog' || path.endsWith('/admin') || path.endsWith('/admin.html') || path.includes('admin');
 
       if (isAdminRoute) {
         const session = this.getCurrentSession();
@@ -158,6 +163,10 @@
 
         if (hash === 'products' || hash === 'inventory') {
           this.activeTab = 'products';
+        } else if (hash === 'journal' || hash === 'blog') {
+          this.activeTab = 'journal';
+        } else if (hash === 'clients') {
+          this.activeTab = 'clients';
         } else if (hash === 'orders') {
           this.activeTab = 'orders';
         }
@@ -1530,6 +1539,645 @@
       this.showToast('Խանութի կարգավորումները պահպանվեցին։', 'success', 3500);
     },
 
+    /* ===================================================================
+       TAB 4: JOURNAL / BLOG POSTS MANAGER & ACF/SCF EDITOR
+       =================================================================== */
+    currentEditingBlogId: null,
+    currentBlogFaqs: [],
+
+    /**
+     * WebP Compression Engine: Converts File / Blob / Image to WebP format,
+     * targeting >= 90% quality and strictly capping file size < 200 KB (204,800 bytes).
+     */
+    async compressToWebP(fileOrImg, initialQuality = 0.90, maxSizeBytes = 204800) {
+      let imgSource = fileOrImg;
+      if (fileOrImg instanceof Blob || fileOrImg instanceof File) {
+        imgSource = await new Promise((resolve, reject) => {
+          const img = new Image();
+          const objUrl = URL.createObjectURL(fileOrImg);
+          img.onload = () => resolve(img);
+          img.onerror = (e) => reject(e);
+          img.src = objUrl;
+        });
+      }
+
+      return new Promise((resolve, reject) => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = imgSource.naturalWidth || imgSource.width || 1200;
+        let height = imgSource.naturalHeight || imgSource.height || 1200;
+
+        const MAX_DIM = 1600;
+        if (width > MAX_DIM || height > MAX_DIM) {
+          if (width > height) {
+            height = Math.round((height * MAX_DIM) / width);
+            width = MAX_DIM;
+          } else {
+            width = Math.round((width * MAX_DIM) / height);
+            height = MAX_DIM;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(imgSource, 0, 0, width, height);
+
+        let quality = initialQuality;
+        const attemptCompress = () => {
+          canvas.toBlob((blob) => {
+            if (!blob) {
+              reject(new Error('Canvas toBlob failed'));
+              return;
+            }
+            if (blob.size <= maxSizeBytes || quality <= 0.5) {
+              console.log(`[Urartoo Media] WebP Auto-Compressed: ${(blob.size / 1024).toFixed(1)} KB, Quality=${(quality * 100).toFixed(0)}%`);
+              resolve(blob);
+            } else {
+              quality -= 0.08;
+              attemptCompress();
+            }
+          }, 'image/webp', quality);
+        };
+        attemptCompress();
+      });
+    },
+
+    async renderJournalSec() {
+      const tbody = document.getElementById('admin-journal-tbody');
+      const mobileCards = document.getElementById('admin-journal-mobile-cards');
+      if (!tbody && !mobileCards) return;
+
+      let posts = [];
+      if (window.NovaSanity) {
+        posts = window.NovaSanity.getJournalPosts();
+        if (!window.NovaSanity._ready) {
+          await window.NovaSanity.init();
+          posts = window.NovaSanity.getJournalPosts();
+        }
+      }
+
+      this.populateJournalHTML(posts || []);
+    },
+
+    populateJournalHTML(posts) {
+      const tbody = document.getElementById('admin-journal-tbody');
+      const mobileCards = document.getElementById('admin-journal-mobile-cards');
+      const countVal = document.getElementById('admin-journal-count-val');
+      const featVal = document.getElementById('admin-journal-featured-val');
+      const topicsVal = document.getElementById('admin-journal-topics-val');
+
+      const searchVal = document.getElementById('admin-journal-search')?.value.toLowerCase().trim() || '';
+      const topicVal = document.getElementById('admin-journal-filter-topic')?.value || 'all';
+
+      // Summary Stats
+      if (countVal) countVal.textContent = posts.length;
+      const featuredPost = posts.find(p => p.featured);
+      if (featVal) featVal.textContent = featuredPost ? featuredPost.title : 'Ընտրված չէ';
+      const uniqueTopics = new Set(posts.map(p => p.topic).filter(Boolean));
+      if (topicsVal) topicsVal.textContent = uniqueTopics.size || 4;
+
+      let filtered = posts.filter(p => {
+        const titleMatch = (p.title && p.title.toLowerCase().includes(searchVal)) ||
+                           (p.location && p.location.toLowerCase().includes(searchVal)) ||
+                           (p.slug && p.slug.toLowerCase().includes(searchVal));
+        const topicMatch = topicVal === 'all' || p.topic === topicVal;
+        return titleMatch && topicMatch;
+      });
+
+      if (filtered.length === 0) {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:36px 16px;color:var(--tuff);">Նշումներ չեն գտնվել</td></tr>';
+        if (mobileCards) mobileCards.innerHTML = '<div style="text-align:center;padding:32px;color:var(--tuff);">Նշումներ չեն գտնվել</div>';
+        return;
+      }
+
+      if (tbody) {
+        tbody.innerHTML = filtered.map(p => {
+          const pId = p.id || p._sanityId || p.slug;
+          const heroImg = p.heroImg || 'Images/stone-quarry.webp';
+          const isFeat = Boolean(p.featured);
+
+          return `
+            <tr>
+              <td>
+                <div style="width:52px; height:42px; background:#FAF8F5; border-radius:4px; overflow:hidden; display:flex; align-items:center; justify-content:center; border:1px solid #EAE8E2;">
+                  <img src="${heroImg}" style="width:100%; height:100%; object-fit:cover;" alt="">
+                </div>
+              </td>
+              <td>
+                <strong style="color:var(--obsidian); font-size:14px;">${p.title || 'Անվերնագիր'}</strong>
+                <div style="font-size:12px; color:var(--tuff); max-width:380px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px;">
+                  ${p.lead || p.excerpt || ''}
+                </div>
+                <small style="color:#888; font-family:var(--mono); font-size:11px;">slug: ${p.slug || pId}</small>
+              </td>
+              <td>
+                <span style="display:inline-block; padding:3px 10px; font-size:11.5px; font-weight:600; border-radius:12px; background:#F4F3EF; color:var(--obsidian); border:1px solid #E2E0D8;">
+                  ${p.topic || 'Քարահավաք'}
+                </span>
+              </td>
+              <td style="font-size:13px; color:#555;">${p.date || '-'}</td>
+              <td style="font-size:13px; color:#555;">${p.location || '-'}</td>
+              <td style="text-align:center;">
+                <span class="journal-featured-star ${isFeat ? 'active' : ''}" onclick="window.WooCommerceAdmin.toggleJournalFeatured('${pId}')" title="${isFeat ? 'Գլխավոր նշում է (Սեղմեք անջատելու համար)' : 'Դարձնել գլխավոր նշում'}">
+                  ${isFeat ? '★' : '☆'}
+                </span>
+              </td>
+              <td style="text-align:right;">
+                <div style="display:inline-flex; align-items:center; gap:6px;">
+                  <button type="button" class="filter-clear-btn" style="padding:5px 10px; font-size:11.5px;" onclick="window.WooCommerceAdmin.openBlogEditor('${pId}')" title="Խմբագրել ACF դաշտերը">✏️ Խմբագրել</button>
+                  <a href="journal-post.html?id=${p.slug || pId}" target="_blank" class="filter-clear-btn" style="padding:5px 8px; font-size:11.5px; text-decoration:none; display:inline-flex; align-items:center;" title="Դիտել կայքում">👁</a>
+                  <button type="button" class="filter-clear-btn" style="color:#C5221F; border-color:#E8C4C4; padding:5px 8px; font-size:11.5px;" onclick="window.WooCommerceAdmin.deleteJournalPost('${pId}')" title="Ջնջել նշումը">🗑</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      if (mobileCards) {
+        mobileCards.innerHTML = filtered.map(p => {
+          const pId = p.id || p._sanityId || p.slug;
+          const heroImg = p.heroImg || 'Images/stone-quarry.webp';
+          const isFeat = Boolean(p.featured);
+
+          return `
+            <div class="admin-prod-mobile-card">
+              <div class="admin-prod-mobile-header">
+                <img src="${heroImg}" class="admin-prod-mobile-img" alt="${p.title}">
+                <div class="admin-prod-mobile-meta">
+                  <div class="admin-prod-mobile-title">${p.title}</div>
+                  <div style="font-size:12px; color:var(--tuff); margin-top:2px;">${p.date || ''} • ${p.location || ''}</div>
+                  <div class="admin-prod-mobile-badges" style="margin-top:4px;">
+                    <span style="font-size:11px; background:#F4F3EF; padding:2px 8px; border-radius:2px; color:var(--tuff);">${p.topic || 'Քարահավաք'}</span>
+                    ${isFeat ? '<span style="font-size:10.5px; background:var(--gold); color:var(--green); font-weight:700; padding:2px 6px; border-radius:2px;">★ ԳԼԽԱՎՈՐ</span>' : ''}
+                  </div>
+                </div>
+              </div>
+              <div class="admin-prod-mobile-actions" style="margin-top:10px;">
+                <button class="filter-clear-btn" onclick="window.WooCommerceAdmin.openBlogEditor('${pId}')">✏️ Խմբագրել</button>
+                <a href="journal-post.html?id=${p.slug || pId}" target="_blank" class="filter-clear-btn" style="text-decoration:none;">👁 Դիտել</a>
+                <button class="filter-clear-btn" style="color:red; border-color:red;" onclick="window.WooCommerceAdmin.deleteJournalPost('${pId}')">🗑 Ջնջել</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      if (window.initCustomSelects) {
+        setTimeout(() => window.initCustomSelects(), 50);
+      }
+    },
+
+    async toggleJournalFeatured(postId) {
+      if (!window.NovaSanity) return;
+      const posts = window.NovaSanity.getJournalPosts();
+      const target = posts.find(p => String(p.id) === String(postId) || String(p._sanityId) === String(postId) || String(p.slug) === String(postId));
+      if (!target) return;
+
+      const newFeat = !target.featured;
+      // If turning ON, unset other featured posts so there is 1 main lead
+      if (newFeat) {
+        posts.forEach(p => { p.featured = false; });
+      }
+      target.featured = newFeat;
+      await window.NovaSanity.saveJournalPost(target);
+      this.renderJournalSec();
+    },
+
+    populateBlogProductDropdown(selectedTitle) {
+      const select = document.getElementById('be-featprod-select');
+      if (!select) return;
+
+      let products = [];
+      if (window.NovaSanity) products = window.NovaSanity.getProducts();
+
+      let html = '<option value="">-- Չկցել ապրանք --</option>';
+      products.forEach(p => {
+        const isSel = (selectedTitle && (p.name === selectedTitle || (p.name && selectedTitle.includes(p.name))));
+        html += `<option value="${p.id || p._sanityId}" ${isSel ? 'selected' : ''} data-name="${p.name}" data-price="${p.price}" data-img="${p.img || p.image || ''}">${p.name} ($${p.price})</option>`;
+      });
+      select.innerHTML = html;
+    },
+
+    handleBlogFeaturedProductSelect(prodId) {
+      if (!prodId) return;
+      const select = document.getElementById('be-featprod-select');
+      const opt = select ? select.options[select.selectedIndex] : null;
+      if (!opt) return;
+
+      const name = opt.dataset.name || opt.textContent;
+      const price = opt.dataset.price || '265';
+      const img = opt.dataset.img || 'Images/ring.webp';
+
+      const titleInput = document.getElementById('be-featprod-title');
+      const priceInput = document.getElementById('be-featprod-price');
+      const badgeInput = document.getElementById('be-featprod-badge');
+      const imgInput = document.getElementById('be-featprod-img');
+
+      if (titleInput) titleInput.value = name;
+      if (priceInput) priceInput.value = '$' + price.replace('$', '');
+      if (badgeInput && !badgeInput.value) badgeInput.value = 'Եզակի (1 of 1)';
+      if (imgInput) imgInput.value = img;
+    },
+
+    async openBlogEditor(postId) {
+      const modal = document.getElementById('blog-editor-modal');
+      if (!modal) return;
+
+      this.currentEditingBlogId = postId;
+      this.currentBlogFaqs = [];
+
+      const modalTitle = document.getElementById('blog-modal-title');
+      const previewBtn = document.getElementById('btn-blog-preview');
+
+      // Populate products dropdown
+      this.populateBlogProductDropdown();
+
+      if (postId) {
+        if (modalTitle) modalTitle.textContent = '📝 Խմբագրել Դաշտային Նշումը (ACF Editor)';
+
+        let post = null;
+        if (window.NovaSanity) post = window.NovaSanity.getJournalPostById(postId);
+
+        if (post) {
+          if (document.getElementById('be-title')) document.getElementById('be-title').value = post.title || '';
+          if (document.getElementById('be-date')) document.getElementById('be-date').value = post.date || '';
+          if (document.getElementById('be-location')) document.getElementById('be-location').value = post.location || '';
+          if (document.getElementById('be-readtime')) document.getElementById('be-readtime').value = post.readTime || '';
+          if (document.getElementById('be-slug')) document.getElementById('be-slug').value = post.slug || post.id || '';
+          if (document.getElementById('be-lead')) document.getElementById('be-lead').value = post.lead || post.excerpt || '';
+          if (document.getElementById('be-topic')) document.getElementById('be-topic').value = post.topic || 'Քարահավաք';
+          if (document.getElementById('be-featured')) document.getElementById('be-featured').checked = Boolean(post.featured);
+
+          // Hero image
+          const heroUrl = post.heroImg || '';
+          this.updateBlogThumbnailFromUrl(heroUrl);
+          if (document.getElementById('be-hero-caption')) document.getElementById('be-hero-caption').value = post.heroCaption || '';
+
+          // Content
+          const contentHtml = post.contentHtml || post.content || '';
+          const visualEl = document.getElementById('be-content-visual');
+          const textEl = document.getElementById('be-content-text');
+          if (visualEl) visualEl.innerHTML = contentHtml;
+          if (textEl) textEl.value = contentHtml;
+
+          // FAQs
+          this.currentBlogFaqs = Array.isArray(post.faqs) ? JSON.parse(JSON.stringify(post.faqs)) : [];
+
+          // Featured Product
+          if (post.featuredProduct) {
+            if (document.getElementById('be-featprod-title')) document.getElementById('be-featprod-title').value = post.featuredProduct.title || '';
+            if (document.getElementById('be-featprod-price')) document.getElementById('be-featprod-price').value = post.featuredProduct.price || '';
+            if (document.getElementById('be-featprod-badge')) document.getElementById('be-featprod-badge').value = post.featuredProduct.badge || 'Եզակի (1 of 1)';
+            if (document.getElementById('be-featprod-img')) document.getElementById('be-featprod-img').value = post.featuredProduct.img || '';
+            this.populateBlogProductDropdown(post.featuredProduct.title);
+          }
+
+          if (previewBtn) previewBtn.href = `journal-post.html?id=${post.slug || post.id}`;
+        }
+      } else {
+        // New post
+        if (modalTitle) modalTitle.textContent = '📝 Ավելացնել Նոր Նշում (ACF Editor)';
+
+        if (document.getElementById('be-title')) document.getElementById('be-title').value = '';
+        if (document.getElementById('be-date')) {
+          const now = new Date();
+          const months = ['Հունվար', 'Փետրվար', 'Մարտ', 'Ապրիլ', 'Մայիս', 'Հունիս', 'Հուլիս', 'Օգոստոս', 'Սեպտեմբեր', 'Հոկտեմբեր', 'Նոյեմբեր', 'Դեկտեմբեր'];
+          document.getElementById('be-date').value = `${months[now.getMonth()]} ${now.getFullYear()}`;
+        }
+        if (document.getElementById('be-location')) document.getElementById('be-location').value = 'Հայաստան';
+        if (document.getElementById('be-readtime')) document.getElementById('be-readtime').value = '5 րոպե';
+        if (document.getElementById('be-slug')) document.getElementById('be-slug').value = '';
+        if (document.getElementById('be-lead')) document.getElementById('be-lead').value = '';
+        if (document.getElementById('be-topic')) document.getElementById('be-topic').value = 'Քարահավաք';
+        if (document.getElementById('be-featured')) document.getElementById('be-featured').checked = false;
+
+        this.updateBlogThumbnailFromUrl('');
+        if (document.getElementById('be-hero-caption')) document.getElementById('be-hero-caption').value = '';
+
+        const visualEl = document.getElementById('be-content-visual');
+        const textEl = document.getElementById('be-content-text');
+        if (visualEl) visualEl.innerHTML = '<p>Գրեք Ձեր դաշտային նշումը այստեղ...</p>';
+        if (textEl) textEl.value = '<p>Գրեք Ձեր դաշտային նշումը այստեղ...</p>';
+
+        this.currentBlogFaqs = [];
+
+        if (document.getElementById('be-featprod-title')) document.getElementById('be-featprod-title').value = '';
+        if (document.getElementById('be-featprod-price')) document.getElementById('be-featprod-price').value = '';
+        if (document.getElementById('be-featprod-badge')) document.getElementById('be-featprod-badge').value = 'Եզակի (1 of 1)';
+        if (document.getElementById('be-featprod-img')) document.getElementById('be-featprod-img').value = '';
+
+        if (previewBtn) previewBtn.href = 'journal-post.html';
+      }
+
+      this.renderBlogFaqs();
+      this.switchBlogEditorMode('visual');
+
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+
+      if (window.initCustomSelects) {
+        setTimeout(() => window.initCustomSelects(), 50);
+      }
+    },
+
+    closeBlogEditor() {
+      const modal = document.getElementById('blog-editor-modal');
+      if (modal) modal.style.display = 'none';
+      document.body.style.overflow = '';
+      this.currentEditingBlogId = null;
+    },
+
+    updateBlogThumbnailFromUrl(url) {
+      const img = document.getElementById('be-hero-preview');
+      const placeholder = document.getElementById('be-hero-placeholder');
+      const input = document.getElementById('be-hero-url');
+
+      if (input && input.value !== url) input.value = url;
+
+      if (url && img && placeholder) {
+        img.src = url;
+        img.style.display = 'block';
+        placeholder.style.display = 'none';
+      } else if (img && placeholder) {
+        img.src = '';
+        img.style.display = 'none';
+        placeholder.style.display = 'block';
+      }
+    },
+
+    clearBlogThumbnail() {
+      this.updateBlogThumbnailFromUrl('');
+    },
+
+    async handleBlogThumbnailUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      try {
+        console.log('[Urartoo] Compressing blog thumbnail to WebP < 200KB...');
+        const webpBlob = await this.compressToWebP(file);
+        
+        let cdnUrl = '';
+        if (window.NovaSanity && typeof window.NovaSanity.uploadImage === 'function') {
+          cdnUrl = await window.NovaSanity.uploadImage(webpBlob);
+        } else {
+          cdnUrl = URL.createObjectURL(webpBlob);
+        }
+
+        this.updateBlogThumbnailFromUrl(cdnUrl);
+        event.target.value = '';
+      } catch (err) {
+        console.error('Error uploading blog thumbnail:', err);
+        alert('Նկարի վերբեռնումը ձախողվեց։ Խնդրում ենք կրկին փորձել։');
+      }
+    },
+
+    async handleBlogAddMedia(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      try {
+        console.log('[Urartoo] Compressing in-content media to WebP < 200KB...');
+        const webpBlob = await this.compressToWebP(file);
+
+        let cdnUrl = '';
+        if (window.NovaSanity && typeof window.NovaSanity.uploadImage === 'function') {
+          cdnUrl = await window.NovaSanity.uploadImage(webpBlob);
+        } else {
+          cdnUrl = URL.createObjectURL(webpBlob);
+        }
+
+        const caption = prompt('Մուտքագրեք լուսանկարի նկարագրությունը (Caption, ոչ պարտադիր):', '') || '';
+
+        const figureHtml = `
+          <figure>
+            <img src="${cdnUrl}" alt="${caption}">
+            ${caption ? `<figcaption>${caption}</figcaption>` : ''}
+          </figure>
+          <p><br></p>
+        `;
+
+        const visualEl = document.getElementById('be-content-visual');
+        if (visualEl) {
+          visualEl.focus();
+          document.execCommand('insertHTML', false, figureHtml);
+          this.syncBlogVisualToText();
+        }
+
+        event.target.value = '';
+      } catch (err) {
+        console.error('Error adding in-content media:', err);
+        alert('Նկարի ավելացումը ձախողվեց։');
+      }
+    },
+
+    switchBlogEditorMode(mode) {
+      const visualTab = document.getElementById('btn-editor-mode-visual');
+      const textTab = document.getElementById('btn-editor-mode-text');
+      const visualEl = document.getElementById('be-content-visual');
+      const textEl = document.getElementById('be-content-text');
+      const toolbar = document.getElementById('scf-editor-toolbar');
+
+      if (mode === 'visual') {
+        if (visualTab) visualTab.classList.add('active');
+        if (textTab) textTab.classList.remove('active');
+        if (toolbar) toolbar.style.display = 'flex';
+
+        if (textEl && visualEl) {
+          visualEl.innerHTML = textEl.value;
+          visualEl.style.display = 'block';
+          textEl.style.display = 'none';
+        }
+      } else {
+        if (textTab) textTab.classList.add('active');
+        if (visualTab) visualTab.classList.remove('active');
+        if (toolbar) toolbar.style.display = 'none';
+
+        if (visualEl && textEl) {
+          textEl.value = visualEl.innerHTML;
+          textEl.style.display = 'block';
+          visualEl.style.display = 'none';
+        }
+      }
+    },
+
+    execBlogCommand(cmd, val = null) {
+      const visualEl = document.getElementById('be-content-visual');
+      if (!visualEl) return;
+      visualEl.focus();
+      document.execCommand(cmd, false, val);
+      this.syncBlogVisualToText();
+    },
+
+    execBlogFormat(tag) {
+      const visualEl = document.getElementById('be-content-visual');
+      if (!visualEl) return;
+      visualEl.focus();
+      document.execCommand('formatBlock', false, `<${tag}>`);
+      this.syncBlogVisualToText();
+    },
+
+    execBlogBlockquote() {
+      const visualEl = document.getElementById('be-content-visual');
+      if (!visualEl) return;
+      visualEl.focus();
+      const selection = window.getSelection();
+      const selectedText = selection.toString() || 'Մեջբերում...';
+      const quoteHtml = `<blockquote><span>${selectedText}</span></blockquote><p><br></p>`;
+      document.execCommand('insertHTML', false, quoteHtml);
+      this.syncBlogVisualToText();
+    },
+
+    execBlogLink() {
+      const url = prompt('Մուտքագրեք հղման URL-ը (e.g. https://... կամ shop.html):', 'https://');
+      if (url) {
+        this.execBlogCommand('createLink', url);
+      }
+    },
+
+    syncBlogVisualToText() {
+      const visualEl = document.getElementById('be-content-visual');
+      const textEl = document.getElementById('be-content-text');
+      if (visualEl && textEl) {
+        textEl.value = visualEl.innerHTML;
+      }
+    },
+
+    syncBlogTextToVisual() {
+      const visualEl = document.getElementById('be-content-visual');
+      const textEl = document.getElementById('be-content-text');
+      if (visualEl && textEl) {
+        visualEl.innerHTML = textEl.value;
+      }
+    },
+
+    addBlogFaqRow(q = '', a = '') {
+      this.currentBlogFaqs.push({ q, a });
+      this.renderBlogFaqs();
+    },
+
+    removeBlogFaqRow(idx) {
+      if (idx >= 0 && idx < this.currentBlogFaqs.length) {
+        this.currentBlogFaqs.splice(idx, 1);
+        this.renderBlogFaqs();
+      }
+    },
+
+    renderBlogFaqs() {
+      const container = document.getElementById('be-faqs-container');
+      if (!container) return;
+
+      if (this.currentBlogFaqs.length === 0) {
+        container.innerHTML = '<div style="font-size:12.5px; color:var(--tuff); text-align:center; padding:12px; margin-bottom:10px;">Հարցեր չկան։ Սեղմեք «+ Ավելացնել Նոր Հարց»։</div>';
+        return;
+      }
+
+      container.innerHTML = this.currentBlogFaqs.map((faq, idx) => `
+        <div class="scf-faq-item">
+          <button type="button" class="scf-faq-remove-btn" onclick="window.WooCommerceAdmin.removeBlogFaqRow(${idx})" title="Ջնջել հարցը">✕</button>
+          <div class="admin-form-group" style="margin-bottom:8px;">
+            <label style="font-size:11.5px; font-weight:600; color:#333; display:block; margin-bottom:4px;">Հարց #${idx + 1}</label>
+            <input type="text" class="admin-input" value="${(faq.q || '').replace(/"/g, '&quot;')}" oninput="window.WooCommerceAdmin.currentBlogFaqs[${idx}].q = this.value;" placeholder="օր․ Կարո՞ղ եմ խնդրել քար որոշակի վայրից։">
+          </div>
+          <div class="admin-form-group" style="margin-bottom:0;">
+            <label style="font-size:11.5px; font-weight:600; color:#333; display:block; margin-bottom:4px;">Պատասխան</label>
+            <textarea class="admin-input" rows="2" oninput="window.WooCommerceAdmin.currentBlogFaqs[${idx}].a = this.value;" placeholder="Մանրամասն պատասխան...">${faq.a || ''}</textarea>
+          </div>
+        </div>
+      `).join('');
+    },
+
+    async saveBlogFromEditor() {
+      const titleInput = document.getElementById('be-title');
+      if (!titleInput || !titleInput.value.trim()) {
+        alert('Խնդրում ենք մուտքագրել հոդվածի վերնագիրը։');
+        return;
+      }
+
+      const title = titleInput.value.trim();
+      const date = document.getElementById('be-date')?.value.trim() || '2026';
+      const location = document.getElementById('be-location')?.value.trim() || 'Հայաստան';
+      const readTime = document.getElementById('be-readtime')?.value.trim() || '5 րոպե';
+      let slug = document.getElementById('be-slug')?.value.trim();
+      if (!slug) {
+        slug = this.currentEditingBlogId || ('post-' + Date.now());
+      }
+      const lead = document.getElementById('be-lead')?.value.trim() || '';
+      const topic = document.getElementById('be-topic')?.value || 'Քարահավաք';
+      const featured = Boolean(document.getElementById('be-featured')?.checked);
+
+      const heroImg = document.getElementById('be-hero-url')?.value.trim() || 'Images/stone-quarry.webp';
+      const heroCaption = document.getElementById('be-hero-caption')?.value.trim() || '';
+
+      const visualEl = document.getElementById('be-content-visual');
+      const textEl = document.getElementById('be-content-text');
+      const contentHtml = (textEl && textEl.style.display !== 'none') ? textEl.value : (visualEl ? visualEl.innerHTML : '');
+
+      // Featured product
+      const featTitle = document.getElementById('be-featprod-title')?.value.trim();
+      let featuredProduct = null;
+      if (featTitle) {
+        featuredProduct = {
+          title: featTitle,
+          price: document.getElementById('be-featprod-price')?.value.trim() || '$265',
+          badge: document.getElementById('be-featprod-badge')?.value.trim() || 'Եզակի (1 of 1)',
+          img: document.getElementById('be-featprod-img')?.value.trim() || 'Images/ring.webp',
+          link: 'shop.html'
+        };
+      }
+
+      // FAQs
+      const faqs = (this.currentBlogFaqs || []).filter(f => f.q && f.q.trim());
+
+      const postData = {
+        id: this.currentEditingBlogId || slug,
+        slug: slug,
+        title: title,
+        date: date,
+        location: location,
+        readTime: readTime,
+        lead: lead,
+        excerpt: lead,
+        topic: topic,
+        featured: featured,
+        heroImg: heroImg,
+        heroCaption: heroCaption,
+        contentHtml: contentHtml,
+        content: contentHtml,
+        featuredProduct: featuredProduct,
+        faqs: faqs
+      };
+
+      if (window.NovaSanity) {
+        await window.NovaSanity.saveJournalPost(postData);
+      }
+
+      this.closeBlogEditor();
+      this.renderJournalSec();
+
+      if (typeof window.showToastNotification === 'function') {
+        window.showToastNotification(`✓ «${title}» նշումը հաջողությամբ պահպանվեց։`, 'success', 3500);
+      } else {
+        console.log(`[Urartoo] Saved post: «${title}»`);
+      }
+    },
+
+    async deleteJournalPost(postId) {
+      if (!confirm('Վստա՞հ եք, որ ցանկանում եք ջնջել այս նշումը։')) return;
+
+      if (window.NovaSanity) {
+        await window.NovaSanity.deleteJournalPost(postId);
+      }
+
+      this.renderJournalSec();
+
+      if (typeof window.showToastNotification === 'function') {
+        window.showToastNotification('✓ Նշումը ջնջվեց։', 'success', 3500);
+      }
+    },
+
     handleAdminFormSubmit(e) {
       if (e && e.preventDefault) e.preventDefault();
       const emailEl = document.getElementById('admin-email-input');
@@ -1665,6 +2313,12 @@
   window.addEventListener('urartoo:users-updated', () => {
     if (window.WooCommerceAdmin && typeof window.WooCommerceAdmin.renderClientsSec === 'function') {
       window.WooCommerceAdmin.renderClientsSec();
+    }
+  });
+
+  window.addEventListener('urartoo:journal-updated', () => {
+    if (window.WooCommerceAdmin && typeof window.WooCommerceAdmin.renderJournalSec === 'function') {
+      window.WooCommerceAdmin.renderJournalSec();
     }
   });
 

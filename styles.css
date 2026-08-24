@@ -5031,3 +5031,354 @@ select, .admin-card select, .admin-input-group select {
   text-transform: uppercase;
   margin-left: 6px;
 }
+
+/* ===================================================================
+   ACF / SCF BLOG POST EDITOR & JOURNAL ADMIN SECTION
+   =================================================================== */
+
+/* Meta Box Container (WordPress / ACF Reference Style) */
+.scf-metabox {
+  background: #FFFFFF;
+  border: 1px solid #E2E0D8;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease;
+}
+
+.scf-metabox:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+
+.scf-metabox-header {
+  padding: 14px 20px;
+  background: #FAFAFA;
+  border-bottom: 1px solid #EAE8E2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.scf-metabox-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #2C3338;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.scf-metabox-toggle-icon {
+  font-size: 12px;
+  color: #787C82;
+  transition: transform 0.2s ease;
+}
+
+.scf-metabox.collapsed .scf-metabox-toggle-icon {
+  transform: rotate(-90deg);
+}
+
+.scf-metabox.collapsed .scf-metabox-body {
+  display: none;
+}
+
+.scf-metabox-body {
+  padding: 20px;
+}
+
+/* Thumbnail Box (Reference Image Top Section) */
+.scf-thumbnail-wrapper {
+  width: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+  background: #F0F2F4;
+  border: 1px solid #DCDCDE;
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scf-thumbnail-img {
+  width: 100%;
+  max-height: 380px;
+  object-fit: cover;
+  display: block;
+}
+
+.scf-thumbnail-overlay {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.scf-thumb-action-btn {
+  background: none;
+  border: none;
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.scf-thumb-action-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Rich Content Editor Frame (Reference Image Description Box) */
+.scf-editor-box {
+  border: 1px solid #DCDCDE;
+  border-radius: 6px;
+  background: #FFFFFF;
+  overflow: hidden;
+}
+
+.scf-editor-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #F6F7F7;
+  border-bottom: 1px solid #DCDCDE;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.scf-add-media-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2271B1;
+  background: #FFFFFF;
+  border: 1px solid #2271B1;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.scf-add-media-btn:hover {
+  background: #F0F6FC;
+}
+
+.scf-mode-tabs {
+  display: flex;
+  gap: 2px;
+  background: #EAEBED;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.scf-mode-tab {
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  background: none;
+  color: #50575E;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.15s ease;
+}
+
+.scf-mode-tab.active {
+  background: #FFFFFF;
+  color: #1D2327;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+
+.scf-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: #F0F0F1;
+  border-bottom: 1px solid #DCDCDE;
+  flex-wrap: wrap;
+}
+
+.scf-tool-btn {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #50575E;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.scf-tool-btn:hover {
+  background: #FFFFFF;
+  border-color: #C3C4C7;
+  color: #1D2327;
+}
+
+.scf-tool-select {
+  height: 28px;
+  padding: 0 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  background: #FFFFFF;
+  border: 1px solid #C3C4C7;
+  border-radius: 3px;
+  color: #2C3338;
+  cursor: pointer;
+  outline: none;
+}
+
+.scf-tool-sep {
+  width: 1px;
+  height: 18px;
+  background: #DCDCDE;
+  margin: 0 4px;
+}
+
+.scf-editor-content {
+  min-height: 320px;
+  max-height: 600px;
+  overflow-y: auto;
+  padding: 18px 20px;
+  font-family: var(--font, 'Instrument Sans', -apple-system, BlinkMacSystemFont, sans-serif);
+  font-size: 15px;
+  line-height: 1.7;
+  color: #2C3338;
+  outline: none;
+}
+
+.scf-editor-content:empty:before {
+  content: attr(data-placeholder);
+  color: #A7AAAD;
+  pointer-events: none;
+}
+
+.scf-editor-content h2 {
+  font-family: var(--font-serif, Cormorant, serif);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--obsidian, #17181A);
+  margin: 20px 0 10px;
+}
+
+.scf-editor-content blockquote {
+  border-left: 3px solid var(--amber, #D4AF37);
+  padding: 8px 16px;
+  margin: 16px 0;
+  background: #FAF8F5;
+  color: #4A4E51;
+  font-style: italic;
+}
+
+.scf-editor-content figure {
+  margin: 20px 0;
+  text-align: center;
+  background: #F9F9FB;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #E2E0D8;
+}
+
+.scf-editor-content figure img {
+  max-width: 100%;
+  border-radius: 4px;
+  display: block;
+  margin: 0 auto;
+}
+
+.scf-editor-content figcaption {
+  font-size: 12px;
+  color: #787C82;
+  margin-top: 8px;
+  font-style: italic;
+}
+
+.scf-editor-html {
+  width: 100%;
+  min-height: 320px;
+  padding: 16px 20px;
+  font-family: var(--mono, Consolas, Monaco, monospace);
+  font-size: 13px;
+  line-height: 1.6;
+  border: none;
+  outline: none;
+  resize: vertical;
+  background: #FFFFFF;
+  color: #1D2327;
+  box-sizing: border-box;
+}
+
+/* FAQ Repeater Rows */
+.scf-faq-item {
+  background: #F9F9FB;
+  border: 1px solid #E2E0D8;
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.scf-faq-remove-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #FFF;
+  border: 1px solid #DCDCDE;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #C5221F;
+  font-size: 11px;
+  transition: all 0.2s ease;
+}
+
+.scf-faq-remove-btn:hover {
+  background: #C5221F;
+  color: #FFF;
+  border-color: #C5221F;
+}
+
+/* Star / Featured Toggle in Post Table */
+.journal-featured-star {
+  cursor: pointer;
+  font-size: 18px;
+  color: #DCDCDE;
+  transition: color 0.2s ease, transform 0.15s ease;
+  user-select: none;
+}
+
+.journal-featured-star.active {
+  color: #E3A008;
+}
+
+.journal-featured-star:hover {
+  transform: scale(1.15);
+}
+
