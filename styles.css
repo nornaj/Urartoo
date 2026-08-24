@@ -1400,7 +1400,6 @@ body.nav-open {
   position: relative;
   overflow: hidden;
   aspect-ratio: 16/10;
-  background: var(--warm-light);
 }
 
 .note-img-inner {
@@ -1409,7 +1408,6 @@ body.nav-open {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 18px;
   transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
