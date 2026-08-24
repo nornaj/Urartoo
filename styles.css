@@ -1633,7 +1633,7 @@ body.nav-open {
    LEGACY STYLES — for shop.html and contact.html (.hdr)
    ═══════════════════════════════════════════════════════════════════ */
 .hdr {
-  position: sticky;
+  position: relative;
   top: 0;
   z-index: 40;
   background: var(--surface);
@@ -1654,6 +1654,7 @@ body.nav-open {
 
 @media (min-width: 900px) {
   .hdr {
+    position: sticky;
     padding: 16px max(var(--gutter), calc((100% - var(--max)) / 2));
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -2657,8 +2658,13 @@ body.nav-open {
 
 /* Left: Title + CTA */
 .pdp-faq-intro {
-  position: sticky;
-  top: 100px;
+  position: relative;
+}
+@media (min-width: 768px) {
+  .pdp-faq-intro {
+    position: sticky;
+    top: 100px;
+  }
 }
 .pdp-faq-title {
   font-family: var(--font-serif);
@@ -4558,11 +4564,15 @@ select, .admin-card select, .admin-input-group select {
   max-width: 52ch;
 }
 
-/* Sticky Sidebar */
+/* Sticky Sidebar — desktop only */
 .journal-post-sidebar {
-  position: sticky;
-  top: 96px;
   min-width: 0;
+}
+@media (min-width: 768px) {
+  .journal-post-sidebar {
+    position: sticky;
+    top: 96px;
+  }
 }
 
 .journal-sidebar-box {
