@@ -1573,6 +1573,10 @@
       const wrapper = document.createElement('div');
       wrapper.className = 'ura-custom-select';
       if (select.id) wrapper.id = `ura-custom-${select.id}`;
+      if (select.style.maxWidth) wrapper.style.maxWidth = select.style.maxWidth;
+      if (select.style.width) wrapper.style.width = select.style.width;
+      if (select.style.minWidth) wrapper.style.minWidth = select.style.minWidth;
+      if (select.style.flex) wrapper.style.flex = select.style.flex;
 
       const trigger = document.createElement('div');
       trigger.className = 'ura-select-trigger';

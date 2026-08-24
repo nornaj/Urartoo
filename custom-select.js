@@ -39,6 +39,9 @@
     wrapper.className = 'ura-custom-select';
     wrapper.tabIndex = 0;
     if (sel.style.maxWidth) wrapper.style.maxWidth = sel.style.maxWidth;
+    if (sel.style.width) wrapper.style.width = sel.style.width;
+    if (sel.style.minWidth) wrapper.style.minWidth = sel.style.minWidth;
+    if (sel.style.flex) wrapper.style.flex = sel.style.flex;
     if (sel.className) wrapper.dataset.originalClass = sel.className;
 
     // Build trigger button

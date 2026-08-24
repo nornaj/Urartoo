@@ -3922,6 +3922,16 @@ select, .admin-card select, .admin-input-group select {
   vertical-align: middle;
 }
 
+#ura-custom-admin-prod-filter-cat {
+  max-width: 200px;
+  width: 100%;
+}
+
+#ura-custom-admin-bulk-action-select {
+  max-width: 220px;
+  width: 100%;
+}
+
 .ura-select-trigger {
   display: flex;
   align-items: center;
