@@ -3199,7 +3199,7 @@ body.nav-open {
   font-family: var(--font);
 }
 
-body.in-admin-mode > *:not(#view-admin):not(#product-editor-modal) {
+body.in-admin-mode > *:not(#view-admin):not(#product-editor-modal):not(#stone-editor-modal):not(#blog-editor-modal) {
   display: none !important;
 }
 

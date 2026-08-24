@@ -51,9 +51,15 @@
     } catch (e) {}
   }
 
+  var _switchingTab = false;
   window.switchAdminTab = function (tabName) {
+    if (_switchingTab) return;
+    _switchingTab = true;
+
     const validTabs = ['orders', 'products', 'clients', 'journal'];
     const activeTab = validTabs.includes(tabName) ? tabName : 'orders';
+
+    console.log('[Admin] switchAdminTab →', activeTab);
 
     validTabs.forEach(t => {
       const btn = document.getElementById(`tab-btn-${t}`);
@@ -93,6 +99,8 @@
       else if (activeTab === 'settings') window.WooCommerceAdmin.renderSettingsSec();
       else window.WooCommerceAdmin.renderOrdersSec();
     }
+
+    _switchingTab = false;
   };
 
   const WooCommerceAdmin = {
