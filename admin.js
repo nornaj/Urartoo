@@ -2217,7 +2217,7 @@
 
       const selectedIds = this.getSelectedJournalIds();
       if (selectedIds.length === 0) {
-        this.showToast('Խնդրում ենք նշել գոնե մեկ նշում:', 'info', 3000);
+        this.showToast('Խնդրում ենք նշել գոնե մեկ նշում։', 'info', 3000);
         return;
       }
 

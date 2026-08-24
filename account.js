@@ -238,7 +238,7 @@
 
       if (!foundUser || !foundUser.email) {
         if (alertBox) {
-          alertBox.innerHTML = 'Այս էլ։ փոստով հաշիվ չի գտնվել։ Հնարավոր է նորից <a href="#" onclick="switchAuthTab(\'register\'); return false;" style="color:var(--amber); text-decoration:underline; font-weight:600;">գրանցվել</a>։';
+          alertBox.innerHTML = 'Այս էլ․ փոստով հաշիվ չի գտնվել։ Կարող եք <a href="#" onclick="switchAuthTab(\'register\'); return false;" style="color:var(--amber); text-decoration:underline; font-weight:600;">գրանցվել</a>։';
           alertBox.className = 'acc-alert visible error';
         }
         return;
