@@ -269,43 +269,69 @@
     if (postFeaturedLink) postFeaturedLink.href = feat.link || 'shop.html';
   }
 
-  // Render Related Notes Grid
+  // Render Related Notes Grid (matches home page .note-card style)
   function renderRelatedNotes(allPosts = []) {
     const grid = document.getElementById('post-related-grid');
     if (!grid) return;
 
+    // Build the list: prefer NovaSanity global posts, fallback to article's related array
     let relatedList = [];
-    if (Array.isArray(currentArticle.related) && currentArticle.related.length > 0) {
-      relatedList = currentArticle.related;
-    } else if (Array.isArray(allPosts) && allPosts.length > 1) {
-      // Pick other articles
-      relatedList = allPosts
+
+    // Get all available posts from NovaSanity or passed allPosts
+    let globalPosts = allPosts;
+    if ((!globalPosts || globalPosts.length === 0) && window.NovaSanity) {
+      globalPosts = window.NovaSanity.getJournalPosts() || [];
+    }
+
+    if (Array.isArray(globalPosts) && globalPosts.length > 0) {
+      // Filter out current article, take latest 3
+      relatedList = globalPosts
         .filter(p => String(p.id) !== String(currentArticle.id) && String(p.slug) !== String(currentArticle.slug))
         .slice(0, 3)
         .map(p => ({
           id: p.slug || p.id,
           meta: `${p.date || ''} · ${p.location || ''}`,
           title: p.title,
-          shot: p.heroImg || 'Images/stone-quarry.webp'
+          img: p.heroImg || ''
         }));
     }
 
+    // Fallback to article's own related array
+    if (relatedList.length === 0 && Array.isArray(currentArticle.related)) {
+      relatedList = currentArticle.related.slice(0, 3).map(r => ({
+        id: r.id,
+        meta: r.meta,
+        title: r.title,
+        img: r.shot || r.img || ''
+      }));
+    }
+
+    // Render using exact home page .note-card markup
     let html = '';
     relatedList.forEach(rel => {
-      html += `
-        <a href="journal-post.html?id=${rel.id}" class="lead-note-card">
-          <div style="position: relative; overflow: hidden; aspect-ratio: 16/10; background: var(--warm-light);">
-            <img src="${rel.shot}" alt="${escapeHtml(rel.title)}" class="journal-card-img" loading="lazy">
-          </div>
-          <div style="padding: 16px 18px 20px;">
-            <div style="font-size: 12px; color: var(--tuff); margin-bottom: 8px;">${escapeHtml(rel.meta)}</div>
-            <div style="font-size: 16px; font-weight: 500; line-height: 1.4; color: var(--obsidian); max-width: 28ch;">${escapeHtml(rel.title)}</div>
-          </div>
-        </a>
-      `;
+      html += '<a href="journal-post.html?id=' + (rel.id || '') + '" class="note-card">' +
+        '<div class="note-img">' +
+          '<div class="note-img-inner">' +
+            (rel.img
+              ? '<img src="' + rel.img + '" alt="' + escapeHtml(rel.title) + '" loading="lazy">'
+              : '<span class="placeholder-text" style="font-family:var(--mono);font-size:9.5px;line-height:1.8;color:rgba(12,14,13,0.26);max-width:180px;text-align:center;">' + escapeHtml(rel.meta) + '</span>'
+            ) +
+          '</div>' +
+        '</div>' +
+        '<div class="note-meta">' + escapeHtml(rel.meta) + '</div>' +
+        '<div class="note-title">' + escapeHtml(rel.title) + '</div>' +
+      '</a>';
     });
 
     grid.innerHTML = html;
+
+    // Also listen for journal updates to re-render when NovaSanity loads
+    if (!grid._journalListenerBound) {
+      grid._journalListenerBound = true;
+      window.addEventListener('urartoo:journal-updated', function () {
+        renderRelatedNotes([]);
+      });
+    }
   }
 
   // Render Single Product FAQ Accordion (Single Product Design System Harmonized)
