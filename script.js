@@ -45,11 +45,9 @@
     { text: 'Երեք տարի առաջ նույն մատանին նվիրեցի կնոջս։ Հասկացա որ ամեն քար ունիկալ է։ Հիմա դա է միակ անգամ պատվիրելու դիմանկը։', who: 'Արմեն Տեր-Գրիգորյան' }
   ];
 
-  const notes = [
-    { id: 'gutanasar-obsidian', meta: 'Սեպտեմբեր 2025 · Գուտանասար', title: 'Երեք օր հրաբխի վրա՝ մեկ լավ ապակու կտորի համար', img: '' },
-    { id: 'garnet-river', meta: 'Հուլիս 2025 · Վայոց Ձոր', title: 'Ինչու է գետի նռնաքարը հղկվում այլ կերպ, քան հանքինը', img: '' },
-    { id: 'symmetrical-setting', meta: 'Մայիս 2025 · Երևան', title: 'Անհամաչափ քարի տեղադրումը արծաթում', img: '' }
-  ];
+
+  // Notes are now dynamically loaded from NovaSanity in the Field Notes section below
+
 
   const trustItems = [
     { label: 'Անվճար առաքում 300֏-ից սկսած', d: 'M2 8h13v8H2zM15 11h4l3 3v2h-7zM6 19a1.6 1.6 0 100-3.2 1.6 1.6 0 000 3.2zM18 19a1.6 1.6 0 100-3.2 1.6 1.6 0 000 3.2z' },
@@ -490,24 +488,37 @@
     goToSlide(0);
   }
 
-  /* ─── Field Notes ──────────────────────────────────────────────── */
+  /* ─── Field Notes (dynamic from NovaSanity) ──────────────────── */
   var notesGrid = document.getElementById('notes-grid');
-  if (notesGrid) {
-    notesGrid.innerHTML = notes.map(function (n) {
-      return '<a href="journal-post.html?id=' + n.id + '" class="note-card">' +
+  function renderHomeNotes() {
+    if (!notesGrid) return;
+    var posts = [];
+    if (window.NovaSanity && typeof window.NovaSanity.getJournalPosts === 'function') {
+      posts = window.NovaSanity.getJournalPosts();
+    }
+    if (!posts || posts.length === 0) return;
+    // Show latest 3 posts
+    var latest = posts.slice(0, 3);
+    notesGrid.innerHTML = latest.map(function (n) {
+      var imgUrl = n.heroImg || n.image || n.img || '';
+      var meta = (n.topic || '') + (n.date ? ' · ' + n.date : '');
+      return '<a href="journal-post.html?id=' + (n.slug || n.id) + '" class="note-card">' +
         '<div class="note-img">' +
           '<div class="note-img-inner">' +
-            (n.img
-              ? '<img src="' + n.img + '" alt="' + n.title + '" loading="lazy">'
-              : '<span class="placeholder-text" style="font-family:var(--mono);font-size:9.5px;line-height:1.8;color:rgba(12,14,13,0.26);max-width:180px;text-align:center;">' + n.meta + '</span>'
+            (imgUrl
+              ? '<img src="' + imgUrl + '" alt="' + (n.title || '') + '" loading="lazy">'
+              : '<span class="placeholder-text" style="font-family:var(--mono);font-size:9.5px;line-height:1.8;color:rgba(12,14,13,0.26);max-width:180px;text-align:center;">' + meta + '</span>'
             ) +
           '</div>' +
         '</div>' +
-        '<div class="note-meta">' + n.meta + '</div>' +
-        '<div class="note-title">' + n.title + '</div>' +
+        '<div class="note-meta">' + meta + '</div>' +
+        '<div class="note-title">' + (n.title || '') + '</div>' +
       '</a>';
     }).join('');
   }
+  // Render immediately if data is available, and also on update events
+  renderHomeNotes();
+  window.addEventListener('urartoo:journal-updated', renderHomeNotes);
 
   /* ─── Newsletter ───────────────────────────────────────────────── */
   var nlBtn = document.getElementById('newsletter-btn');

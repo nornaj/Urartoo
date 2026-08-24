@@ -146,22 +146,9 @@
     <p style="font-size: 15.5px; line-height: 1.7; color: var(--tuff); max-width: 52ch; margin: 0 auto; text-align: center;">Պատմություններ լեռնալանջերից, աշխատանոցի գաղտնիքները և գեմոլոգիական նշումներ Armenian gemstones-ի մասին։</p>
   </section>
 
-  <!-- ═══ 3. FEATURED LEAD ARTICLE ═══ -->
-  <section style="padding: 36px max(var(--gutter), calc((100% - var(--max)) / 2)) 0;">
-    <a href="journal-post.html?id=gutanasar-obsidian" class="lead-note-card">
-      <div style="position: relative; overflow: hidden; min-height: 320px; display: flex; align-items: center; justify-content: center;">
-        <span style="font-family: var(--mono); font-size: 9.5px; line-height: 1.8; color: rgba(12,14,13,0.36); max-width: 230px; text-align: center;">գլխավոր լուսանկար · օբսիդիանի լանջը Գուտանասարի վրա առավոտյան</span>
-      </div>
-      <div style="display: flex; flex-direction: column; justify-content: center; padding: 40px 36px;">
-        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-          <span style="background: var(--obsidian); color: var(--bone); font-size: 9.5px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; padding: 5px 10px;">Վերջինը</span>
-          <span style="font-size: 12.5px; color: var(--tuff);">Սեպտեմբեր 2025 · Քարահավաք · 6 րոպե</span>
-        </div>
-        <h2 style="font-family: Cormorant, serif; font-weight: 400; font-size: clamp(24px, 2.6vw, 38px); line-height: 1.14; letter-spacing: -0.02em; margin: 0 0 16px;">Երեք օր հրաբխի վրա՝ մեկ լավ ապակու կտորի համար</h2>
-        <p style="font-size: 15.5px; line-height: 1.7; color: var(--graphite); margin: 0 0 24px; max-width: 52ch;">Գուտանասարի օբսիդիանը կոտրվում է տասից ինն անգամ սխալ։ Ահա թե ինչ տեսք ունի տասներորդը և ինչ արժեցավ այնտեղ հասնելը։</p>
-        <span style="align-self: start; font-size: 13px; font-weight: 500; border-bottom: 1px solid var(--obsidian); padding-bottom: 3px;">Կարդալ նշումը</span>
-      </div>
-    </a>
+  <!-- ═══ 3. FEATURED LEAD ARTICLE (Dynamic) ═══ -->
+  <section style="padding: 36px max(var(--gutter), calc((100% - var(--max)) / 2)) 0;" id="lead-article-section">
+    <!-- Rendered dynamically by JS below -->
   </section>
 
   <!-- ═══ 4. ARTICLES GRID & FILTERS ═══ -->
@@ -253,6 +240,35 @@
     let rawPosts = [];
     if (window.NovaSanity && typeof window.NovaSanity.getJournalPosts === 'function') {
       rawPosts = window.NovaSanity.getJournalPosts();
+    }
+
+    // Render lead article dynamically
+    const leadSection = document.getElementById('lead-article-section');
+    if (leadSection) {
+      const featPost = rawPosts.find(p => p.featured) || rawPosts[0];
+      if (featPost) {
+        const heroImg = featPost.heroImg || featPost.image || '';
+        leadSection.innerHTML = `
+          <a href="journal-post.html?id=${featPost.slug || featPost.id}" class="lead-note-card">
+            <div style="position: relative; overflow: hidden; min-height: 320px; display: flex; align-items: center; justify-content: center;">
+              ${heroImg
+                ? `<img src="${heroImg}" alt="${featPost.title || ''}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">`
+                : `<span style="font-family: var(--mono); font-size: 9.5px; line-height: 1.8; color: rgba(12,14,13,0.36); max-width: 230px; text-align: center;">${featPost.heroCaption || featPost.topic || ''}</span>`
+              }
+            </div>
+            <div style="display: flex; flex-direction: column; justify-content: center; padding: 40px 36px;">
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                <span style="background: var(--obsidian); color: var(--bone); font-size: 9.5px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; padding: 5px 10px;">${featPost.topic || ''}</span>
+                <span style="font-size: 12.5px; color: var(--tuff);">${featPost.date || ''} · ${featPost.readTime || ''}</span>
+              </div>
+              <h2 style="font-family: Cormorant, serif; font-weight: 400; font-size: clamp(24px, 2.6vw, 38px); line-height: 1.14; letter-spacing: -0.02em; margin: 0 0 16px;">${featPost.title || ''}</h2>
+              <p style="font-size: 15.5px; line-height: 1.7; color: var(--graphite); margin: 0 0 24px; max-width: 52ch;">${featPost.lead || featPost.excerpt || ''}</p>
+              <span style="align-self: start; font-size: 13px; font-weight: 500; border-bottom: 1px solid var(--obsidian); padding-bottom: 3px;">Կարդալ նշումը</span>
+            </div>
+          </a>`;
+      } else {
+        leadSection.style.display = 'none';
+      }
     }
 
     if (!rawPosts || rawPosts.length === 0) {

@@ -19,134 +19,8 @@
   // Default initial Armenian seed items (empty — no mock products)
   const INITIAL_SEED_PRODUCTS = [];
 
-  const INITIAL_SEED_JOURNAL = [
-    {
-      id: "gutanasar-obsidian",
-      slug: "three-days-on-a-volcano-for-one-good-piece-of-glass",
-      topic: "Քարահավաք",
-      date: "Սեպտեմբեր 2025",
-      location: "Գուտանասար",
-      readTime: "9 րոպե",
-      title: "Երեք օր հրաբխի վրա՝ մեկ լավ ապակու կտորի համար",
-      lead: "Գուտանասարի օբսիդիանը կոտրվում է տասից ինն անգամ սխալ։ Ահա թե ինչ տեսք ունի տասներորդը և ինչ արժեցավ այնտեղ հասնելը։",
-      heroImg: "Images/stone-quarry.webp",
-      heroCaption: "գլխավոր լուսանկար · օբսիդիանի լանջը Գուտանասարի վրա առավոտյան",
-      contentHtml: "<p>Գուտանասարը հրաբխային գմբեթ է Երևանից մեկ ժամ հյուսիս, և նրա ողջ հյուսիսային լանջը ծածկված է սև ապակիով։ Ճանապարհից այն թվում է հսկայական հանք՝ այնպիսի վայր, որտեղ պատկերացնում ես քսան րոպեում պարկը լցնելն ու տուն վերադառնալը։ Բայց իրականում դա այդպես չէ։</p><h2>Լանջն է որոշում, ոչ թե դուք</h2><p>Այնպես որ առաջին օրը քար հավաքելը չէ։ Դա քայլելն է, բարձրացնելը և գրեթե բոլորը հետ դնելը։ Ես փնտրում եմ կտորներ, որոնք վերջերս են դուրս եկել փլուզումից։</p><blockquote><span>Առողջ կտորը զանգում է հպելիս։ Ճաքածը թխկում է։ Լանջին մեկ օր աշխատելուց հետո ձեռքերդ ավելի շուտ են իմանում, քան աչքերդ։</span></blockquote><h2>Աշխատանոցի ակոսում</h2><p>Հղկումը կատարվում է թաց և դանդաղ, որովհետև օբսիդիանը վատ է տանում ջերմությունը, իսկ արագ հղկումը կճաքեցնի լանջին կատարյալ քարը։</p>",
-      featuredProduct: {
-        title: "Գուտանասարի օբսիդիանով կախազարդ",
-        price: "$265",
-        badge: "Եզակի (1 of 1)",
-        img: "Images/ring.webp",
-        link: "shop.html"
-      },
-      faqs: [
-        { q: "Կարո՞ղ եմ խնդրել քար որոշակի վայրից։", a: "Այո, ընտրեք տարածաշրջանը և ցանկալի ձևը, ես կփնտրեմ հաջորդ ուղևորության ընթացքում։" },
-        { q: "Ինչպե՞ս իմանամ, որ քարը իսկապես այդ վայրից է։", a: "Յուրաքանչյուր զարդ ուղարկվում է հավաստագրով, որտեղ նշված է հովիտը, գտնելու ամիսը և հանքանյութը։" },
-        { q: "Արդյո՞ք օբսիդիանը բավականաչափ ամուր է ամենօրյա կրման համար։", a: "Կախազարդերի և ականջօղերի համար՝ այո։ Ամեն օր կրվող մատանիների համար նախընտրելի է նռնաքարը կամ հասպիսը։" }
-      ],
-      featured: true
-    },
-    {
-      id: "garnet-river",
-      slug: "river-garnet-lapidary-vayots-dzor",
-      topic: "Գեմոլոգիա",
-      date: "Հուլիս 2025",
-      location: "Վայոց Ձոր",
-      readTime: "4 րոպե",
-      title: "Ինչու է գետի նռնաքարը հղկվում այլ կերպ, քան հանքինը",
-      lead: "Գետի ջուրը դարերի ընթացքում արդեն իսկ հղկել է քարի թույլ կողմերը։ Մեզ մնում է գտնել երակը։",
-      heroImg: "Images/necklace.webp",
-      heroCaption: "գլխավոր լուսանկար · Վայոց Ձորի գետաքարերը",
-      contentHtml: "<p>Վայոց Ձորի գետերում հայտնաբերված նռնաքարերը բնական ճանապարհով անցել են առաջնային հղկման փուլը։ Ջրի հոսքը հեռացրել է բոլոր փխրուն շերտերը։</p><h2>Գետաքարի խտությունը</h2><p>Երբ գետից նռնաքար ես վերցնում, գիտես, որ այն դիմացել է հազարամյա ճնշմանը։</p>",
-      featuredProduct: {
-        title: "Վայոց Ձորի նռնաքարով վզնոց",
-        price: "$310",
-        badge: "Եզակի (1 of 1)",
-        img: "Images/necklace.webp",
-        link: "shop.html"
-      },
-      faqs: [
-        { q: "Որտե՞ղ է հավաքվում այս նռնաքարը։", a: "Վայոց Ձորի լեռնային գետերի հուներից՝ ամռան չոր ամիսներին։" }
-      ],
-      featured: false
-    },
-    {
-      id: "symmetrical-setting",
-      slug: "setting-asymmetric-stones-in-silver",
-      topic: "Աշխատանոց",
-      date: "Մայիս 2025",
-      location: "Երևան",
-      readTime: "5 րոպե",
-      title: "Անհամաչափ քարի տեղադրումը արծաթում",
-      lead: "Երբ քարը բնական ձև ունի, շրջանակը պետք է կրկնի նրա հետագիծը, ոչ թե ստիպի դառնալ երկրաչափական։",
-      heroImg: "Images/earring.webp",
-      heroCaption: "աշխատանոցի սեղանին · անհամաչափ ձևի քարի շրջանակում",
-      contentHtml: "<p>Ամեն մի քար ունի իր անհատական ձևը։ Փոխանակ քարը կտրելու և ստանդարտ օվալ դարձնելու, մենք արծաթյա բնիկը կառուցում ենք հենց քարի եզրագծով։</p>",
-      featuredProduct: {
-        title: "Անհամաչափ ականջօղեր",
-        price: "$195",
-        badge: "Եզակի (1 of 1)",
-        img: "Images/earring.webp",
-        link: "shop.html"
-      },
-      faqs: [],
-      featured: false
-    },
-    {
-      id: "silver-patina",
-      slug: "925-sterling-silver-patina-and-finishing",
-      topic: "Ստուդիա",
-      date: "Ապրիլ 2025",
-      location: "Երևան",
-      readTime: "3 րոպե",
-      title: "925 արծաթի մշակումը և հնեցումը",
-      lead: "Ինչպես է օքսիդացումը ընդգծում հայկական քարերի խորությունն ու բնական փայլը։",
-      heroImg: "Images/ring.webp",
-      heroCaption: "օքսիդացված արծաթի խորը ստվերները",
-      contentHtml: "<p>Արծաթի օքսիդացումը թույլ է տալիս ստանալ խորը ստվերներ զարդի փորագրությունների մեջ, ինչը կատարյալ հակադրություն է ստեղծում բնական քարի հետ։</p>",
-      featuredProduct: null,
-      faqs: [],
-      featured: false
-    },
-    {
-      id: "turquoise-copper",
-      slug: "turquoise-from-old-copper-mines-syunik",
-      topic: "Քարահավաք",
-      date: "Մարտ 2025",
-      location: "Սյունիք",
-      readTime: "7 րոպե",
-      title: "Սյունիքի հին պղնձի հանքերի փիրուզը",
-      lead: "Գարնանը, երբ ձյունը հալվում է, Սյունիքի հին ակոսներում հայտնվում են կապույտ երակներ։",
-      heroImg: "Images/bracelet.webp",
-      heroCaption: "Սյունիքի փիրուզի բնական շերտերը",
-      contentHtml: "<p>Սյունիքի լեռնային ճանապարհներին հին պղնձահանքերի մոտ կարելի է գտնել բնական փիրուզի երակներ։</p>",
-      featuredProduct: {
-        title: "Սյունիքի փիրուզով ապարանջան",
-        price: "$340",
-        badge: "Եզակի (1 of 1)",
-        img: "Images/bracelet.webp",
-        link: "shop.html"
-      },
-      faqs: [],
-      featured: false
-    },
-    {
-      id: "areni-jasper",
-      slug: "areni-red-jasper-iron-veins",
-      topic: "Գեմոլոգիա",
-      date: "Փետրվար 2025",
-      location: "Արենի",
-      readTime: "5 րոպե",
-      title: "Արենիի հասպիսի երկաթյա շերտերը",
-      lead: "Կարմիր և դեղնավուն շերտերով հասպիսը Հայաստանի ամենատաք քարերից մեկն է։",
-      heroImg: "Images/stone-quarry.webp",
-      heroCaption: "Արենիի կարմիր հասպիսը",
-      contentHtml: "<p>Արենիի հասպիսը հայտնի է իր տաք երանգներով և բարձր կարծրությամբ։ Հղկելիս այն ստանում է հայելային փայլ։</p>",
-      featuredProduct: null,
-      faqs: [],
-      featured: false
-    }
-  ];
+  // Initial seed journal posts removed - all posts now managed via admin panel + Sanity CMS
+  const INITIAL_SEED_JOURNAL = [];
 
   const NovaSanity = {
     _products: [],
@@ -226,6 +100,12 @@
      * is the ONLY dataset used. Deletions in Sanity persist permanently.
      */
     async init() {
+      // One-time cleanup: remove old seed journal posts from localStorage
+      if (!localStorage.getItem('urartoo_journal_cleaned_v2')) {
+        localStorage.removeItem('urartoo_journal_posts_v1');
+        localStorage.setItem('urartoo_journal_cleaned_v2', '1');
+      }
+
       // Load local storage cached products first (for instant render & local persistence)
       try {
         const stored = JSON.parse(localStorage.getItem('urartoo_local_products_v1'));
