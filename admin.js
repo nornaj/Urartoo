@@ -1654,7 +1654,7 @@
       });
 
       if (filtered.length === 0) {
-        if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:36px 16px;color:var(--tuff);">Նշումներ չեն գտնվել</td></tr>';
+        if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:36px 16px;color:var(--tuff);">Նշումներ չեն գտնվել</td></tr>';
         if (mobileCards) mobileCards.innerHTML = '<div style="text-align:center;padding:32px;color:var(--tuff);">Նշումներ չեն գտնվել</div>';
         return;
       }
@@ -1667,6 +1667,7 @@
 
           return `
             <tr>
+              <td style="text-align:center;"><input type="checkbox" class="admin-journal-checkbox" value="${pId}" style="width:16px; height:16px; cursor:pointer;"></td>
               <td>
                 <div style="width:52px; height:42px; background:#FAF8F5; border-radius:4px; overflow:hidden; display:flex; align-items:center; justify-content:center; border:1px solid #EAE8E2;">
                   <img src="${heroImg}" style="width:100%; height:100%; object-fit:cover;" alt="">
@@ -1711,6 +1712,10 @@
 
           return `
             <div class="admin-prod-mobile-card">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                <input type="checkbox" class="admin-journal-checkbox" value="${pId}" style="width:18px; height:18px; cursor:pointer;">
+                <span style="font-size:12px; color:var(--tuff);">Ընտրել</span>
+              </div>
               <div class="admin-prod-mobile-header">
                 <img src="${heroImg}" class="admin-prod-mobile-img" alt="${p.title}">
                 <div class="admin-prod-mobile-meta">
@@ -2183,6 +2188,61 @@
 
       if (typeof window.showToastNotification === 'function') {
         window.showToastNotification('✓ Նշումը ջնջվեց։', 'success', 3500);
+      }
+    },
+
+    /* JOURNAL BULK ACTIONS */
+    toggleSelectAllJournal(isChecked) {
+      document.querySelectorAll('.admin-journal-checkbox').forEach(cb => {
+        cb.checked = isChecked;
+      });
+    },
+
+    getSelectedJournalIds() {
+      const checkboxes = document.querySelectorAll('.admin-journal-checkbox:checked');
+      const ids = new Set();
+      checkboxes.forEach(cb => ids.add(cb.value));
+      return Array.from(ids);
+    },
+
+    async executeBulkJournalAction() {
+      const selectEl = document.getElementById('admin-journal-bulk-action');
+      const action = selectEl ? selectEl.value : '';
+
+      if (!action) return;
+
+      const selectedIds = this.getSelectedJournalIds();
+      if (selectedIds.length === 0) {
+        this.showToast('Խնդրում ենք նշել գոնե մեկ նշում:', 'info', 3000);
+        return;
+      }
+
+      if (action === 'delete') {
+        if (!confirm(`Վստա՞հ եք, որ ցանկանում եք ջնջել ${selectedIds.length} նշում։`)) return;
+
+        const loadingToast = this.showToast(`Ջնջվում է ${selectedIds.length} նշում...`, 'loading', 0);
+
+        let deletedCount = 0;
+        for (const id of selectedIds) {
+          try {
+            if (window.NovaSanity) {
+              await window.NovaSanity.deleteJournalPost(id);
+              deletedCount++;
+            }
+          } catch (e) {
+            console.error('Error bulk deleting journal post:', id, e);
+          }
+        }
+
+        if (selectEl) selectEl.value = '';
+        const selectAll = document.getElementById('admin-journal-select-all');
+        if (selectAll) selectAll.checked = false;
+
+        this.renderJournalSec();
+
+        if (loadingToast) {
+          loadingToast.update(`${deletedCount} նշում հաջողությամբ ջնջվեց։`, 'danger', 4000);
+        }
       }
     },
 
