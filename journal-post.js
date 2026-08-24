@@ -123,7 +123,8 @@
     renderArticleMeta();
     renderArticleBody();
     renderTableOfContents();
-    renderFeaturedProduct();
+    // POST RELATED PRODUCT — disabled (uncomment to reactivate)
+    // renderFeaturedProduct();
     renderRelatedNotes(allPosts);
     renderFaqAccordion();
 
@@ -247,6 +248,7 @@
     tocNav.innerHTML = html;
   }
 
+  /* ═══ POST RELATED PRODUCT — disabled (uncomment to reactivate) ═══
   // Render Featured Product Card
   function renderFeaturedProduct() {
     const featCard = document.getElementById('post-featured-card');
@@ -268,6 +270,7 @@
     if (postFeaturedImg && feat.img) postFeaturedImg.src = feat.img;
     if (postFeaturedLink) postFeaturedLink.href = feat.link || 'shop.html';
   }
+  ═══ END POST RELATED PRODUCT ═══ */
 
   // Render Related Notes Grid (matches home page .note-card style)
   function renderRelatedNotes(allPosts = []) {
