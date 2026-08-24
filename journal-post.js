@@ -293,12 +293,14 @@
     let html = '';
     relatedList.forEach(rel => {
       html += `
-        <a href="journal-post.html?id=${rel.id}" class="lead-note-card" style="text-decoration: none; display: block; cursor: pointer;">
+        <a href="journal-post.html?id=${rel.id}" class="lead-note-card">
           <div style="position: relative; overflow: hidden; aspect-ratio: 16/10; background: var(--warm-light);">
-            <img src="${rel.shot}" alt="${escapeHtml(rel.title)}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease;" class="journal-card-img">
+            <img src="${rel.shot}" alt="${escapeHtml(rel.title)}" class="journal-card-img" loading="lazy">
           </div>
-          <div style="font-size: 12px; color: var(--tuff); margin: 14px 0 8px;">${escapeHtml(rel.meta)}</div>
-          <div style="font-size: 16px; font-weight: 500; line-height: 1.4; color: var(--obsidian); max-width: 28ch;">${escapeHtml(rel.title)}</div>
+          <div style="padding: 16px 18px 20px;">
+            <div style="font-size: 12px; color: var(--tuff); margin-bottom: 8px;">${escapeHtml(rel.meta)}</div>
+            <div style="font-size: 16px; font-weight: 500; line-height: 1.4; color: var(--obsidian); max-width: 28ch;">${escapeHtml(rel.title)}</div>
+          </div>
         </a>
       `;
     });
