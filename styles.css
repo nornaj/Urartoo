@@ -1113,8 +1113,9 @@ body.nav-open {
   align-items: center;
   justify-content: center;
   margin-top: auto;
-  margin-bottom: 26px;
-  padding: 14px 0;
+  margin-bottom: 20px;
+  padding: 10px 0;
+  min-height: 120px;
 }
 
 .stone-swatch {
@@ -1132,15 +1133,16 @@ body.nav-open {
 }
 
 .stone-img {
-  width: 88px;
-  height: 88px;
+  width: 118px;
+  height: 118px;
+  max-width: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 10px 18px rgba(12, 14, 13, 0.22));
+  filter: drop-shadow(0 12px 22px rgba(12, 14, 13, 0.24));
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   display: block;
 }
 .stone-card:hover .stone-img {
-  transform: scale(1.08) translateY(-3px);
+  transform: scale(1.08) translateY(-4px);
 }
 
 .stone-foot {

@@ -215,7 +215,7 @@
         '<span class="stone-note">' + s.note + '</span>' +
         '<span class="stone-swatch-wrap">' +
           (s.img
-            ? '<img src="' + s.img + '" alt="' + s.name + '" class="stone-img" width="90" height="90" loading="lazy">'
+            ? '<img src="' + s.img + '" alt="' + s.name + '" class="stone-img" width="120" height="120" loading="lazy">'
             : '<span class="stone-swatch" style="background:' + s.color + '"></span>') +
         '</span>' +
         '<span class="stone-foot">' +
