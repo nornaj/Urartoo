@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Urartoo — Առաքում և Վերադարձ</title>
+  <meta name="description" content="Urartoo — Առաքման, պատվերի չեղարկման և վերադարձի պայմանները Հայաստանում։">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;0,600&family=Noto+Serif+Armenian:wght@300;400;500;600&family=Noto+Sans+Armenian:wght@300;400;500;600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .policy-wrapper {
+      padding: 64px var(--gutter) 100px;
+      max-width: 780px;
+      margin: 0 auto;
+      min-height: 60vh;
+    }
+    .policy-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .policy-subtitle {
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--amber);
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: block;
+    }
+    .policy-title {
+      font-family: Cormorant, "Noto Serif Armenian", Georgia, serif;
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 400;
+      color: var(--obsidian);
+      line-height: 1.25;
+      margin: 0 0 16px;
+    }
+    .policy-divider {
+      width: 48px;
+      height: 1px;
+      background: var(--amber);
+      margin: 20px auto 0;
+      opacity: 0.8;
+    }
+    .policy-content {
+      background: #FFFFFF;
+      border: 1px solid rgba(12, 14, 13, 0.08);
+      padding: 36px 28px;
+      box-shadow: 0 2px 12px rgba(12, 14, 13, 0.03);
+    }
+    @media (min-width: 640px) {
+      .policy-content {
+        padding: 48px 44px;
+      }
+    }
+    .policy-section {
+      margin-bottom: 40px;
+    }
+    .policy-section:last-child {
+      margin-bottom: 0;
+    }
+    .policy-sec-title {
+      font-family: Cormorant, "Noto Serif Armenian", Georgia, serif;
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--obsidian);
+      margin: 0 0 16px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      border-bottom: 1px solid var(--pumice);
+      padding-bottom: 10px;
+    }
+    .policy-sec-num {
+      font-family: var(--mono);
+      font-size: 16px;
+      color: var(--amber);
+      font-weight: 600;
+    }
+    .policy-text {
+      font-size: 15px;
+      line-height: 1.8;
+      color: #333633;
+      margin: 0 0 16px;
+    }
+    .policy-text:last-child {
+      margin-bottom: 0;
+    }
+    .policy-list {
+      list-style: none;
+      padding: 0;
+      margin: 16px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .policy-list li {
+      position: relative;
+      padding-left: 20px;
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: #2b2e2c;
+    }
+    .policy-list li::before {
+      content: "—";
+      position: absolute;
+      left: 0;
+      color: var(--amber);
+      font-weight: 600;
+    }
+    .policy-highlight-box {
+      background: var(--sand);
+      border-left: 3px solid var(--amber);
+      padding: 16px 20px;
+      margin: 18px 0;
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--obsidian);
+    }
+    .policy-link {
+      color: var(--obsidian);
+      font-weight: 500;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color 0.2s ease;
+    }
+    .policy-link:hover {
+      color: var(--amber);
+    }
+  </style>
+  <link rel="icon" type="image/png" href="Images/Favicon.png">
+  <link rel="apple-touch-icon" href="Images/Favicon.png">
+</head>
+<body>
+
+  <!-- ═══ 1. STICKY LIGHT HEADER (Slides down smoothly on scroll) ═══ -->
+  <header class="hdr-sticky" id="sticky-header">
+    <button class="burger" aria-label="Մենյու" aria-expanded="false" data-sticky-menu-toggle>
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" data-sticky-menu>
+      <a href="shop.html" class="nav-link">Խանութ</a>
+      <a href="journal.html" class="nav-link">Օրագիր</a>
+      <a href="services.html" class="nav-link">Ծառայություններ</a>
+      <a href="contact.html" class="nav-link">Կապ</a>
+    </nav>
+    <a href="index.html" class="logo">
+      <img src="Images/Urartoo-Logo.webp" alt="Urartoo">
+    </a>
+    <div class="hdr-utils">
+      <a href="account.html" class="util-link nav-link nav-account-icon" aria-label="Իմ հաշիվը" title="Իմ հաշիվը">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="user-icon-svg"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <a href="cart.html" class="util-link nav-link nav-cart-icon" aria-label="Զամբյուղ" title="Զամբյուղ">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="cart-icon-svg">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+        <span class="cart-badge-count" data-cart-count>0</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ═══ 2. STATIC DARK HEADER AT TOP ═══ -->
+  <header class="hdr-static" id="top">
+    <button class="burger" aria-label="Մենյու" aria-expanded="false" data-hero-menu-toggle>
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" data-hero-menu>
+      <a href="shop.html" class="nav-link">Խանութ</a>
+      <a href="journal.html" class="nav-link">Օրագիր</a>
+      <a href="services.html" class="nav-link">Ծառայություններ</a>
+      <a href="contact.html" class="nav-link">Կապ</a>
+    </nav>
+    <a href="index.html" class="logo">
+      <img src="Images/Urartoo-Logo.webp" alt="Urartoo">
+    </a>
+    <div class="hdr-utils">
+      <a href="account.html" class="util-link nav-link nav-account-icon" aria-label="Իմ հաշիվը" title="Իմ հաշիվը">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="user-icon-svg"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <a href="cart.html" class="util-link nav-link nav-cart-icon" aria-label="Զամբյուղ" title="Զամբյուղ">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="cart-icon-svg">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+        <span class="cart-badge-count" data-cart-count>0</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ═══ 3. MAIN POLICY CONTENT ═══ -->
+  <main class="policy-wrapper" id="hero-section">
+    <div class="policy-header">
+      <span class="policy-subtitle">Urartoo</span>
+      <h1 class="policy-title">Առաքման, Չեղարկման և Վերադարձի Պայմաններ</h1>
+      <div class="policy-divider"></div>
+    </div>
+
+    <div class="policy-content">
+      <!-- Section 1 -->
+      <section class="policy-section">
+        <h2 class="policy-sec-title">
+          <span class="policy-sec-num">1.</span> Առաքում և Հանձնում
+        </h2>
+        <p class="policy-text">
+          Urartoo-ում յուրաքանչյուր զարդ խնամքով փաթեթավորվում է՝ ապահովելու իր անվտանգությունն ու անթերի տեսքը։ Մենք առաքում ենք բացառապես Հայաստանի տարածքում։
+        </p>
+        <ul class="policy-list">
+          <li><strong>Առաքում Երևանում՝</strong> 1-2 աշխատանքային օր</li>
+          <li><strong>ՀՀ մարզեր՝</strong> 2-4 աշխատանքային օր</li>
+        </ul>
+      </section>
+
+      <!-- Section 2 -->
+      <section class="policy-section">
+        <h2 class="policy-sec-title">
+          <span class="policy-sec-num">2.</span> Պատվերի Չեղարկում, Վերադարձ և Փոխանակում
+        </h2>
+        <p class="policy-text">
+          <strong>Պատվերի չեղարկում՝</strong> Դուք կարող եք անվճար չեղարկել ձեր պատվերը ցանկացած պահի՝ նախքան այն առաքման հանձնելը։ Չեղարկման համար խնդրում ենք անմիջապես կապվել մեզ հետ <a href="mailto:studio@urartoo.com" class="policy-link">studio@urartoo.com</a> էլ․ հասցեով կամ <a href="contact.html" class="policy-link">կապի էջի</a> միջոցով։
+        </p>
+        <p class="policy-text">
+          Հաշվի առնելով ձեռագործ զարդերի անհատական և նուրբ բնույթը, մենք կարող ենք ընդունել միայն այն ապրանքների վերադարձը, որոնք լիովին չօգտագործված են, չեն կրվել և գտնվում են իրենց օրիգինալ փակ փաթեթավորման մեջ՝ առաքումից հետո 14 օրվա ընթացքում։
+        </p>
+        <div class="policy-highlight-box">
+          Եթե ցանկանում եք վերադարձ կատարել, խնդրում ենք նախապես կապվել մեր թիմի հետ <a href="mailto:studio@urartoo.com" class="policy-link">studio@urartoo.com</a> հասցեով՝ նախքան ծրարը հետ ուղարկելը։
+        </div>
+      </section>
+
+      <!-- Section 3 -->
+      <section class="policy-section">
+        <h2 class="policy-sec-title">
+          <span class="policy-sec-num">3.</span> Վնասված Ապրանքներ
+        </h2>
+        <p class="policy-text">
+          Եթե ձեր զարդը վնասված է կամ առկա է թերություն, խնդրում ենք անմիջապես լուսանկարել այն և կապվել մեզ հետ ստանալուց հետո 48 ժամվա ընթացքում։ Մենք անմիջապես կկազմակերպենք փոխարինում կամ լիարժեք վերադարձ։
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <!-- ═══ 4. FOOTER ═══ -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="Images/Urartoo-Logo.webp" alt="Urartoo" class="footer-logo">
+        <p>Հայաստանի տարածքում հավաքված քարեր՝ հղկված և տեղադրված մեկ վարպետի կողմից Երևանում։</p>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Խանութ</div>
+        <a href="shop.html">Մատանիներ</a>
+        <a href="shop.html">Վզնոցներ</a>
+        <a href="shop.html">Ապարանջաններ</a>
+        <a href="shop.html">Ականջօղեր</a>
+        <a href="shop.html">Բոլոր զարդերը</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Բրենդը</div>
+        <a href="index.html#maker">Վարպետը</a>
+        <a href="index.html#stones">Քարերը</a>
+        <a href="services.html">Ծառայություններ</a>
+        <a href="journal.html">Օրագիր</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Սպասարկում</div>
+        <a href="shipping.html">Առաքում և վերադարձ</a>
+        <a href="services.html#care">Խնամք և չափսեր</a>
+        <a href="contact.html">Կապ</a>
+        <a href="#instagram">Instagram</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Urartoo · Երևան, Հայաստան</span>
+      <span class="footer-legal">
+        <a href="#terms">Պայմաններ</a>
+        <a href="#privacy">Գաղտնիություն</a>
+      </span>
+    </div>
+  </footer>
+
+  <!-- ═══ CART DRAWER OVERLAY ═══ -->
+  <div class="cart-overlay" id="cart-overlay"></div>
+  <aside class="cart-drawer" id="cart-drawer">
+    <div class="cart-header">
+      <h3>Զամբյուղ (<span data-cart-count>0</span>)</h3>
+      <button class="cart-close" id="cart-close" aria-label="Փակել">×</button>
+    </div>
+    <div class="cart-body" id="cart-body">
+      <!-- Rendered by JS -->
+    </div>
+    <div class="cart-footer" id="cart-footer">
+      <div class="cart-total-row">
+        <span>Ընդամենը:</span>
+        <span class="cart-total-price" id="cart-total-price">0֏</span>
+      </div>
+      <button class="btn-primary cart-checkout-btn" onclick="window.location.href='checkout.html'">Ձևակերպել պատվերը</button>
+    </div>
+  </aside>
+
+  <script src="script.js"></script>
+</body>
+</html>
