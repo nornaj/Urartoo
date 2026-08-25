@@ -1131,6 +1131,18 @@ body.nav-open {
   transform: scale(1.06);
 }
 
+.stone-img {
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 18px rgba(12, 14, 13, 0.22));
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  display: block;
+}
+.stone-card:hover .stone-img {
+  transform: scale(1.08) translateY(-3px);
+}
+
 .stone-foot {
   display: flex;
   align-items: baseline;

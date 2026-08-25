@@ -30,10 +30,10 @@
   const pieces = [];
 
   const stones = [
-    { name: 'Օբսիդիան', headline: 'Հրաբխային ապակի՝ հղկված մինչև սայր։', region: 'Գուտանասար', count: 12, color: '#17181A', note: 'Վերցնում է այնպիսի սրություն, որ ուրիշ ոչ մի քար չի պահի, և տասից ինն անգամ սխալ է կոտրվում։' },
-    { name: 'Նռնաքար', headline: 'Գետի հղկված, խորը նռան գույն։', region: 'Վայոց Ձոր', count: 11, color: '#7B2D3B', note: 'Հղկված է քարի ներսի երակի հետագծով, այդ պատճառով երկու նույնատիպ կտոր չկա։' },
-    { name: 'Փիրուզ', headline: 'Պղնձի երկրի կապույտը։', region: 'Սյունիք', count: 9, color: '#2E8C8C', note: 'Երակավոր և հազվադեպ միատարր, հավաքված հին հանքերից մի ափով։' },
-    { name: 'Հասպիս', headline: 'Երկաթի կարմիր, տաք շերտավոր։', region: 'Արենի', count: 9, color: '#A4442B', note: 'Խիտ կարմիր շերտեր՝ ամենատաքը 925 արծաթի համադրությամբ։' }
+    { name: 'Օբսիդիան', headline: 'Հրաբխային ապակի՝ հղկված մինչև սայր։', region: 'Գուտանասար', count: 12, color: '#17181A', img: 'Images/obsidian.webp', note: 'Վերցնում է այնպիսի սրություն, որ ուրիշ ոչ մի քար չի պահի, և տասից ինն անգամ սխալ է կոտրվում։' },
+    { name: 'Նռնաքար', headline: 'Գետի հղկված, խորը նռան գույն։', region: 'Վայոց Ձոր', count: 11, color: '#7B2D3B', img: 'Images/nrnaqar.webp', note: 'Հղկված է քարի ներսի երակի հետագծով, այդ պատճառով երկու նույնատիպ կտոր չկա։' },
+    { name: 'Փիրուզ', headline: 'Պղնձի երկրի կապույտը։', region: 'Սյունիք', count: 9, color: '#2E8C8C', img: 'Images/piryuz.webp', note: 'Երակավոր և հազվադեպ միատարր, հավաքված հին հանքերից մի ափով։' },
+    { name: 'Հասպիս', headline: 'Երկաթի կարմիր, տաք շերտավոր։', region: 'Արենի', count: 9, color: '#A4442B', img: 'Images/haspis.webp', note: 'Խիտ կարմիր շերտեր՝ ամենատաքը 925 արծաթի համադրությամբ։' }
   ];
 
   const quotes = [
@@ -214,7 +214,9 @@
         '<span class="stone-headline">' + s.headline + '</span>' +
         '<span class="stone-note">' + s.note + '</span>' +
         '<span class="stone-swatch-wrap">' +
-          '<span class="stone-swatch" style="background:' + s.color + '"></span>' +
+          (s.img
+            ? '<img src="' + s.img + '" alt="' + s.name + '" class="stone-img" width="90" height="90" loading="lazy">'
+            : '<span class="stone-swatch" style="background:' + s.color + '"></span>') +
         '</span>' +
         '<span class="stone-foot">' +
           '<span class="stone-region">' + s.region + '</span>' +
