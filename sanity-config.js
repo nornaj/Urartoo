@@ -535,7 +535,7 @@
                 const canvas = document.createElement('canvas');
                 let w = img.naturalWidth || 1200;
                 let h = img.naturalHeight || 1200;
-                const maxDim = 1600;
+                const maxDim = 2000;
                 if (w > maxDim || h > maxDim) {
                   if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
                   else { w = Math.round((w * maxDim) / h); h = maxDim; }
@@ -548,7 +548,7 @@
                   URL.revokeObjectURL(objUrl);
                   if (blob) resolve(blob);
                   else resolve(fileOrBlob);
-                }, 'image/webp', 0.85);
+                }, 'image/webp', 0.94);
               };
               img.onerror = () => { URL.revokeObjectURL(objUrl); resolve(fileOrBlob); };
               img.src = objUrl;
@@ -748,14 +748,15 @@
       }
     },
 
-    _optimizeSanityUrl(url, width = 540, quality = 80) {
+    _optimizeSanityUrl(url, width = 1200, quality = 92) {
       if (!url || typeof url !== 'string') return url || 'Images/bracelet.webp';
       if (url.includes('cdn.sanity.io/images/')) {
         const [base, query] = url.split('?');
         const params = new URLSearchParams(query || '');
-        if (!params.has('auto')) params.set('auto', 'format');
+        params.delete('auto');
+        params.set('fm', 'webp');
         if (!params.has('w') && !params.has('width')) params.set('w', String(width));
-        if (!params.has('q')) params.set('q', String(quality));
+        params.set('q', String(quality));
         if (!params.has('fit')) params.set('fit', 'max');
         return `${base}?${params.toString()}`;
       }
@@ -777,9 +778,9 @@
 
       return docs.map((doc, idx) => {
         const rawMain = doc.image || doc.img || 'Images/bracelet.webp';
-        const mainImg = this._optimizeSanityUrl(rawMain, 540, 80);
+        const mainImg = this._optimizeSanityUrl(rawMain, 1200, 92);
         const rawList = (doc.images && doc.images.length > 0) ? doc.images : [rawMain];
-        const imgList = rawList.map(u => this._optimizeSanityUrl(u, 540, 80));
+        const imgList = rawList.map(u => this._optimizeSanityUrl(u, 1200, 92));
         
         let resolvedSku = doc.sku;
         if (!resolvedSku || resolvedSku === 'UR-100' || !resolvedSku.startsWith('UR-')) {
