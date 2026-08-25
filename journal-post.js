@@ -379,12 +379,16 @@
     if (postLocation) postLocation.textContent = currentArticle.location;
     if (postReadTime) postReadTime.textContent = currentArticle.readTime;
     if (postTitle) postTitle.textContent = currentArticle.title;
-    const heroSrc = currentArticle.heroImg || currentArticle.image || 'Images/author.webp';
-    if (postHeroImg) {
+    const heroSrc = currentArticle.heroImg || currentArticle.image || '';
+    if (heroSrc && postHeroImg) {
       postHeroImg.src = heroSrc;
       postHeroImg.alt = currentArticle.title || 'Urartoo';
       postHeroImg.style.display = 'block';
       if (postHeroPlaceholder) postHeroPlaceholder.style.display = 'none';
+    } else if (postHeroPlaceholder) {
+      postHeroPlaceholder.textContent = currentArticle.heroCaption || 'լուսանկար · դաշտային նշում';
+      postHeroPlaceholder.style.display = 'flex';
+      if (postHeroImg) postHeroImg.style.display = 'none';
     }
   }
 
@@ -429,10 +433,12 @@
       html = `<div class="journal-post-block"><p>${escapeHtml(currentArticle.content)}</p></div>`;
     }
 
-    // Author Bench Box
+    // Author Bench Box (Displays author picture)
     html += `
       <div class="bench-author-box">
-        <div class="bench-author-avatar">U</div>
+        <div class="bench-author-avatar">
+          <img src="Images/author.webp" alt="Urartoo Maker" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+        </div>
         <div>
           <div class="bench-author-title">Գրված է աշխատանոցում</div>
           <div class="bench-author-desc">Դաշտային նշումներ վարպետից, ով հավաքում, հղկում և տեղադրում է Urartoo-ի յուրաքանչյուր քար։ Երևան, Հայաստան։</div>

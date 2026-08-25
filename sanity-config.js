@@ -36,7 +36,7 @@
       readTimeEn: '9 min read',
       topic: 'Քարահավաք',
       featured: true,
-      heroImg: 'Images/author.webp',
+      heroImg: '',
       heroCaption: 'լուսանկար · օբսիդիանի լանջը Գուտանասարի վրա առավոտյան',
       featuredProduct: null,
       contentHtml: `
@@ -108,7 +108,7 @@
       readTimeEn: '7 min read',
       topic: 'Քարահավաք',
       featured: false,
-      heroImg: 'Images/author.webp',
+      heroImg: '',
       heroCaption: 'լուսանկար · Արփայի գետաքարերի շերտը և ալյուվիալ նռնաքարի բյուրեղները',
       featuredProduct: null,
       contentHtml: `
@@ -170,7 +170,7 @@
       readTimeEn: '8 min read',
       topic: 'Քարահավաք',
       featured: false,
-      heroImg: 'Images/author.webp',
+      heroImg: '',
       heroCaption: 'լուսանկար · պղնձի օքսիդացված երակները և փիրուզագույն կեղևը լեռնալանջին',
       featuredProduct: null,
       contentHtml: `
@@ -232,7 +232,7 @@
       readTimeEn: '6 min read',
       topic: 'Գեմոլոգիա',
       featured: false,
-      heroImg: 'Images/author.webp',
+      heroImg: '',
       heroCaption: 'լուսանկար · Արագածի հրաբխային տուֆերը և ագաթային նոդուլները քարաթափերում',
       featuredProduct: null,
       contentHtml: `
@@ -294,7 +294,7 @@
       readTimeEn: '7 min read',
       topic: 'Քարահավաք',
       featured: false,
-      heroImg: 'Images/author.webp',
+      heroImg: '',
       heroCaption: 'լուսանկար · Ձորագետի խոնավ կիրճը և մամռանման դենդրիտային կանաչ ագաթները',
       featuredProduct: null,
       contentHtml: `
@@ -356,7 +356,7 @@
       readTimeEn: '8 min read',
       topic: 'Աշխատանոց',
       featured: false,
-      heroImg: 'Images/author.webp',
+      heroImg: '',
       heroCaption: 'լուսանկար · արծաթյա եզրաշերտի (bezel) ճշգրտումը ասիմետրիկ կաբոշոնի շուրջ',
       featuredProduct: null,
       contentHtml: `
@@ -418,7 +418,7 @@
       readTimeEn: '7 min read',
       topic: 'Ստուդիա',
       featured: false,
-      heroImg: 'Images/author.webp',
+      heroImg: '',
       heroCaption: 'լուսանկար · Իջևանի անտառներում գտնված քարացած ծառաբների միկրոկառուցվածքը',
       featuredProduct: null,
       contentHtml: `

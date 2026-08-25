@@ -270,17 +270,27 @@
     if (window.NovaSanity && typeof window.NovaSanity.getJournalPosts === 'function') {
       rawPosts = window.NovaSanity.getJournalPosts();
     }
+    if (!rawPosts || rawPosts.length === 0) {
+      try {
+        rawPosts = JSON.parse(localStorage.getItem('urartoo_journal_posts_v1')) || [];
+      } catch (e) {}
+    }
 
     // Render lead article dynamically
     const leadSection = document.getElementById('lead-article-section');
+    const featPost = (rawPosts && rawPosts.length > 0) ? (rawPosts.find(p => p.featured) || rawPosts[0]) : null;
+
     if (leadSection) {
-      const featPost = rawPosts.find(p => p.featured) || rawPosts[0];
-      if (featPost) {
-        const heroImg = featPost.heroImg || featPost.image || 'Images/author.webp';
+      if (featPost && (currentTopic === 'all' || featPost.topic === currentTopic)) {
+        leadSection.style.display = 'block';
+        const heroImg = featPost.heroImg || featPost.image || '';
         leadSection.innerHTML = `
           <a href="journal-post.html?id=${featPost.slug || featPost.id}" class="lead-note-card">
-            <div style="position: relative; overflow: hidden; min-height: 320px; display: flex; align-items: center; justify-content: center;">
-              <img src="${heroImg}" alt="${featPost.title || ''}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+            <div style="position: relative; overflow: hidden; min-height: 320px; display: flex; align-items: center; justify-content: center; background: var(--basalt);">
+              ${heroImg
+                ? `<img src="${heroImg}" alt="${featPost.title || ''}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">`
+                : `<div style="padding:28px;text-align:center;"><span style="font-size:11px;line-height:1.8;letter-spacing:0.12em;text-transform:uppercase;color:rgba(232,226,218,0.5);">${featPost.heroCaption || featPost.topic || 'Urartoo'}</span></div>`
+              }
             </div>
             <div style="display: flex; flex-direction: column; justify-content: center; padding: 40px 36px;">
               <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
@@ -297,28 +307,27 @@
       }
     }
 
-    if (!rawPosts || rawPosts.length === 0) {
-      try {
-        rawPosts = JSON.parse(localStorage.getItem('urartoo_journal_posts_v1')) || [];
-      } catch (e) {}
-    }
+    let filtered = (rawPosts || []).filter(p => currentTopic === 'all' || p.topic === currentTopic);
+    const gridPosts = (currentTopic === 'all' && featPost) ? filtered.filter(p => (p.slug || p.id) !== (featPost.slug || featPost.id)) : filtered;
 
-    let filtered = rawPosts.filter(p => currentTopic === 'all' || p.topic === currentTopic);
     if (countEl) countEl.textContent = 'Ցուցադրված է ' + filtered.length + ' նշում';
     if (gridEl) {
-      gridEl.innerHTML = filtered.map(p => {
-        const imgUrl = p.heroImg || p.image || 'Images/author.webp';
+      gridEl.innerHTML = gridPosts.map(p => {
+        const imgUrl = p.heroImg || p.image || '';
         return `
           <a href="journal-post.html?id=${p.slug || p.id}" class="note-card" style="text-decoration:none; color:inherit; display:block;">
-            <div class="note-img" style="aspect-ratio:16/10; overflow:hidden;">
-              <div class="note-img-inner" style="width:100%; height:100%;">
-                <img src="${imgUrl}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover; transition:transform 0.4s ease;" class="journal-card-img">
+            <div class="note-img" style="aspect-ratio:16/10; overflow:hidden; background:var(--basalt);">
+              <div class="note-img-inner" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
+                ${imgUrl
+                  ? `<img src="${imgUrl}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover; transition:transform 0.4s ease;" class="journal-card-img">`
+                  : `<span class="placeholder-text" style="font-size:10px;line-height:1.6;letter-spacing:0.08em;color:rgba(232,226,218,0.4);max-width:180px;text-align:center;display:flex;align-items:center;justify-content:center;height:100%;padding:16px;">${p.topic} · ${p.date}</span>`
+                }
               </div>
             </div>
             <div class="note-meta" style="margin-top:12px; font-size:12px; color:var(--tuff);">
               <span style="color:var(--amber);font-weight:600;">${p.topic || 'Քարահավաք'}</span> · ${p.date || ''} · ${p.readTime || ''}
             </div>
-            <div class="note-title" style="font-family:var(--font-serif, Cormorant, serif); font-size:20px; font-weight:500; margin-top:6px; color:var(--obsidian); line-height:1.3;">${p.title}</div>
+            <div class="note-title" style="font-family:var(--font, 'Instrument Sans', sans-serif); font-size:20px; font-weight:500; margin-top:6px; color:var(--obsidian); line-height:1.3;">${p.title}</div>
             <p style="font-size:14px;line-height:1.65;color:var(--graphite);margin:8px 0 0;">${p.lead || p.excerpt || ''}</p>
           </a>
         `;
