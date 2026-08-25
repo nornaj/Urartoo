@@ -634,13 +634,13 @@
       }
     });
   }
-  /* ─── Site-Wide Stone Loader & AJAX-style Page Transitions ────── */
+  /* ─── Site-Wide Stone Loader on Page Leave ────── */
   function initLoader() {
     var loader = document.getElementById('site-loader');
     if (!loader) {
       loader = document.createElement('div');
       loader.id = 'site-loader';
-      loader.className = 'site-loader';
+      loader.className = 'site-loader hidden'; // Starts completely hidden on entering page
       loader.innerHTML =
         '<div class="loader-content">' +
           '<div class="stone-spinner">' +
@@ -649,28 +649,43 @@
           '</div>' +
         '</div>';
       document.body.prepend(loader);
+    } else {
+      loader.classList.add('hidden');
     }
 
-    // Intentionally hold loader for 1.2s on page load before hiding
-    setTimeout(function () {
-      loader.classList.add('hidden');
-    }, 1200);
+    // Ensure loader is hidden when navigating back via browser history (bfcache)
+    window.addEventListener('pageshow', function () {
+      if (loader) loader.classList.add('hidden');
+    });
 
-    // Intercept internal page navigation links for smooth AJAX-like transition
+    // Intercept internal page navigation links to show loader ONLY when leaving the page
     document.addEventListener('click', function (e) {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+
       var link = e.target.closest('a[href]');
       if (!link) return;
 
+      if (link.target && link.target !== '_self') return;
+      if (link.hasAttribute('download')) return;
+
       var href = link.getAttribute('href');
-      if (href && !href.startsWith('#') && !href.startsWith('mailto:') && !href.startsWith('tel:') && !href.startsWith('javascript:')) {
-        var targetUrl = link.href;
-        if (targetUrl && targetUrl.includes(window.location.host)) {
-          e.preventDefault();
-          loader.classList.remove('hidden');
-          setTimeout(function () {
-            window.location.href = targetUrl;
-          }, 600);
+      if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) {
+        return;
+      }
+
+      var targetUrl = link.href;
+      if (targetUrl && targetUrl.includes(window.location.host)) {
+        var currentUrlWithoutHash = window.location.href.split('#')[0];
+        var targetUrlWithoutHash = targetUrl.split('#')[0];
+        if (currentUrlWithoutHash === targetUrlWithoutHash && targetUrl.includes('#')) {
+          return;
         }
+
+        e.preventDefault();
+        loader.classList.remove('hidden');
+        setTimeout(function () {
+          window.location.href = targetUrl;
+        }, 400);
       }
     });
   }
