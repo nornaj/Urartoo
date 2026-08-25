@@ -616,51 +616,83 @@ body.nav-open {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   3. TRUST BAR
+   3. STATS & TRUST BAR
    ═══════════════════════════════════════════════════════════════════ */
 .trust-bar {
   border-bottom: 1px solid var(--pumice);
-  padding: 20px var(--gutter);
+  background: var(--surface);
+  padding: 38px var(--gutter);
 }
 
 .trust-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: 28px;
+  max-width: var(--max);
+  margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+  .trust-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
 }
 
 .trust-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 11px;
-}
-
-.trust-icon {
-  width: 18px;
-  height: 18px;
-  flex: 0 0 auto;
-  display: block;
-  background-color: var(--tuff);
-  mask-size: contain;
-  -webkit-mask-size: contain;
-  mask-repeat: no-repeat;
-  -webkit-mask-repeat: no-repeat;
-}
-
-.trust-label {
-  font-size: 12px;
-  color: var(--graphite);
+  text-align: center;
+  position: relative;
+  padding: 8px 16px;
 }
 
 @media (min-width: 768px) {
-  .trust-bar {
-    padding: 20px max(var(--gutter), calc((100% - var(--max)) / 2));
+  .trust-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 15%;
+    height: 70%;
+    width: 1px;
+    background: var(--pumice);
   }
-  .trust-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 20px;
-  }
-  .trust-label { font-size: 12.5px; }
+}
+
+.stat-number {
+  font-family: Cormorant, serif;
+  font-size: clamp(38px, 4.5vw, 54px);
+  font-weight: 500;
+  color: var(--obsidian);
+  line-height: 1;
+  margin-bottom: 8px;
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  letter-spacing: -0.01em;
+}
+
+.stat-number .stat-accent {
+  color: var(--amber);
+  margin-left: 2px;
+}
+
+.stat-title {
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--obsidian);
+  margin-bottom: 4px;
+  letter-spacing: 0.01em;
+}
+
+.stat-desc {
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--tuff);
+  line-height: 1.5;
+  max-width: 28ch;
 }
 
 /* ═══════════════════════════════════════════════════════════════════

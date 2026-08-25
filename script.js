@@ -49,13 +49,6 @@
   // Notes are now dynamically loaded from NovaSanity in the Field Notes section below
 
 
-  const trustItems = [
-    { label: 'Անվճար առաքում 30,000֏-ից սկսած', d: 'M2 8h13v8H2zM15 11h4l3 3v2h-7zM6 19a1.6 1.6 0 100-3.2 1.6 1.6 0 000 3.2zM18 19a1.6 1.6 0 100-3.2 1.6 1.6 0 000 3.2z' },
-    { label: 'Ծագման վկայականը ներառված է', d: 'M6 3h9l4 4v14H6zM9 11h8M9 15h5M15 3v4h4' },
-    { label: '30-օրյա վերադարձ', d: 'M4 10a8 8 0 0113.6-3.6L21 9M21 4v5h-5M20 14a8 8 0 01-13.6 3.6L3 15M3 20v-5h5' },
-    { label: 'Չափսի անվճար փոփոխում առաջին տարում', d: 'M12 8a6 6 0 100 12 6 6 0 000-12zM9.5 6.5L12 3l2.5 3.5' }
-  ];
-
   /* ─── State ────────────────────────────────────────────────────── */
   let cartCount = 0;
   const added = {};
@@ -102,17 +95,64 @@
   setupMenu('[data-hero-menu-toggle]', '[data-hero-menu]');
   setupMenu('[data-sticky-menu-toggle]', '[data-sticky-menu]');
 
-  /* ─── Trust Bar ────────────────────────────────────────────────── */
-  const trustGrid = document.getElementById('trust-grid');
-  if (trustGrid) {
-    trustGrid.innerHTML = trustItems.map(function (t) {
-      var uri = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.5'%3E%3Cpath d='" + encodeURIComponent(t.d) + "'/%3E%3C/svg%3E\")";
-      return '<span class="trust-item">' +
-        '<span class="trust-icon" style="mask-image:' + uri + ';-webkit-mask-image:' + uri + '"></span>' +
-        '<span class="trust-label">' + t.label + '</span>' +
-      '</span>';
-    }).join('');
+  /* ─── Stats Counter Animation ───────────────────────────────────── */
+  function initStatsAnimation() {
+    const statSection = document.getElementById('stats-section') || document.querySelector('.trust-bar');
+    if (!statSection) return;
+
+    let animated = false;
+
+    function runCounter(el, target, suffix, prefix, duration) {
+      const startTime = performance.now();
+
+      function update(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        // Smooth easeOutExpo curve
+        const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+        const current = Math.round(ease * target);
+
+        el.textContent = (prefix || '') + current + (suffix || '');
+
+        if (progress < 1) {
+          requestAnimationFrame(update);
+        } else {
+          el.textContent = (prefix || '') + target + (suffix || '');
+        }
+      }
+
+      requestAnimationFrame(update);
+    }
+
+    function triggerCounters() {
+      if (animated) return;
+      animated = true;
+      const counters = statSection.querySelectorAll('[data-counter]');
+      counters.forEach(function (counter) {
+        const target = parseInt(counter.dataset.counter, 10) || 0;
+        const suffix = counter.dataset.suffix || '';
+        const prefix = counter.dataset.prefix || '';
+        runCounter(counter, target, suffix, prefix, 1600);
+      });
+    }
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            triggerCounters();
+            observer.unobserve(statSection);
+          }
+        });
+      }, { threshold: 0.15 });
+
+      observer.observe(statSection);
+    } else {
+      triggerCounters();
+    }
   }
+
+  initStatsAnimation();
 
   /* ─── Categories ───────────────────────────────────────────────── */
   function renderCategories() {
