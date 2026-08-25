@@ -497,6 +497,7 @@
         var btn = document.createElement('button');
         btn.className = 'testi-dot' + (i === currentSlide ? ' active' : '');
         btn.setAttribute('data-dot', i);
+        btn.setAttribute('aria-label', 'Կարծիք ' + (i + 1));
         pagination.appendChild(btn);
       }
     }
@@ -512,11 +513,17 @@
       var maxIdx = Math.max(0, totalSlides - visible);
       currentSlide = Math.max(0, Math.min(idx, maxIdx));
 
-      var cardEl = cards[0];
-      if (!cardEl) return;
-      var gap = 24;
-      var cardWidth = cardEl.offsetWidth + gap;
-      track.style.transform = 'translateX(' + (-currentSlide * cardWidth) + 'px)';
+      if (currentSlide === 0) {
+        track.style.transform = 'translateX(0px)';
+      } else {
+        window.requestAnimationFrame(function () {
+          var cardEl = cards[0];
+          if (!cardEl) return;
+          var gap = 24;
+          var cardWidth = (cardEl.getBoundingClientRect ? cardEl.getBoundingClientRect().width : cardEl.offsetWidth) + gap;
+          track.style.transform = 'translateX(' + (-currentSlide * cardWidth) + 'px)';
+        });
+      }
 
       // Update dots
       var dots = pagination ? pagination.querySelectorAll('.testi-dot') : [];

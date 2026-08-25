@@ -748,7 +748,7 @@
       }
     },
 
-    _optimizeSanityUrl(url, width = 800, quality = 80) {
+    _optimizeSanityUrl(url, width = 540, quality = 80) {
       if (!url || typeof url !== 'string') return url || 'Images/bracelet.webp';
       if (url.includes('cdn.sanity.io/images/')) {
         const [base, query] = url.split('?');
@@ -777,9 +777,9 @@
 
       return docs.map((doc, idx) => {
         const rawMain = doc.image || doc.img || 'Images/bracelet.webp';
-        const mainImg = this._optimizeSanityUrl(rawMain, 800, 80);
+        const mainImg = this._optimizeSanityUrl(rawMain, 540, 80);
         const rawList = (doc.images && doc.images.length > 0) ? doc.images : [rawMain];
-        const imgList = rawList.map(u => this._optimizeSanityUrl(u, 800, 80));
+        const imgList = rawList.map(u => this._optimizeSanityUrl(u, 540, 80));
         
         let resolvedSku = doc.sku;
         if (!resolvedSku || resolvedSku === 'UR-100' || !resolvedSku.startsWith('UR-')) {
