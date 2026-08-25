@@ -837,26 +837,27 @@
 
       for (const file of files) {
         try {
-          if (window.NovaSanity) {
-            const uploadedAssetUrl = await window.NovaSanity.uploadImage(file);
+          const webpBlob = await this.compressToWebP(file);
+          if (window.NovaSanity && typeof window.NovaSanity.uploadImage === 'function') {
+            const uploadedAssetUrl = await window.NovaSanity.uploadImage(webpBlob);
             if (uploadedAssetUrl) {
               this.currentGallery.push(uploadedAssetUrl);
               continue;
             }
           }
+
+          // Local fallback base64 with compressed blob
+          await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+              if (evt.target.result) this.currentGallery.push(evt.target.result);
+              resolve();
+            };
+            reader.readAsDataURL(webpBlob);
+          });
         } catch (err) {
           console.error('Image upload failed:', err);
         }
-
-        // Local fallback base64
-        await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onload = (evt) => {
-            if (evt.target.result) this.currentGallery.push(evt.target.result);
-            resolve();
-          };
-          reader.readAsDataURL(file);
-        });
       }
 
       this.activeImageIndex = Math.max(0, this.currentGallery.length - 1);

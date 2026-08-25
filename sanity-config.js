@@ -517,18 +517,55 @@
     },
 
     /**
-     * Uploads image binary/file to Sanity Assets API
+     * Uploads image binary/file to Sanity Assets API (auto-converts to WebP if in browser)
      */
     async uploadImage(fileOrBlob) {
       const url = `https://${SANITY_CONFIG.projectId}.api.sanity.io/v${SANITY_CONFIG.apiVersion}/assets/images/${SANITY_CONFIG.dataset}`;
       try {
+        let payload = fileOrBlob;
+        let mimeType = (fileOrBlob && fileOrBlob.type) ? fileOrBlob.type : 'image/webp';
+
+        // Auto-compress to WebP in browser if raw uncompressed image is passed
+        if (typeof window !== 'undefined' && typeof document !== 'undefined' && fileOrBlob instanceof Blob && (!fileOrBlob.type || fileOrBlob.type !== 'image/webp')) {
+          try {
+            payload = await new Promise((resolve, reject) => {
+              const img = new Image();
+              const objUrl = URL.createObjectURL(fileOrBlob);
+              img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let w = img.naturalWidth || 1200;
+                let h = img.naturalHeight || 1200;
+                const maxDim = 1600;
+                if (w > maxDim || h > maxDim) {
+                  if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                  else { w = Math.round((w * maxDim) / h); h = maxDim; }
+                }
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                canvas.toBlob((blob) => {
+                  URL.revokeObjectURL(objUrl);
+                  if (blob) resolve(blob);
+                  else resolve(fileOrBlob);
+                }, 'image/webp', 0.85);
+              };
+              img.onerror = () => { URL.revokeObjectURL(objUrl); resolve(fileOrBlob); };
+              img.src = objUrl;
+            });
+            mimeType = payload.type || 'image/webp';
+          } catch (e) {
+            console.warn('[NovaSanity] Fallback upload without canvas conversion:', e);
+          }
+        }
+
         const res = await fetch(url, {
           method: 'POST',
           headers: {
-            'Content-Type': fileOrBlob.type || 'image/jpeg',
+            'Content-Type': mimeType,
             'Authorization': `Bearer ${SANITY_CONFIG.token}`
           },
-          body: fileOrBlob
+          body: payload
         });
         if (!res.ok) throw new Error(`Sanity Asset Upload Failed: ${res.status}`);
         const data = await res.json();
@@ -711,6 +748,20 @@
       }
     },
 
+    _optimizeSanityUrl(url, width = 800, quality = 80) {
+      if (!url || typeof url !== 'string') return url || 'Images/bracelet.webp';
+      if (url.includes('cdn.sanity.io/images/')) {
+        const [base, query] = url.split('?');
+        const params = new URLSearchParams(query || '');
+        if (!params.has('auto')) params.set('auto', 'format');
+        if (!params.has('w') && !params.has('width')) params.set('w', String(width));
+        if (!params.has('q')) params.set('q', String(quality));
+        if (!params.has('fit')) params.set('fit', 'max');
+        return `${base}?${params.toString()}`;
+      }
+      return url;
+    },
+
     _transformSanityProducts(docs) {
       let maxSequential = 0;
       // First pass: find highest existing UR-XXX
@@ -725,8 +776,10 @@
       });
 
       return docs.map((doc, idx) => {
-        const mainImg = doc.image || doc.img || 'Images/bracelet.webp';
-        const imgList = (doc.images && doc.images.length > 0) ? doc.images : [mainImg];
+        const rawMain = doc.image || doc.img || 'Images/bracelet.webp';
+        const mainImg = this._optimizeSanityUrl(rawMain, 800, 80);
+        const rawList = (doc.images && doc.images.length > 0) ? doc.images : [rawMain];
+        const imgList = rawList.map(u => this._optimizeSanityUrl(u, 800, 80));
         
         let resolvedSku = doc.sku;
         if (!resolvedSku || resolvedSku === 'UR-100' || !resolvedSku.startsWith('UR-')) {

@@ -202,7 +202,7 @@
       return '<div class="product-card' + (isSold ? ' sold' : '') + '" data-id="' + p.id + '">' +
         '<div class="media">' +
           '<a href="product.html?id=' + p.id + '" class="media-inner">' +
-            '<img src="' + p.img + '" alt="' + p.name + '" loading="lazy">' +
+            '<img src="' + p.img + '" alt="' + p.name + '" loading="lazy" width="300" height="300">' +
           '</a>' +
           '<button class="heart' + (isSaved ? ' saved' : '') + '" data-save="' + p.id + '" aria-label="Պահպանել զարդը">' + heartSvg + '</button>' +
           (isSold

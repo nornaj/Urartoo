@@ -7,7 +7,13 @@
   <meta name="description" content="Urartoo — Գաղտնիության քաղաքականություն, օգտագործման պայմաններ և հեղինակային ձեռագործ զարդերի երաշխիք։">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;0,600&family=Noto+Serif+Armenian:wght@300;400;500;600&family=Noto+Sans+Armenian:wght@300;400;500;600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://g1vi85kp.api.sanity.io" crossorigin>
+  <link rel="preconnect" href="https://cdn.sanity.io" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;0,600&family=Noto+Serif+Armenian:wght@300;400;500;600&family=Noto+Sans+Armenian:wght@300;400;500;600;700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;0,600&family=Noto+Serif+Armenian:wght@300;400;500;600&family=Noto+Sans+Armenian:wght@300;400;500;600;700&family=Instrument+Sans:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;0,600&family=Noto+Serif+Armenian:wght@300;400;500;600&family=Noto+Sans+Armenian:wght@300;400;500;600;700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  </noscript>
   <link rel="stylesheet" href="styles.css">
   <style>
     .policy-wrapper {
@@ -125,7 +131,7 @@
       <a href="contact.html" class="nav-link">Կապ</a>
     </nav>
     <a href="index.html" class="logo">
-      <img src="Images/Urartoo-Logo.webp" alt="Urartoo">
+      <img src="Images/Urartoo-Logo.webp" alt="Urartoo" width="128" height="32">
     </a>
     <div class="hdr-utils">
       <a href="account.html" class="util-link nav-link nav-account-icon" aria-label="Իմ հաշիվը" title="Իմ հաշիվը">
@@ -154,7 +160,7 @@
       <a href="contact.html" class="nav-link">Կապ</a>
     </nav>
     <a href="index.html" class="logo">
-      <img src="Images/Urartoo-Logo.webp" alt="Urartoo">
+      <img src="Images/Urartoo-Logo.webp" alt="Urartoo" width="128" height="32" fetchpriority="high">
     </a>
     <div class="hdr-utils">
       <a href="account.html" class="util-link nav-link nav-account-icon" aria-label="Իմ հաշիվը" title="Իմ հաշիվը">
@@ -229,7 +235,9 @@
     <div class="footer-grid">
       <!-- 1. Brand -->
       <div class="footer-brand">
-        <img src="Images/Urartoo-Logo.webp" alt="Urartoo" class="footer-logo">
+        <a href="index.html" class="footer-logo-link" aria-label="Urartoo գլխավոր">
+          <img src="Images/Urartoo-Logo.webp" alt="Urartoo" class="footer-logo" width="128" height="32" loading="lazy">
+        </a>
         <p>Հայաստանի տարածքում հավաքված քարեր՝ հղկված և տեղադրված մեկ վարպետի կողմից Երևանում։</p>
       </div>
 
@@ -303,6 +311,6 @@
     </div>
   </aside>
 
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>

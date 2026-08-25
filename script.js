@@ -56,14 +56,21 @@
 
   /* ─── Header Scroll Observer ───────────────────────────────────── */
   const stickyHdr = document.getElementById('sticky-header');
+  let scrollTicking = false;
 
   function checkScroll() {
     if (!stickyHdr) return;
-    // Reveal sticky light header smoothly when user scrolls down past 80px on any page
-    if (window.scrollY > 80) {
-      stickyHdr.classList.add('visible');
-    } else {
-      stickyHdr.classList.remove('visible');
+    if (!scrollTicking) {
+      window.requestAnimationFrame(function () {
+        const isPast = window.scrollY > 80;
+        if (isPast && !stickyHdr.classList.contains('visible')) {
+          stickyHdr.classList.add('visible');
+        } else if (!isPast && stickyHdr.classList.contains('visible')) {
+          stickyHdr.classList.remove('visible');
+        }
+        scrollTicking = false;
+      });
+      scrollTicking = true;
     }
   }
 
@@ -172,7 +179,7 @@
       return '<a href="shop.html?cat=' + encodeURIComponent(c.name) + '" class="category-card">' +
         '<div class="category-img">' +
           '<div class="category-img-inner">' +
-            '<img src="' + c.img + '" alt="' + c.name + '" loading="lazy">' +
+            '<img src="' + c.img + '" alt="' + c.name + '" loading="lazy" width="360" height="480">' +
           '</div>' +
           '<span class="category-badge">' + c.name + ' (' + realCount + ')</span>' +
         '</div>' +
@@ -336,7 +343,7 @@
       return '<div class="product-card' + (isSold ? ' sold' : '') + '" data-idx="' + pId + '">' +
         '<div class="media">' +
           '<a href="product.html?id=' + pId + '" class="media-inner">' +
-            '<img src="' + (p.img || p.image || 'Images/bracelet.webp') + '" alt="' + p.name + '" loading="lazy">' +
+            '<img src="' + (p.img || p.image || 'Images/bracelet.webp') + '" alt="' + p.name + '" loading="lazy" width="300" height="300">' +
           '</a>' +
           '<button class="heart' + (isSaved ? ' saved' : '') + '" data-save="' + pId + '" aria-label="Պահպանել զարդը">' + heartSvg + '</button>' +
           (isSold
@@ -441,14 +448,12 @@
 
   if (prodGrid && prevBtn && nextBtn) {
     prevBtn.addEventListener('click', function () {
-      var card = prodGrid.querySelector('.product-card');
-      var cardWidth = card ? card.offsetWidth : 280;
-      prodGrid.scrollBy({ left: -(cardWidth + 20), behavior: 'smooth' });
+      var scrollAmount = Math.max(280, Math.round(prodGrid.clientWidth * 0.75));
+      prodGrid.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
     });
     nextBtn.addEventListener('click', function () {
-      var card = prodGrid.querySelector('.product-card');
-      var cardWidth = card ? card.offsetWidth : 280;
-      prodGrid.scrollBy({ left: (cardWidth + 20), behavior: 'smooth' });
+      var scrollAmount = Math.max(280, Math.round(prodGrid.clientWidth * 0.75));
+      prodGrid.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     });
   }
 
