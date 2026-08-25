@@ -603,15 +603,12 @@
     // Show latest 3 posts
     var latest = posts.slice(0, 3);
     notesGrid.innerHTML = latest.map(function (n) {
-      var imgUrl = n.heroImg || n.image || n.img || '';
+      var imgUrl = n.heroImg || n.image || n.img || 'Images/author.webp';
       var meta = (n.topic || '') + (n.date ? ' · ' + n.date : '');
       return '<a href="journal-post.html?id=' + (n.slug || n.id) + '" class="note-card">' +
         '<div class="note-img">' +
           '<div class="note-img-inner">' +
-            (imgUrl
-              ? '<img src="' + imgUrl + '" alt="' + (n.title || '') + '" loading="lazy">'
-              : '<span class="placeholder-text" style="font-family:var(--mono);font-size:9.5px;line-height:1.8;color:rgba(12,14,13,0.26);max-width:180px;text-align:center;">' + meta + '</span>'
-            ) +
+            '<img src="' + imgUrl + '" alt="' + (n.title || '') + '" loading="lazy" style="width:100%;height:100%;object-fit:cover;">' +
           '</div>' +
         '</div>' +
         '<div class="note-meta">' + meta + '</div>' +

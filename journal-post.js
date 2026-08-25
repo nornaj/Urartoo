@@ -24,7 +24,7 @@
       readTimeEn: '9 min read',
       topic: 'Քարահավաք',
       featured: true,
-      heroImg: '',
+      heroImg: 'Images/author.webp',
       heroCaption: 'գլխավոր լուսանկար · օբսիդիանի լանջը Գուտանասարի վրա առավոտյան',
       featuredProduct: null,
       blocks: [
@@ -73,7 +73,7 @@
       readTimeEn: '7 min read',
       topic: 'Քարահավաք',
       featured: false,
-      heroImg: '',
+      heroImg: 'Images/author.webp',
       heroCaption: 'լուսանկար · Արփայի գետաքարերի շերտը և ալյուվիալ նռնաքարի բյուրեղները',
       featuredProduct: null,
       blocks: [
@@ -117,7 +117,7 @@
       readTimeEn: '8 min read',
       topic: 'Քարահավաք',
       featured: false,
-      heroImg: '',
+      heroImg: 'Images/author.webp',
       heroCaption: 'լուսանկար · պղնձի օքսիդացված երակները և փիրուզագույն կեղևը լեռնալանջին',
       featuredProduct: null,
       blocks: [
@@ -161,7 +161,7 @@
       readTimeEn: '6 min read',
       topic: 'Գեմոլոգիա',
       featured: false,
-      heroImg: '',
+      heroImg: 'Images/author.webp',
       heroCaption: 'լուսանկար · Արագածի հրաբխային տուֆերը և ագաթային նոդուլները քարաթափերում',
       featuredProduct: null,
       blocks: [
@@ -205,7 +205,7 @@
       readTimeEn: '7 min read',
       topic: 'Քարահավաք',
       featured: false,
-      heroImg: '',
+      heroImg: 'Images/author.webp',
       heroCaption: 'լուսանկար · Ձորագետի խոնավ կիրճը և մամռանման դենդրիտային կանաչ ագաթները',
       featuredProduct: null,
       blocks: [
@@ -249,7 +249,7 @@
       readTimeEn: '8 min read',
       topic: 'Աշխատանոց',
       featured: false,
-      heroImg: '',
+      heroImg: 'Images/author.webp',
       heroCaption: 'լուսանկար · արծաթյա եզրաշերտի (bezel) ճշգրտումը ասիմետրիկ կաբոշոնի շուրջ',
       featuredProduct: null,
       blocks: [
@@ -293,7 +293,7 @@
       readTimeEn: '7 min read',
       topic: 'Ստուդիա',
       featured: false,
-      heroImg: '',
+      heroImg: 'Images/author.webp',
       heroCaption: 'լուսանկար · Իջևանի անտառներում գտնված քարացած ծառաբների միկրոկառուցվածքը',
       featuredProduct: null,
       blocks: [
@@ -379,15 +379,12 @@
     if (postLocation) postLocation.textContent = currentArticle.location;
     if (postReadTime) postReadTime.textContent = currentArticle.readTime;
     if (postTitle) postTitle.textContent = currentArticle.title;
-    if (postLead) postLead.textContent = currentArticle.lead || currentArticle.excerpt || '';
-
-    if (currentArticle.heroImg && postHeroImg) {
-      postHeroImg.src = currentArticle.heroImg;
-      postHeroImg.alt = currentArticle.title;
+    const heroSrc = currentArticle.heroImg || currentArticle.image || 'Images/author.webp';
+    if (postHeroImg) {
+      postHeroImg.src = heroSrc;
+      postHeroImg.alt = currentArticle.title || 'Urartoo';
       postHeroImg.style.display = 'block';
       if (postHeroPlaceholder) postHeroPlaceholder.style.display = 'none';
-    } else if (postHeroPlaceholder) {
-      postHeroPlaceholder.textContent = currentArticle.heroCaption || 'լուսանկար · դաշտային նշում';
     }
   }
 

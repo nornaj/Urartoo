@@ -36,7 +36,7 @@
       readTimeEn: '9 min read',
       topic: 'Քարահավաք',
       featured: true,
-      heroImg: '',
+      heroImg: 'Images/author.webp',
       heroCaption: 'լուսանկար · օբսիդիանի լանջը Գուտանասարի վրա առավոտյան',
       featuredProduct: null,
       contentHtml: `
@@ -108,7 +108,7 @@
       readTimeEn: '7 min read',
       topic: 'Քարահավաք',
       featured: false,
-      heroImg: '',
+      heroImg: 'Images/author.webp',
       heroCaption: 'լուսանկար · Արփայի գետաքարերի շերտը և ալյուվիալ նռնաքարի բյուրեղները',
       featuredProduct: null,
       contentHtml: `
@@ -170,7 +170,7 @@
       readTimeEn: '8 min read',
       topic: 'Քարահավաք',
       featured: false,
-      heroImg: '',
+      heroImg: 'Images/author.webp',
       heroCaption: 'լուսանկար · պղնձի օքսիդացված երակները և փիրուզագույն կեղևը լեռնալանջին',
       featuredProduct: null,
       contentHtml: `
@@ -232,7 +232,7 @@
       readTimeEn: '6 min read',
       topic: 'Գեմոլոգիա',
       featured: false,
-      heroImg: '',
+      heroImg: 'Images/author.webp',
       heroCaption: 'լուսանկար · Արագածի հրաբխային տուֆերը և ագաթային նոդուլները քարաթափերում',
       featuredProduct: null,
       contentHtml: `
@@ -294,7 +294,7 @@
       readTimeEn: '7 min read',
       topic: 'Քարահավաք',
       featured: false,
-      heroImg: '',
+      heroImg: 'Images/author.webp',
       heroCaption: 'լուսանկար · Ձորագետի խոնավ կիրճը և մամռանման դենդրիտային կանաչ ագաթները',
       featuredProduct: null,
       contentHtml: `
@@ -356,7 +356,7 @@
       readTimeEn: '8 min read',
       topic: 'Աշխատանոց',
       featured: false,
-      heroImg: '',
+      heroImg: 'Images/author.webp',
       heroCaption: 'լուսանկար · արծաթյա եզրաշերտի (bezel) ճշգրտումը ասիմետրիկ կաբոշոնի շուրջ',
       featuredProduct: null,
       contentHtml: `
@@ -418,7 +418,7 @@
       readTimeEn: '7 min read',
       topic: 'Ստուդիա',
       featured: false,
-      heroImg: '',
+      heroImg: 'Images/author.webp',
       heroCaption: 'լուսանկար · Իջևանի անտառներում գտնված քարացած ծառաբների միկրոկառուցվածքը',
       featuredProduct: null,
       contentHtml: `
@@ -868,7 +868,7 @@
         titleEn: postData.titleEn || '',
         lead: postData.lead || postData.excerpt || '',
         excerpt: postData.lead || postData.excerpt || '',
-        heroImg: postData.heroImg || 'Images/stone-quarry.webp',
+        heroImg: postData.heroImg || 'Images/author.webp',
         heroCaption: postData.heroCaption || '',
         contentHtml: postData.contentHtml || '',
         content: postData.content || postData.contentHtml || '',

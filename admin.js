@@ -1667,7 +1667,7 @@
       if (tbody) {
         tbody.innerHTML = filtered.map(p => {
           const pId = p.id || p._sanityId || p.slug;
-          const heroImg = p.heroImg || 'Images/stone-quarry.webp';
+          const heroImg = p.heroImg || 'Images/author.webp';
           const isFeat = Boolean(p.featured);
 
           return `
@@ -1712,7 +1712,7 @@
       if (mobileCards) {
         mobileCards.innerHTML = filtered.map(p => {
           const pId = p.id || p._sanityId || p.slug;
-          const heroImg = p.heroImg || 'Images/stone-quarry.webp';
+          const heroImg = p.heroImg || 'Images/author.webp';
           const isFeat = Boolean(p.featured);
 
           return `
@@ -2126,7 +2126,7 @@
       const topic = document.getElementById('be-topic')?.value || 'Քարահավաք';
       const featured = Boolean(document.getElementById('be-featured')?.checked);
 
-      const heroImg = document.getElementById('be-hero-url')?.value.trim() || 'Images/stone-quarry.webp';
+      const heroImg = document.getElementById('be-hero-url')?.value.trim() || 'Images/author.webp';
       const heroCaption = document.getElementById('be-hero-caption')?.value.trim() || '';
 
       const visualEl = document.getElementById('be-content-visual');
