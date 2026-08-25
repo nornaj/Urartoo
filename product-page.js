@@ -142,14 +142,18 @@
     // Wishlist button
     var wishBtn = document.getElementById('pdp-add-wish');
     if (wishBtn) {
-      var wishlistIds = [];
-      try { wishlistIds = JSON.parse(localStorage.getItem(WISHLIST_KEY)) || []; } catch (e) {}
-      var isWished = wishlistIds.includes(product.id);
+      var prodIdStr = String(product.id || product._sanityId);
+      var getWished = function () {
+        var ids = [];
+        try { ids = JSON.parse(localStorage.getItem(WISHLIST_KEY)) || []; } catch (e) {}
+        return ids.some(function (i) { return String(i) === prodIdStr || (product._sanityId && String(i) === String(product._sanityId)); });
+      };
 
       var updateWishBtn = function() {
+        var isWished = getWished();
         if (isWished) {
           wishBtn.classList.add('pdp-wished');
-          wishBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="#2D6B4F" stroke="#2D6B4F" stroke-width="1.6"><path d="M12 20.5l-7.1-7a4.4 4.4 0 016.2-6.2l.9.9.9-.9a4.4 4.4 0 016.2 6.2z"/></svg>';
+          wishBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="#A4442B" stroke="#A4442B" stroke-width="1.6"><path d="M12 20.5l-7.1-7a4.4 4.4 0 016.2-6.2l.9.9.9-.9a4.4 4.4 0 016.2 6.2z"/></svg>';
         } else {
           wishBtn.classList.remove('pdp-wished');
           wishBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 20.5l-7.1-7a4.4 4.4 0 016.2-6.2l.9.9.9-.9a4.4 4.4 0 016.2 6.2z"/></svg>';
@@ -158,15 +162,24 @@
       updateWishBtn();
 
       wishBtn.onclick = function () {
-        isWished = !isWished;
+        var wishlistIds = [];
+        try { wishlistIds = JSON.parse(localStorage.getItem(WISHLIST_KEY)) || []; } catch (e) {}
+        var isWished = wishlistIds.some(function (i) { return String(i) === prodIdStr || (product._sanityId && String(i) === String(product._sanityId)); });
+
         if (isWished) {
-          wishlistIds.push(product.id);
+          wishlistIds = wishlistIds.filter(function (i) { return String(i) !== prodIdStr && (!product._sanityId || String(i) !== String(product._sanityId)); });
         } else {
-          wishlistIds = wishlistIds.filter(function (i) { return i !== product.id; });
+          wishlistIds.push(prodIdStr);
         }
         localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlistIds));
         updateWishBtn();
+        window.dispatchEvent(new CustomEvent('urartoo:wishlist-updated', { detail: { id: prodIdStr, saved: !isWished } }));
       };
+
+      window.addEventListener('urartoo:wishlist-updated', updateWishBtn);
+      window.addEventListener('storage', function(e) {
+        if (e.key === WISHLIST_KEY) updateWishBtn();
+      });
     }
 
     // Related products (same category or stone, exclude current, always show 4)

@@ -224,6 +224,40 @@
     });
   }
 
+  /* ─── Wishlist & Cart Helpers ───────────────────────────────────── */
+  const WISHLIST_KEY = 'urartoo_wishlist_v1';
+
+  function getWishlistArray() {
+    try {
+      var w = JSON.parse(localStorage.getItem(WISHLIST_KEY));
+      return Array.isArray(w) ? w : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function isWishlisted(id) {
+    if (!id) return false;
+    var w = getWishlistArray();
+    var idStr = String(id);
+    return w.some(function (item) { return String(item) === idStr; });
+  }
+
+  function toggleWishlistItem(id) {
+    if (!id) return false;
+    var w = getWishlistArray();
+    var idStr = String(id);
+    var exists = w.some(function (item) { return String(item) === idStr; });
+    if (exists) {
+      w = w.filter(function (item) { return String(item) !== idStr; });
+    } else {
+      w.push(idStr);
+    }
+    localStorage.setItem(WISHLIST_KEY, JSON.stringify(w));
+    window.dispatchEvent(new CustomEvent('urartoo:wishlist-updated', { detail: { id: idStr, saved: !exists } }));
+    return !exists;
+  }
+
   function renderProducts() {
     var grid = document.getElementById('products-grid');
     if (!grid) return;
@@ -251,12 +285,12 @@
       var dot = STONE_DOTS[p.stone] || '#2C2F2E';
       var isSold = p.sold || p.stock === 0;
       var isAdded = !!cartMap[String(pId)] || !!cartMap[String(p._sanityId)] || !!added[pId];
-      var isSaved = !!saved[pId];
+      var isSaved = isWishlisted(pId) || (p._sanityId && isWishlisted(p._sanityId));
       var formattedPrice = typeof p.price === 'number' ? (p.price + '֏') : p.price;
 
       var heartSvg = '<svg width="15" height="15" viewBox="0 0 24 24" fill="' +
-        (isSaved ? '#2D6B4F' : 'none') + '" stroke="' +
-        (isSaved ? '#2D6B4F' : '#0C0E0D') + '" stroke-width="1.5">' +
+        (isSaved ? '#A4442B' : 'none') + '" stroke="' +
+        (isSaved ? '#A4442B' : '#0C0E0D') + '" stroke-width="1.6">' +
         '<path d="M12 20.5l-7.1-7a4.4 4.4 0 016.2-6.2l.9.9.9-.9a4.4 4.4 0 016.2 6.2z"/></svg>';
 
       return '<div class="product-card' + (isSold ? ' sold' : '') + '" data-idx="' + pId + '">' +
@@ -324,11 +358,26 @@
 
       if (saveBtn) {
         var pid2 = saveBtn.dataset.save;
-        saved[pid2] = !saved[pid2];
+        var prod2 = currentPieces.find(function(item) {
+          return String(item.id) === String(pid2) || String(item._sanityId) === String(pid2);
+        }) || currentPieces[pid2];
+        var nowSaved = toggleWishlistItem(pid2);
         renderProducts();
+        if (prod2) {
+          showStorefrontToast(nowSaved ? '«' + prod2.name + '» ավելացվեց պահպանվածներում։' : '«' + prod2.name + '» հեռացվեց պահպանվածներից։');
+        }
       }
     };
   }
+
+  window.addEventListener('urartoo:wishlist-updated', function () {
+    renderProducts();
+  });
+  window.addEventListener('storage', function (e) {
+    if (e.key === WISHLIST_KEY) {
+      renderProducts();
+    }
+  });
 
   function updateAllStoreData() {
     renderProducts();

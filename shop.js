@@ -195,8 +195,8 @@
       var isSaved = !!savedItems[p.id];
 
       var heartSvg = '<svg width="15" height="15" viewBox="0 0 24 24" fill="' +
-        (isSaved ? '#2D6B4F' : 'none') + '" stroke="' +
-        (isSaved ? '#2D6B4F' : '#0C0E0D') + '" stroke-width="1.5">' +
+        (isSaved ? '#A4442B' : 'none') + '" stroke="' +
+        (isSaved ? '#A4442B' : '#0C0E0D') + '" stroke-width="1.6">' +
         '<path d="M12 20.5l-7.1-7a4.4 4.4 0 016.2-6.2l.9.9.9-.9a4.4 4.4 0 016.2 6.2z"/></svg>';
 
       return '<div class="product-card' + (isSold ? ' sold' : '') + '" data-id="' + p.id + '">' +
@@ -391,8 +391,31 @@
         if (savedItems[key]) wishlistIds.push(key);
       }
       localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlistIds));
+      window.dispatchEvent(new CustomEvent('urartoo:wishlist-updated', { detail: { id: id2, saved: !!savedItems[id2] } }));
+
+      var clickedProd = getProductsList().find(function (p) {
+        return String(p.id) === String(id2) || String(p._sanityId) === String(id2);
+      });
+      if (clickedProd) {
+        showShopToast(savedItems[id2] ? '«' + clickedProd.name + '» ավելացվեց պահպանվածներում։' : '«' + clickedProd.name + '» հեռացվեց պահպանվածներից։');
+      }
+
       filterAndSort();
     }
+  });
+
+  function reloadWishlistFromStorage() {
+    savedItems = {};
+    try {
+      var storedWishlist = JSON.parse(localStorage.getItem(WISHLIST_KEY)) || [];
+      storedWishlist.forEach(function (id) { savedItems[id] = true; });
+    } catch (e) {}
+    filterAndSort();
+  }
+
+  window.addEventListener('urartoo:wishlist-updated', reloadWishlistFromStorage);
+  window.addEventListener('storage', function(e) {
+    if (e.key === WISHLIST_KEY) reloadWishlistFromStorage();
   });
 
   // Initial render - try immediately, then re-render when Sanity data arrives

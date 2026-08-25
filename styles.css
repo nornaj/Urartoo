@@ -865,22 +865,41 @@ body.nav-open {
   position: absolute;
   right: 12px;
   top: 12px;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   border: none;
-  background: rgba(250, 248, 245, 0.92);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 8px rgba(12, 14, 13, 0.08);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 2;
+  opacity: 0.88;
+  transition: opacity 0.25s ease, transform 0.25s ease, background 0.25s ease;
+  z-index: 3;
 }
 .product-card:hover .heart,
 .product-card .heart.saved {
   opacity: 1;
+}
+.product-card .heart:hover {
+  transform: scale(1.1);
+  background: #FFFFFF;
+}
+.product-card .heart.saved {
+  background: #FFFFFF;
+  opacity: 1;
+}
+.product-card .heart.saved svg,
+.heart.saved svg,
+.pdp-wish-btn.pdp-wished svg {
+  fill: #A4442B !important;
+  stroke: #A4442B !important;
+}
+.product-card .heart:hover svg {
+  stroke: #A4442B;
 }
 
 /* Add to cart button */

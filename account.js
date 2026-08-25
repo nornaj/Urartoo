@@ -577,17 +577,21 @@
     let wishlistIds = [];
     try {
       wishlistIds = JSON.parse(localStorage.getItem(WISHLIST_KEY)) || [];
+      if (!Array.isArray(wishlistIds)) wishlistIds = [];
     } catch (e) {
       wishlistIds = [];
     }
 
     if (badge) badge.textContent = wishlistIds.length;
 
-    const savedItems = CATALOG_PRODUCTS.filter(p => wishlistIds.includes(p.id));
+    const allProducts = getCatalogProducts();
+    const savedItems = allProducts.filter(p => {
+      return wishlistIds.some(wid => String(wid) === String(p.id) || (p._sanityId && String(wid) === String(p._sanityId)));
+    });
 
-    if (savedItems.length === 0) {
+    if (wishlistIds.length === 0 || savedItems.length === 0) {
       container.innerHTML = '<div class="empty-dash-state">' +
-        '<p>Դուք դեռ չունեք պահպանված զարդեր։</p>' +
+        '<p>' + (wishlistIds.length > 0 && allProducts.length === 0 ? 'Բեռնվում են պահպանված զարդերը...' : 'Դուք դեռ չունեք պահպանված զարդեր։') + '</p>' +
         '<a href="shop.html" class="btn-primary" style="display:inline-block; padding:12px 24px; text-decoration:none;">Ուսումնասիրել տեսականին</a>' +
       '</div>';
       return;
@@ -595,16 +599,19 @@
 
     container.innerHTML = '<div class="account-wishlist-grid">' +
       savedItems.map(p => {
-        return '<div class="wishlist-card" data-id="' + p.id + '">' +
+        const pId = p.id || p._sanityId;
+        const pImg = p.img || p.image || 'Images/bracelet.webp';
+        const formattedPrice = typeof p.price === 'number' ? (p.price + '֏') : p.price;
+        return '<div class="wishlist-card" data-id="' + pId + '">' +
           '<div class="wishlist-card-media">' +
-            '<img src="' + p.img + '" alt="' + p.name + '" loading="lazy">' +
+            '<a href="product.html?id=' + pId + '" style="display:block; width:100%; height:100%;"><img src="' + pImg + '" alt="' + p.name + '" loading="lazy"></a>' +
           '</div>' +
           '<div class="wishlist-card-body">' +
-            '<div class="wishlist-card-name">' + p.name + '</div>' +
-            '<div class="wishlist-card-price">' + p.price + '֏' + '</div>' +
+            '<div class="wishlist-card-name"><a href="product.html?id=' + pId + '" style="color:inherit;text-decoration:none;">' + p.name + '</a></div>' +
+            '<div class="wishlist-card-price">' + formattedPrice + '</div>' +
             '<div class="wishlist-actions">' +
-              '<button class="btn-wish-add" onclick="addWishlistItemToCart(' + p.id + ')">Ավելացնել զամբյուղ</button>' +
-              '<button class="btn-wish-remove" onclick="removeWishlistItem(' + p.id + ')">×</button>' +
+              '<button class="btn-wish-add" onclick="addWishlistItemToCart(\'' + pId + '\')">Ավելացնել զամբյուղ</button>' +
+              '<button class="btn-wish-remove" onclick="removeWishlistItem(\'' + pId + '\')" title="Հեռացնել">×</button>' +
             '</div>' +
           '</div>' +
         '</div>';
@@ -614,7 +621,8 @@
 
   // Add Item from Wishlist to Cart
   window.addWishlistItemToCart = function (id) {
-    const prod = CATALOG_PRODUCTS.find(p => p.id === id);
+    const allProducts = getCatalogProducts();
+    const prod = allProducts.find(p => String(p.id) === String(id) || String(p._sanityId) === String(id));
     if (!prod) return;
 
     let cart = [];
@@ -622,16 +630,24 @@
       cart = JSON.parse(localStorage.getItem(CART_KEY)) || [];
     } catch (e) { cart = []; }
 
-    const idx = cart.findIndex(c => c.id === id);
+    const idx = cart.findIndex(c => String(c.id) === String(prod.id) || (prod._sanityId && String(c.id) === String(prod._sanityId)) || (c._sanityId && String(c._sanityId) === String(prod._sanityId)));
     if (idx > -1) {
-      cart[idx].qty += 1;
+      cart[idx].qty = (cart[idx].qty || 1) + 1;
     } else {
-      cart.push({ id: prod.id, name: prod.name, price: prod.price, img: prod.img, qty: 1 });
+      cart.push({
+        id: prod.id || prod._sanityId,
+        _sanityId: prod._sanityId,
+        name: prod.name,
+        price: Number(prod.price) || 0,
+        img: prod.img || prod.image || 'Images/bracelet.webp',
+        cat: prod.cat || prod.category || 'Մատանիներ',
+        qty: 1
+      });
     }
     localStorage.setItem(CART_KEY, JSON.stringify(cart));
 
     // Update cart badge
-    const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+    const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
     document.querySelectorAll('[data-cart-count]').forEach(badge => badge.textContent = totalQty);
 
     alert('«' + prod.name + '» զարդն ավելացվեց զամբյուղում։');
@@ -644,10 +660,28 @@
       wishlistIds = JSON.parse(localStorage.getItem(WISHLIST_KEY)) || [];
     } catch (e) { wishlistIds = []; }
 
-    wishlistIds = wishlistIds.filter(itemId => itemId !== id);
+    const targetIdStr = String(id);
+    wishlistIds = wishlistIds.filter(itemId => String(itemId) !== targetIdStr);
     localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlistIds));
     renderWishlistPanel();
+    window.dispatchEvent(new CustomEvent('urartoo:wishlist-updated', { detail: { id: targetIdStr, saved: false } }));
   };
+
+  window.addEventListener('urartoo:wishlist-updated', function () {
+    renderWishlistPanel();
+  });
+  window.addEventListener('storage', function (e) {
+    if (e.key === WISHLIST_KEY) renderWishlistPanel();
+  });
+  window.addEventListener('sanityCatalogReady', function () {
+    renderWishlistPanel();
+  });
+
+  if (window.NovaSanity) {
+    window.NovaSanity.init().then(function () {
+      renderWishlistPanel();
+    });
+  }
 
   // Populate Profile Form
   function populateProfileForm(user) {
@@ -672,6 +706,30 @@
     if (zipInput) zipInput.value = addr.zip || '';
   }
 
+  // --- Dashboard Tab Switching ---
+  window.switchDashTab = function (tabName) {
+    const tabs = document.querySelectorAll('.dash-nav-btn');
+    const panels = document.querySelectorAll('.dash-panel');
+
+    tabs.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.dashTab === tabName);
+    });
+
+    panels.forEach(p => {
+      const isTarget = p.id === 'dash-panel-' + tabName;
+      p.classList.toggle('active', isTarget);
+      if (isTarget) {
+        p.style.display = 'block';
+      } else {
+        p.style.display = 'none';
+      }
+    });
+
+    if (tabName === 'wishlist') {
+      renderWishlistPanel();
+    }
+  };
+
   // --- Initialize Page on Load ---
   document.addEventListener('DOMContentLoaded', function () {
     initUsersDatabase();
@@ -683,6 +741,11 @@
       if (alertBox) {
         showAlert(alertBox, '🔒 Ադմինիստրատորի էջ մուտք գործելու համար անհրաժեշտ է մուտք գործել ադմինիստրատորի հաշվով։', 'error');
       }
+    }
+
+    const targetTab = urlParams.get('tab') || (window.location.hash ? window.location.hash.replace('#', '') : null);
+    if (targetTab && (targetTab === 'orders' || targetTab === 'wishlist' || targetTab === 'profile')) {
+      window.switchDashTab(targetTab);
     }
   });
 
