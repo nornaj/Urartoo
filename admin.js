@@ -793,7 +793,19 @@
           }
           document.getElementById('pe-desc').value = found.description || '';
           document.getElementById('pe-cat').value = found.cat || found.category || 'Մատանիներ';
-          document.getElementById('pe-stone').value = found.stone || 'Նռնաքար';
+
+          const stoneSelect = document.getElementById('pe-stone');
+          const targetStone = found.stone || 'Նռնաքար';
+          if (stoneSelect) {
+            if (!Array.from(stoneSelect.options).some(o => o.value === targetStone)) {
+              const opt = document.createElement('option');
+              opt.value = targetStone;
+              opt.textContent = targetStone;
+              stoneSelect.appendChild(opt);
+            }
+            stoneSelect.value = targetStone;
+          }
+
           document.getElementById('pe-region').value = found.region || found.stoneOrigin || 'Վայոց Ձոր';
           document.getElementById('pe-material').value = found.material || '925 արծաթ';
 

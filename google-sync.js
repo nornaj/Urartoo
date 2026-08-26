@@ -47,23 +47,24 @@
       const values = parseLine(lines[i]);
       if (values.length === 0 || !values[0]) continue;
       const row = {};
-      rawHeaders.forEach((h, idx) => {
-        const val = values[idx] || '';
-        // Map column names flexibly
-        if (h.includes('Title') || h.includes('անուն')) row.title = val;
-        else if (h.includes('Price') || h.includes('Գին')) row.price = val;
-        else if (h.includes('Description') || h.includes('նկարագիր')) row.description = val;
-        else if (h.includes('Stone') || h.includes('քարը')) row.stone = val;
-        else if (h.includes('Location') || h.includes('տարածաշրջան')) row.location = val;
-        else if (h.includes('Jewelry Type') || h.includes('տեսակ')) row.category = val;
-        else if (h.includes('Substance') || h.includes('Նյութ')) row.substance = val;
-        else if (h.includes('Image') || h.includes('Նկար') || h.includes('Photo') || h.includes('Picture')) row.image = val;
-        else if (h.includes('Stock') || h.includes('Քանակ') || h.includes('Qty') || h.includes('Quantity')) row.stock = val;
-        else row[h] = val;
-      });
-      if (row.title) rows.push(row);
-    }
-    return rows;
+    rawHeaders.forEach((rawH, idx) => {
+      const h = rawH.toLowerCase();
+      const val = values[idx] || '';
+      // Map column names flexibly with strict priority
+      if (h.includes('title') || h.includes('անուն') || h.includes('name')) row.title = val;
+      else if (h.includes('price') || h.includes('գին') || h.includes('արժեք')) row.price = val;
+      else if (h.includes('description') || h.includes('նկարագիր') || h.includes('desc')) row.description = val;
+      else if (h.includes('location') || h.includes('տարածաշրջան') || h.includes('վայր') || h.includes('region') || h.includes('origin')) row.location = val;
+      else if (h.includes('stone') || h.includes('օգտագործ') || (h.includes('քար') && !h.includes('տարածաշրջան'))) row.stone = val;
+      else if (h.includes('jewelry type') || h.includes('տեսակ') || h.includes('cat') || h.includes('category')) row.category = val;
+      else if (h.includes('substance') || h.includes('նյութ') || h.includes('material')) row.substance = val;
+      else if (h.includes('image') || h.includes('նկար') || h.includes('photo') || h.includes('picture') || h.includes('img')) row.image = val;
+      else if (h.includes('stock') || h.includes('քանակ') || h.includes('qty') || h.includes('quantity')) row.stock = val;
+      else row[rawH] = val;
+    });
+    if (row.title) rows.push(row);
+  }
+  return rows;
   }
 
   /**
