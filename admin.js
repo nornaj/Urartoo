@@ -1417,6 +1417,10 @@
       this.renderProductsSec();
     },
 
+    async renderClientsSec() {
+      await this._renderClientsFromSanity();
+    },
+
     async _renderClientsFromSanity() {
       const tbody = document.getElementById('admin-clients-tbody');
       const searchInput = document.getElementById('admin-client-search');
@@ -1424,16 +1428,27 @@
 
       const orders = getOrders();
 
-      // Fetch users from Sanity CMS (sole source of truth)
-      let usersDB = [];
+      // 1. Initial immediate populate from local storage database
+      let localDB = [];
+      try {
+        localDB = JSON.parse(localStorage.getItem('urartoo_users_db_v1')) || [];
+      } catch (e) { localDB = []; }
+
+      // 2. Fetch users from Sanity CMS (sole source of truth)
+      let usersDB = localDB;
       try {
         const SANITY_TOKEN = 'sknNBnm3TWuTaSZw1TnVkytJGAZT2dTrDMKqVypR4SeaHcq71pMhBnZulwLmjC12rmwe1xMYFIt8t78BcXkmueG1HFwVIzACwXOc4qEq3y0fEHcegdVZCUeCqo9QDZbCzfmprbB4SQQkfWV3Gx4Xdz1ZkEcq0hXpjwnYLO6TPLMuS7c2wsud';
-        const groq = encodeURIComponent('*[_type == "userAccount"]{ _id, name, email, phone, joined, isAdmin, role, orders }');
+        const groq = encodeURIComponent('*[_type in ["userAccount", "user"]]{ _id, name, email, phone, joined, isAdmin, role, address, orders }');
         const url = 'https://g1vi85kp.api.sanity.io/v2024-01-01/data/query/production?query=' + groq;
         const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + SANITY_TOKEN } });
         if (res.ok) {
           const data = await res.json();
-          usersDB = data.result || [];
+          if (Array.isArray(data.result) && data.result.length > 0) {
+            usersDB = data.result;
+            try {
+              localStorage.setItem('urartoo_users_db_v1', JSON.stringify(usersDB));
+            } catch (e) {}
+          }
         }
       } catch (e) { console.warn('Failed to fetch users from Sanity:', e); }
 
@@ -1441,30 +1456,35 @@
 
       // 1. Populate registered users from database
       usersDB.forEach(u => {
-        const email = (u.email || '').toLowerCase();
+        const email = (u.email || '').toLowerCase().trim();
         if (!email) return;
         clientMap.set(email, {
-          name: u.name || 'Անանուն',
+          id: u._id || u.id,
+          name: u.name || email,
           email: email,
           phone: u.phone || '',
+          address: u.address || { city: '', street: '', zip: '' },
           joined: u.joined || '2026',
-          isAdmin: !!u.isAdmin || u.role === 'Super Admin',
-          ordersCount: (u.orders || []).length,
-          totalSpent: (u.orders || []).reduce((sum, o) => sum + (Number(o.total) || 0), 0),
-          lastOrderDate: (u.orders && u.orders.length > 0) ? u.orders[0].date : ''
+          isAdmin: Boolean(u.isAdmin) || u.role === 'Super Admin' || ['najaryannorayr209@gmail.com', 'mineralsarm@gmail.com', 'norayrnajaryann@gmail.com'].includes(email),
+          role: u.role || (u.isAdmin ? 'Super Admin' : 'Customer'),
+          ordersCount: Array.isArray(u.orders) ? u.orders.length : 0,
+          totalSpent: Array.isArray(u.orders) ? u.orders.reduce((sum, o) => sum + (Number(o.total) || 0), 0) : 0,
+          lastOrderDate: (Array.isArray(u.orders) && u.orders.length > 0) ? u.orders[0].date : ''
         });
       });
 
       // 2. Merge orders list (for guest checkouts or additional orders)
       orders.forEach(o => {
-        const email = (o.email || 'customer@example.com').toLowerCase();
+        const email = (o.email || 'customer@example.com').toLowerCase().trim();
         if (!clientMap.has(email)) {
           clientMap.set(email, {
             name: o.customer || 'Գնորդ',
             email: email,
             phone: o.phone || '',
+            address: { city: '', street: o.address || '', zip: '' },
             joined: '2026',
             isAdmin: false,
+            role: 'Customer',
             ordersCount: 0,
             totalSpent: 0,
             lastOrderDate: o.date
@@ -1481,7 +1501,11 @@
 
       let clients = Array.from(clientMap.values());
       if (searchQ) {
-        clients = clients.filter(c => c.name.toLowerCase().includes(searchQ) || c.email.toLowerCase().includes(searchQ) || c.phone.toLowerCase().includes(searchQ));
+        clients = clients.filter(c => 
+          (c.name && c.name.toLowerCase().includes(searchQ)) || 
+          (c.email && c.email.toLowerCase().includes(searchQ)) || 
+          (c.phone && c.phone.toLowerCase().includes(searchQ))
+        );
       }
 
       // Update stat cards
@@ -1494,7 +1518,7 @@
 
       const totalLtv = clients.reduce((sum, c) => sum + c.totalSpent, 0);
       const avgLtv = clients.length > 0 ? Math.round(totalLtv / clients.length) : 0;
-      if (ltvEl) ltvEl.textContent = `${avgLtv}֏`;
+      if (ltvEl) ltvEl.textContent = `${avgLtv.toLocaleString()}֏`;
 
       if (!tbody) return;
 
@@ -1514,15 +1538,20 @@
           statusText = 'Ակտիվ Գնորդ';
         }
 
+        const addressText = c.address && (c.address.city || c.address.street) 
+          ? [c.address.city, c.address.street].filter(Boolean).join(', ') 
+          : '';
+
         return `<tr>
           <td>
             <strong style="font-size:13.5px; color:var(--ink);">${c.name}</strong>
             ${c.phone ? `<div style="font-size:12px; color:var(--tuff); margin-top:2px;">📞 ${c.phone}</div>` : ''}
-            <div style="font-size:11px; color:var(--tuff); margin-top:1px;">Գրանցված: ${c.joined}</div>
+            ${addressText ? `<div style="font-size:11.5px; color:var(--tuff); margin-top:2px;">📍 ${addressText}</div>` : ''}
+            <div style="font-size:11px; color:var(--tuff); margin-top:1px;">Գրանցված: ${c.joined} թ․</div>
           </td>
           <td style="font-size:13px; color:var(--charcoal); font-weight:500;">✉️ ${c.email}</td>
           <td><span class="admin-status-badge ${c.ordersCount > 0 ? 'badge-processing' : 'badge-pending'}">${c.ordersCount} պատվեր</span></td>
-          <td style="font-family:var(--mono); font-weight:700; color:var(--amber); font-size:14px;">${c.totalSpent}֏</td>
+          <td style="font-family:var(--mono); font-weight:700; color:var(--amber); font-size:14px;">${c.totalSpent.toLocaleString()}֏</td>
           <td style="font-size:12px; color:var(--tuff);">${c.lastOrderDate || '—'}</td>
           <td><span class="admin-status-badge ${badgeClass}">${statusText}</span></td>
         </tr>`;
