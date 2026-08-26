@@ -442,17 +442,23 @@ body.nav-open {
     display: none !important;
   }
   .hdr-hero,
+  .hdr-static,
   .hdr-sticky {
     padding: 18px max(var(--gutter), calc((100% - var(--max)) / 2));
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) !important;
     gap: 28px;
     align-items: center;
+    box-sizing: border-box;
+    width: 100%;
   }
-  .burger { display: none; }
+  .burger {
+    display: none !important;
+  }
   .nav {
     position: static;
-    width: auto; height: auto;
+    width: auto;
+    height: auto;
     background: none;
     flex-direction: row;
     justify-content: flex-start;
@@ -463,15 +469,18 @@ body.nav-open {
     opacity: 1;
     pointer-events: all;
     order: 0;
+    padding: 0 !important;
   }
   .logo {
     order: 1;
     justify-self: center;
+    text-align: center;
   }
   .hdr-utils {
     order: 2;
-    display: flex;
+    display: flex !important;
     justify-self: end;
+    align-items: center;
     gap: 22px;
   }
 }
