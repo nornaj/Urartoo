@@ -5427,6 +5427,20 @@ select, .admin-card select, .admin-input-group select {
   border: 1px solid #E2E0D8;
 }
 
+.scf-editor-content figure,
+.scf-editor-content .journal-post-block figure {
+  margin: 24px 0;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.scf-editor-content figure:hover {
+  outline: 2px dashed var(--gold, #C2A379);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
 .scf-editor-content figure img {
   max-width: 100%;
   border-radius: 4px;
@@ -5434,11 +5448,48 @@ select, .admin-card select, .admin-input-group select {
   margin: 0 auto;
 }
 
-.scf-editor-content figcaption {
+.scf-editor-content .journal-post-figure-img,
+.scf-editor-content .journal-post-hero-placeholder {
+  min-height: 200px;
+  background: #EAE7DC;
+  border: 2px dashed #C2A379;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  text-align: center;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.scf-editor-content .journal-post-figure-img:hover,
+.scf-editor-content .journal-post-hero-placeholder:hover {
+  background: #DFDBCF;
+  border-color: var(--green, #191B1A);
+}
+
+.scf-editor-content .journal-post-hero-placeholder::before {
+  content: '📷 Սեղմեք այստեղ՝ լուսանկար վերբեռնելու համար (WebP < 200KB)';
+  display: block;
+  font-weight: 700;
+  font-size: 13.5px;
+  color: #191B1A;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 6px 16px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.scf-editor-content figcaption,
+.scf-editor-content .journal-post-figure-caption {
   font-size: 12px;
   color: #787C82;
   margin-top: 8px;
   font-style: italic;
+  text-align: center;
 }
 
 .scf-editor-html {

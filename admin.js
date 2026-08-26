@@ -1921,6 +1921,20 @@
       this.renderBlogFaqs();
       this.switchBlogEditorMode('visual');
 
+      const visualEl = document.getElementById('be-content-visual');
+      if (visualEl && !visualEl._mediaListenerAttached) {
+        visualEl._mediaListenerAttached = true;
+        visualEl.addEventListener('click', (e) => {
+          const fig = e.target.closest('figure, .journal-post-figure-img, .journal-post-hero-placeholder, .article-figure');
+          if (fig) {
+            e.stopPropagation();
+            window.WooCommerceAdmin._activeTargetFigure = fig.closest('figure') || fig;
+            const fileInput = document.getElementById('be-media-file-input');
+            if (fileInput) fileInput.click();
+          }
+        });
+      }
+
       modal.style.display = 'flex';
       document.body.style.overflow = 'hidden';
 
@@ -1934,6 +1948,7 @@
       if (modal) modal.style.display = 'none';
       document.body.style.overflow = '';
       this.currentEditingBlogId = null;
+      this._activeTargetFigure = null;
     },
 
     updateBlogThumbnailFromUrl(url) {
@@ -2051,10 +2066,6 @@
       });
     },
 
-    clearBlogThumbnail() {
-      this.updateBlogThumbnailFromUrl('');
-    },
-
     async handleBlogThumbnailUpload(event) {
       const file = event.target.files && event.target.files[0];
       if (!file) return;
@@ -2147,10 +2158,17 @@
           cdnUrl = URL.createObjectURL(webpBlob);
         }
 
-        const caption = prompt('Մուտքագրեք լուսանկարի նկարագրությունը (Caption, ոչ պարտադիր):', '') || '';
+        // Get caption
+        let defaultCaption = '';
+        if (this._activeTargetFigure) {
+          const existingCaption = this._activeTargetFigure.querySelector('figcaption, .journal-post-figure-caption');
+          if (existingCaption) defaultCaption = existingCaption.textContent.trim();
+        }
+
+        const caption = prompt('Մուտքագրեք լուսանկարի նկարագրությունը (Caption, ոչ պարտադիր):', defaultCaption) || defaultCaption;
 
         const figureHtml = `
-          <figure class="article-figure" style="margin:24px 0; text-align:center;">
+          <figure class="article-figure" style="margin:28px 0; text-align:center;">
             <img src="${cdnUrl}" alt="${caption}" style="max-width:100%; height:auto; border-radius:3px; display:block; margin:0 auto;" loading="lazy">
             ${caption ? `<figcaption style="font-size:12.5px; color:#787C82; margin-top:8px; font-style:italic;">${caption}</figcaption>` : ''}
           </figure>
@@ -2160,8 +2178,17 @@
         this.switchBlogEditorMode('visual');
         const visualEl = document.getElementById('be-content-visual');
         if (visualEl) {
-          visualEl.focus();
-          document.execCommand('insertHTML', false, figureHtml);
+          if (this._activeTargetFigure && this._activeTargetFigure.parentElement) {
+            const targetFig = this._activeTargetFigure;
+            this._activeTargetFigure = null;
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = figureHtml.trim();
+            const newFig = tempDiv.firstElementChild;
+            targetFig.replaceWith(newFig);
+          } else {
+            visualEl.focus();
+            document.execCommand('insertHTML', false, figureHtml);
+          }
           this.syncBlogVisualToText();
         }
 
