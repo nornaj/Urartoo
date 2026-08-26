@@ -637,24 +637,22 @@
     const shareBtns = document.querySelectorAll('[data-share]');
 
     shareBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
         const type = btn.getAttribute('data-share');
         if (type === 'copy') {
-          if (navigator.clipboard) {
+          e.preventDefault();
+          if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(window.location.href).then(() => {
-              showStatus('Հղումը պատճենված է։');
+              showStatus('✓ Հղումը պատճենված է');
             }).catch(() => {
-              showStatus('Հղումը պատճենված է։');
+              showStatus('✓ Հղումը պատճենված է');
             });
           } else {
-            showStatus('Հղումը պատճենված է։');
+            showStatus('✓ Հղումը պատճենված է');
           }
-        } else if (type === 'x') {
-          window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(currentArticle.title)}&url=${encodeURIComponent(window.location.href)}`, '_blank');
         } else if (type === 'fb') {
-          window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank');
-        } else if (type === 'pin') {
-          window.open(`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(window.location.href)}&description=${encodeURIComponent(currentArticle.title)}`, '_blank');
+          e.preventDefault();
+          window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank', 'noopener,noreferrer,width=600,height=450');
         }
       });
     });
