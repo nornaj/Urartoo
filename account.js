@@ -893,26 +893,40 @@
   }
 
   // Populate Profile Form
-  function populateProfileForm(user) {
+  function populateProfileForm(user, force) {
+    if (!user) return;
     const nameInput = document.getElementById('edit-name');
     const emailInput = document.getElementById('edit-email');
     const phoneInput = document.getElementById('edit-phone');
 
-    if (nameInput) nameInput.value = user.name || '';
-    if (emailInput) emailInput.value = user.email || '';
-    if (phoneInput) phoneInput.value = user.phone || '';
+    if (nameInput && (force || document.activeElement !== nameInput)) {
+      nameInput.value = user.name || '';
+    }
+    if (emailInput && (force || document.activeElement !== emailInput)) {
+      emailInput.value = user.email || '';
+    }
+    if (phoneInput && (force || document.activeElement !== phoneInput)) {
+      phoneInput.value = user.phone || '';
+    }
   }
 
   // Populate Address Form
-  function populateAddressForm(user) {
+  function populateAddressForm(user, force) {
+    if (!user) return;
     const cityInput = document.getElementById('addr-city');
     const streetInput = document.getElementById('addr-street');
     const zipInput = document.getElementById('addr-zip');
 
     const addr = user.address || {};
-    if (cityInput) cityInput.value = addr.city || '';
-    if (streetInput) streetInput.value = addr.street || '';
-    if (zipInput) zipInput.value = addr.zip || '';
+    if (cityInput && (force || document.activeElement !== cityInput)) {
+      cityInput.value = addr.city || '';
+    }
+    if (streetInput && (force || document.activeElement !== streetInput)) {
+      streetInput.value = addr.street || '';
+    }
+    if (zipInput && (force || document.activeElement !== zipInput)) {
+      zipInput.value = addr.zip || '';
+    }
   }
 
   // --- Dashboard Tab Switching ---
