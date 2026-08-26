@@ -760,6 +760,15 @@
         if (!params.has('fit')) params.set('fit', 'max');
         return `${base}?${params.toString()}`;
       }
+      // If a raw Google Drive file link or ID is present
+      const driveFileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]{20,})/) || url.match(/[?&]id=([a-zA-Z0-9_-]{20,})/);
+      if (driveFileMatch && driveFileMatch[1]) {
+        return `https://wsrv.nl/?url=https://drive.google.com/uc?id=${driveFileMatch[1]}&output=webp&q=${quality}&w=${width}`;
+      }
+      // If a folder URL is mistakenly present
+      if (url.includes('drive.google.com/drive/folders/')) {
+        return 'Images/bracelet.webp';
+      }
       return url;
     },
 
