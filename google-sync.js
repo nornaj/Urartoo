@@ -67,76 +67,42 @@
   }
 
   /**
-   * WebP Compression Engine: Converts an image element or blob to WebP format,
-   * targeting 90% quality and strictly capping file size < 200 KB (204,800 bytes).
+   * Helper: Extracts Google Drive file ID from various link formats
    */
-  async function compressToWebP(imgSource, initialQuality = 0.90, maxSizeBytes = 204800) {
-    return new Promise((resolve, reject) => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+  function extractGoogleDriveFileId(str) {
+    if (!str) return null;
+    const s = String(str).trim();
+    if (!s) return null;
 
-      let width = imgSource.naturalWidth || imgSource.width || 1200;
-      let height = imgSource.naturalHeight || imgSource.height || 1200;
+    // Direct /file/d/FILE_ID
+    const m1 = s.match(/\/file\/d\/([a-zA-Z0-9_-]{20,})/);
+    if (m1 && m1[1]) return m1[1];
 
-      // Max dimension cap for fast performance
-      const MAX_DIM = 1600;
-      if (width > MAX_DIM || height > MAX_DIM) {
-        if (width > height) {
-          height = Math.round((height * MAX_DIM) / width);
-          width = MAX_DIM;
-        } else {
-          width = Math.round((width * MAX_DIM) / height);
-          height = MAX_DIM;
-        }
-      }
+    // Query param id=FILE_ID
+    const m2 = s.match(/[?&]id=([a-zA-Z0-9_-]{20,})/);
+    if (m2 && m2[1]) return m2[1];
 
-      canvas.width = width;
-      canvas.height = height;
-      ctx.drawImage(imgSource, 0, 0, width, height);
+    // /d/FILE_ID
+    const m3 = s.match(/\/d\/([a-zA-Z0-9_-]{20,})/);
+    if (m3 && m3[1]) return m3[1];
 
-      let quality = initialQuality;
+    // If string itself looks like a raw Google file ID
+    if (/^[a-zA-Z0-9_-]{25,}$/.test(s)) {
+      return s;
+    }
 
-      const attemptCompress = () => {
-        canvas.toBlob((blob) => {
-          if (!blob) {
-            reject(new Error('Canvas toBlob failed'));
-            return;
-          }
-
-          // If blob size is under max size (200 KB) or quality is already low (0.5), return blob
-          if (blob.size <= maxSizeBytes || quality <= 0.5) {
-            console.log(`WebP Compression Success: Size=${(blob.size / 1024).toFixed(1)} KB, Quality=${(quality * 100).toFixed(0)}%`);
-            resolve(blob);
-          } else {
-            // Reduce quality slightly and retry
-            quality -= 0.08;
-            attemptCompress();
-          }
-        }, 'image/webp', quality);
-      };
-
-      attemptCompress();
-    });
+    return null;
   }
 
   /**
-   * Helper: Converts an image URL into a WebP Blob < 200 KB
+   * Helper: Extracts folder ID if link is a folder URL
    */
-  async function processImageUrlToWebP(imageUrl) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = 'Anonymous';
-      img.onload = async () => {
-        try {
-          const webpBlob = await compressToWebP(img);
-          resolve(webpBlob);
-        } catch (e) {
-          reject(e);
-        }
-      };
-      img.onerror = (err) => reject(err);
-      img.src = imageUrl;
-    });
+  function extractGoogleDriveFolderId(str) {
+    if (!str) return null;
+    const s = String(str).trim();
+    const m = s.match(/\/drive\/(?:u\/\d+\/)?folders\/([a-zA-Z0-9_-]{20,})/);
+    if (m && m[1]) return m[1];
+    return null;
   }
 
   /**
@@ -150,29 +116,112 @@
   }
 
   /**
-   * Helper: Extracts direct Google Drive CDN image URL from share links or raw file IDs
+   * WebP Compression Engine: Converts an image element or blob to WebP format,
+   * targeting 90-94% quality and strictly capping file size < 200 KB (204,800 bytes).
    */
-  function extractGoogleDriveImageUrl(urlStr) {
-    if (!urlStr) return null;
-    const str = String(urlStr).trim();
-    if (!str) return null;
+  async function compressBlobToWebP(blob, maxSizeBytes = 204800) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const objUrl = URL.createObjectURL(blob);
+      img.onload = () => {
+        try {
+          let w = img.naturalWidth || 1200;
+          let h = img.naturalHeight || 1200;
+          const maxDim = 1600;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
 
-    if (str.startsWith('http://') || str.startsWith('https://')) {
-      const fileIdMatch = str.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) ||
-                          str.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-      if (fileIdMatch && fileIdMatch[1]) {
-        return `https://lh3.googleusercontent.com/d/${fileIdMatch[1]}`;
-      }
-      return str;
-    }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, 0, w, h);
 
-    if (/^[a-zA-Z0-9_-]{25,}$/.test(str)) {
-      return `https://lh3.googleusercontent.com/d/${str}`;
-    }
+          const qualities = [0.94, 0.92, 0.90];
+          let qIdx = 0;
 
-    return null;
+          const attemptCompress = () => {
+            const q = qualities[qIdx] || 0.90;
+            canvas.toBlob((b) => {
+              URL.revokeObjectURL(objUrl);
+              if (!b) return resolve(blob);
+              if (b.size <= maxSizeBytes || qIdx >= qualities.length - 1) {
+                console.log(`[GoogleSync WebP] Size: ${(b.size / 1024).toFixed(1)} KB (Quality: ${(q * 100).toFixed(0)}%)`);
+                return resolve(b);
+              }
+              qIdx++;
+              attemptCompress();
+            }, 'image/webp', q);
+          };
+
+          attemptCompress();
+        } catch (e) {
+          URL.revokeObjectURL(objUrl);
+          resolve(blob);
+        }
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(objUrl);
+        resolve(blob);
+      };
+      img.src = objUrl;
+    });
   }
 
+  /**
+   * Helper: Fetches image from Google Drive / URL, converts to WebP < 200KB,
+   * and uploads to Sanity Assets CDN.
+   */
+  async function resolveAndUploadProductImage(rawSource, matchedFileId = null) {
+    let fileId = extractGoogleDriveFileId(rawSource) || matchedFileId;
+
+    const urlsToTry = [];
+    if (fileId) {
+      // 1. Cloudflare/WSRV CORS WebP Proxy
+      urlsToTry.push(`https://wsrv.nl/?url=https://drive.google.com/uc?id=${fileId}&output=webp&q=90&w=1600`);
+      // 2. Google Direct Thumbnail
+      urlsToTry.push(`https://lh3.googleusercontent.com/d/${fileId}=w1600`);
+      urlsToTry.push(`https://drive.google.com/thumbnail?id=${fileId}&sz=w1600`);
+    } else if (rawSource && (rawSource.startsWith('http://') || rawSource.startsWith('https://'))) {
+      urlsToTry.push(`https://wsrv.nl/?url=${encodeURIComponent(rawSource)}&output=webp&q=90&w=1600`);
+      urlsToTry.push(rawSource);
+    }
+
+    for (const url of urlsToTry) {
+      try {
+        const res = await fetch(url);
+        if (res.ok) {
+          const blob = await res.blob();
+          if (blob && blob.size > 0) {
+            const webpBlob = await compressBlobToWebP(blob);
+            if (webpBlob) {
+              if (window.NovaSanity && typeof window.NovaSanity.uploadImage === 'function') {
+                const cdnUrl = await window.NovaSanity.uploadImage(webpBlob);
+                if (cdnUrl) return cdnUrl;
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[GoogleSync] Image fetch attempt error:', url, err);
+      }
+    }
+
+    // Direct fallback URL if available
+    if (fileId) {
+      return `https://wsrv.nl/?url=https://drive.google.com/uc?id=${fileId}&output=webp&q=90`;
+    }
+    return null;
+  }
 
   /**
    * Helper: Ensures a stone exists in the stones database.
@@ -202,7 +251,7 @@
     // Check if stone already exists (case-insensitive match)
     const allStones = [...defaultStones, ...customStones];
     const found = allStones.find(s => s.name.toLowerCase() === trimmed.toLowerCase());
-    if (found) return found.name; // Return the exact stored name (preserves casing)
+    if (found) return found.name;
 
     // Stone doesn't exist — create it with a generated color
     const hue = Math.floor(Math.random() * 360);
@@ -213,7 +262,6 @@
       localStorage.setItem('urartoo_stones_db_v1', JSON.stringify(customStones));
     } catch (e) {}
 
-    // Notify other parts of the app
     window.dispatchEvent(new CustomEvent('urartoo:stones-updated', { detail: newStone }));
     console.log(`[GoogleSync] Auto-created new stone: "${trimmed}" with color ${newColor}`);
     return trimmed;
@@ -238,14 +286,16 @@
     /**
      * Fetches file list from Google Drive folder and maps normalized title -> fileId
      */
-    async fetchDriveFilesMap() {
+    async fetchDriveFilesMap(folderId = null) {
+      const targetFolderId = folderId || GOOGLE_CONFIG.driveFolderId;
       try {
-        const folderUrl = `https://drive.google.com/embeddedfolderview?id=${GOOGLE_CONFIG.driveFolderId}`;
+        const folderUrl = `https://drive.google.com/embeddedfolderview?id=${targetFolderId}`;
         const res = await fetch(folderUrl);
         if (!res.ok) return new Map();
         const html = await res.text();
 
         const fileMap = new Map();
+        const filesList = [];
 
         // Match Google Drive folder entry format: id="entry-FILE_ID" ... class="flip-entry-title">TITLE</div>
         const entryRegex = /id="entry-([a-zA-Z0-9_-]+)"[\s\S]*?class="flip-entry-title">([^<]+)<\/div>/g;
@@ -255,6 +305,7 @@
           const rawTitle = match[2].trim();
           const normKey = normalizeTitleKey(rawTitle);
           fileMap.set(normKey, fileId);
+          filesList.push({ fileId, title: rawTitle });
         }
 
         // Fallback regex match: /file/d/FILE_ID/view ... title
@@ -265,10 +316,12 @@
           const normKey = normalizeTitleKey(rawTitle);
           if (!fileMap.has(normKey)) {
             fileMap.set(normKey, fileId);
+            filesList.push({ fileId, title: rawTitle });
           }
         }
 
-        console.log('Google Drive Parsed Files Map:', Array.from(fileMap.entries()));
+        console.log('[GoogleSync] Drive Files Map:', Array.from(fileMap.entries()));
+        fileMap._filesList = filesList;
         return fileMap;
       } catch (e) {
         console.warn('Google Drive file map error:', e);
@@ -330,9 +383,8 @@
         const title = row.title;
         if (!title) continue;
 
-        if (statusCallback) statusCallback(`Մշակվում է [${i + 1}/${sheetRows.length}]: «${title}»...`);
+        if (statusCallback) statusCallback(`Մշակվում է [${i + 1}/${sheetRows.length}]: «${title}» (նկարի WebP սեղմում <200KB)...`);
 
-        // Construct product object for Sanity
         const numericPrice = Number(String(row.price).replace(/[^0-9.]/g, '')) || 300;
         const prodData = {
           id: `product-gsheet-${i + 1}`,
@@ -353,43 +405,38 @@
           sizes: [{ label: "Standard", price: numericPrice }],
           tags: ["Ձեռագործ", row.stone || "Զարդ"],
           img: 'Images/bracelet.webp',
-          image: 'Images/bracelet.webp'
+          image: 'Images/bracelet.webp',
+          images: ['Images/bracelet.webp']
         };
 
-        // Priority 1: Direct link pasted in Sheet "Image" column
-        let resolvedImageUrl = extractGoogleDriveImageUrl(row.image);
+        // Determine matched Drive file
+        let matchedFileId = null;
 
-        // Priority 2: Title match from Drive folder if no direct link in Sheet
-        if (!resolvedImageUrl) {
-          const normProductKey = normalizeTitleKey(title);
-          const matchedFileId = driveFileMap.get(normProductKey);
-          if (matchedFileId) {
-            resolvedImageUrl = `https://lh3.googleusercontent.com/d/${matchedFileId}`;
+        // 1. Check if folder URL is provided in row.image
+        const folderIdInRow = extractGoogleDriveFolderId(row.image);
+        if (folderIdInRow) {
+          const rowFolderMap = (folderIdInRow === GOOGLE_CONFIG.driveFolderId) ? driveFileMap : await this.fetchDriveFilesMap(folderIdInRow);
+          const normTitle = normalizeTitleKey(title);
+          matchedFileId = rowFolderMap.get(normTitle);
+          if (!matchedFileId && rowFolderMap._filesList && rowFolderMap._filesList[i]) {
+            matchedFileId = rowFolderMap._filesList[i].fileId;
+          } else if (!matchedFileId && rowFolderMap._filesList && rowFolderMap._filesList.length > 0) {
+            matchedFileId = rowFolderMap._filesList[0].fileId;
           }
         }
 
-        if (resolvedImageUrl) {
-          prodData.img = resolvedImageUrl;
-          prodData.image = resolvedImageUrl;
-          prodData.images = [resolvedImageUrl];
+        // 2. Direct file ID match by title if not found yet
+        if (!matchedFileId) {
+          const normTitle = normalizeTitleKey(title);
+          matchedFileId = driveFileMap.get(normTitle);
+        }
 
-          try {
-            // Upload image blob directly to Sanity CDN if possible
-            const res = await fetch(resolvedImageUrl).catch(() => null);
-            if (res && res.ok) {
-              const blob = await res.blob();
-              if (blob && window.NovaSanity) {
-                const sanityAssetUrl = await window.NovaSanity.uploadImage(blob).catch(() => null);
-                if (sanityAssetUrl) {
-                  prodData.img = sanityAssetUrl;
-                  prodData.image = sanityAssetUrl;
-                  prodData.images = [sanityAssetUrl];
-                }
-              }
-            }
-          } catch (e) {
-            console.warn(`Sanity upload fallback for ${title}:`, e);
-          }
+        // 3. Resolve, convert to WebP (<200KB) and upload to Sanity
+        const finalImageUrl = await resolveAndUploadProductImage(row.image, matchedFileId);
+        if (finalImageUrl) {
+          prodData.img = finalImageUrl;
+          prodData.image = finalImageUrl;
+          prodData.images = [finalImageUrl];
         }
 
         // Save document directly to Sanity CMS
