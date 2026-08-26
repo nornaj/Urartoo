@@ -1941,16 +1941,41 @@
       const placeholder = document.getElementById('be-hero-placeholder');
       const input = document.getElementById('be-hero-url');
 
-      if (input && input.value !== url) input.value = url;
+      const cleanUrl = (url || '').trim();
+      if (input && input.value !== cleanUrl) input.value = cleanUrl;
 
-      if (url && img && placeholder) {
-        img.src = url;
+      if (cleanUrl && img && placeholder) {
+        img.src = cleanUrl;
         img.style.display = 'block';
         placeholder.style.display = 'none';
       } else if (img && placeholder) {
         img.src = '';
         img.style.display = 'none';
         placeholder.style.display = 'block';
+      }
+    },
+
+    clearBlogThumbnail() {
+      const img = document.getElementById('be-hero-preview');
+      const placeholder = document.getElementById('be-hero-placeholder');
+      const input = document.getElementById('be-hero-url');
+      const captionInput = document.getElementById('be-hero-caption');
+      const fileInput = document.getElementById('be-hero-file');
+
+      if (input) input.value = '';
+      if (captionInput) captionInput.value = '';
+      if (fileInput) fileInput.value = '';
+
+      if (img) {
+        img.src = '';
+        img.style.display = 'none';
+      }
+      if (placeholder) {
+        placeholder.style.display = 'block';
+      }
+
+      if (typeof this.showToast === 'function') {
+        this.showToast('Գլխավոր լուսանկարը հեռացվեց։', 'info', 2500);
       }
     },
 
@@ -2284,8 +2309,8 @@
       const topic = document.getElementById('be-topic')?.value || 'Քարահավաք';
       const featured = Boolean(document.getElementById('be-featured')?.checked);
 
-      const heroImg = document.getElementById('be-hero-url')?.value.trim() || 'Images/author.webp';
-      const heroCaption = document.getElementById('be-hero-caption')?.value.trim() || '';
+      const heroImg = (document.getElementById('be-hero-url')?.value || '').trim();
+      const heroCaption = (document.getElementById('be-hero-caption')?.value || '').trim();
 
       const visualEl = document.getElementById('be-content-visual');
       const textEl = document.getElementById('be-content-text');
