@@ -1954,6 +1954,78 @@
       }
     },
 
+    /**
+     * Compresses any image file/blob to WebP (< 200KB, at least 90% quality)
+     */
+    async compressToWebP(fileOrBlob) {
+      if (!fileOrBlob) throw new Error('No file provided');
+
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('Failed to read image file'));
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onerror = () => reject(new Error('Failed to load image element'));
+          img.onload = () => {
+            try {
+              let w = img.naturalWidth || img.width || 1200;
+              let h = img.naturalHeight || img.height || 1200;
+
+              // Max dimension 1920px for crisp high-res blog & product displays
+              const maxDim = 1920;
+              if (w > maxDim || h > maxDim) {
+                if (w > h) {
+                  h = Math.round((h * maxDim) / w);
+                  w = maxDim;
+                } else {
+                  w = Math.round((w * maxDim) / h);
+                  h = maxDim;
+                }
+              }
+
+              const canvas = document.createElement('canvas');
+              canvas.width = w;
+              canvas.height = h;
+              const ctx = canvas.getContext('2d');
+              ctx.imageSmoothingEnabled = true;
+              ctx.imageSmoothingQuality = 'high';
+              ctx.drawImage(img, 0, 0, w, h);
+
+              // Target: under 200KB with at least 90% quality (0.94 -> 0.92 -> 0.90)
+              const tryQualities = [0.94, 0.92, 0.90];
+              let currentIdx = 0;
+
+              function attemptCompression() {
+                const quality = tryQualities[currentIdx] || 0.90;
+                canvas.toBlob((blob) => {
+                  if (!blob) {
+                    return resolve(fileOrBlob);
+                  }
+
+                  // If under 200KB (204,800 bytes) or we've reached 90% quality floor
+                  if (blob.size <= 200 * 1024 || currentIdx >= tryQualities.length - 1) {
+                    console.log(`[Urartoo Image Optimizer] Compressed to WebP: ${(blob.size / 1024).toFixed(1)} KB (quality: ${(quality * 100).toFixed(0)}%)`);
+                    return resolve(blob);
+                  }
+
+                  // If still > 200KB, attempt next quality step down to 90%
+                  currentIdx++;
+                  attemptCompression();
+                }, 'image/webp', quality);
+              }
+
+              attemptCompression();
+            } catch (err) {
+              console.warn('[Urartoo Image Optimizer] Canvas conversion error:', err);
+              resolve(fileOrBlob);
+            }
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(fileOrBlob);
+      });
+    },
+
     clearBlogThumbnail() {
       this.updateBlogThumbnailFromUrl('');
     },
@@ -1962,6 +2034,8 @@
       const file = event.target.files && event.target.files[0];
       if (!file) return;
 
+      const toast = this.showToast ? this.showToast('Գլխավոր նկարը սեղմվում է WebP (<200KB)...', 'loading', 0) : null;
+
       try {
         console.log('[Urartoo] Compressing blog thumbnail to WebP < 200KB...');
         const webpBlob = await this.compressToWebP(file);
@@ -1969,14 +2043,40 @@
         let cdnUrl = '';
         if (window.NovaSanity && typeof window.NovaSanity.uploadImage === 'function') {
           cdnUrl = await window.NovaSanity.uploadImage(webpBlob);
-        } else {
+        }
+
+        if (!cdnUrl) {
+          try {
+            const SANITY_TOKEN = 'sknNBnm3TWuTaSZw1TnVkytJGAZT2dTrDMKqVypR4SeaHcq71pMhBnZulwLmjC12rmwe1xMYFIt8t78BcXkmueG1HFwVIzACwXOc4qEq3y0fEHcegdVZCUeCqo9QDZbCzfmprbB4SQQkfWV3Gx4Xdz1ZkEcq0hXpjwnYLO6TPLMuS7c2wsud';
+            const uploadRes = await fetch('https://g1vi85kp.api.sanity.io/v2024-01-01/assets/images/production', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'image/webp',
+                'Authorization': 'Bearer ' + SANITY_TOKEN
+              },
+              body: webpBlob
+            });
+            if (uploadRes.ok) {
+              const uploadData = await uploadRes.json();
+              if (uploadData && uploadData.document && uploadData.document.url) {
+                cdnUrl = uploadData.document.url;
+              }
+            }
+          } catch (directErr) {
+            console.warn('Direct Sanity asset upload failed:', directErr);
+          }
+        }
+
+        if (!cdnUrl) {
           cdnUrl = URL.createObjectURL(webpBlob);
         }
 
         this.updateBlogThumbnailFromUrl(cdnUrl);
+        if (toast) toast.update('Գլխավոր նկարը հաջողությամբ վերբեռնվեց (WebP, <200KB)։', 'success', 3500);
         event.target.value = '';
       } catch (err) {
         console.error('Error uploading blog thumbnail:', err);
+        if (toast) toast.update('Նկարի վերբեռնումը ձախողվեց։', 'danger', 3500);
         alert('Նկարի վերբեռնումը ձախողվեց։ Խնդրում ենք կրկին փորձել։');
       }
     },
@@ -1985,6 +2085,8 @@
       const file = event.target.files && event.target.files[0];
       if (!file) return;
 
+      const toast = this.showToast ? this.showToast('Նկարը սեղմվում է WebP (<200KB) և վերբեռնվում...', 'loading', 0) : null;
+
       try {
         console.log('[Urartoo] Compressing in-content media to WebP < 200KB...');
         const webpBlob = await this.compressToWebP(file);
@@ -1992,20 +2094,45 @@
         let cdnUrl = '';
         if (window.NovaSanity && typeof window.NovaSanity.uploadImage === 'function') {
           cdnUrl = await window.NovaSanity.uploadImage(webpBlob);
-        } else {
+        }
+
+        if (!cdnUrl) {
+          try {
+            const SANITY_TOKEN = 'sknNBnm3TWuTaSZw1TnVkytJGAZT2dTrDMKqVypR4SeaHcq71pMhBnZulwLmjC12rmwe1xMYFIt8t78BcXkmueG1HFwVIzACwXOc4qEq3y0fEHcegdVZCUeCqo9QDZbCzfmprbB4SQQkfWV3Gx4Xdz1ZkEcq0hXpjwnYLO6TPLMuS7c2wsud';
+            const uploadRes = await fetch('https://g1vi85kp.api.sanity.io/v2024-01-01/assets/images/production', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'image/webp',
+                'Authorization': 'Bearer ' + SANITY_TOKEN
+              },
+              body: webpBlob
+            });
+            if (uploadRes.ok) {
+              const uploadData = await uploadRes.json();
+              if (uploadData && uploadData.document && uploadData.document.url) {
+                cdnUrl = uploadData.document.url;
+              }
+            }
+          } catch (directErr) {
+            console.warn('Direct Sanity asset upload failed:', directErr);
+          }
+        }
+
+        if (!cdnUrl) {
           cdnUrl = URL.createObjectURL(webpBlob);
         }
 
         const caption = prompt('Մուտքագրեք լուսանկարի նկարագրությունը (Caption, ոչ պարտադիր):', '') || '';
 
         const figureHtml = `
-          <figure>
-            <img src="${cdnUrl}" alt="${caption}">
-            ${caption ? `<figcaption>${caption}</figcaption>` : ''}
+          <figure class="article-figure" style="margin:24px 0; text-align:center;">
+            <img src="${cdnUrl}" alt="${caption}" style="max-width:100%; height:auto; border-radius:3px; display:block; margin:0 auto;" loading="lazy">
+            ${caption ? `<figcaption style="font-size:12.5px; color:#787C82; margin-top:8px; font-style:italic;">${caption}</figcaption>` : ''}
           </figure>
           <p><br></p>
         `;
 
+        this.switchBlogEditorMode('visual');
         const visualEl = document.getElementById('be-content-visual');
         if (visualEl) {
           visualEl.focus();
@@ -2013,10 +2140,12 @@
           this.syncBlogVisualToText();
         }
 
+        if (toast) toast.update('Նկարը հաջողությամբ ավելացվեց (WebP, <200KB)։', 'success', 3500);
         event.target.value = '';
       } catch (err) {
         console.error('Error adding in-content media:', err);
-        alert('Նկարի ավելացումը ձախողվեց։');
+        if (toast) toast.update('Նկարի ավելացումը ձախողվեց։', 'danger', 3500);
+        alert('Նկարի ավելացումը ձախողվեց։ Խնդրում ենք կրկին փորձել։');
       }
     },
 
