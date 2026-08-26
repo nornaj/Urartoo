@@ -255,6 +255,7 @@
 
       const sessionUser = {
         id: foundUser._id,
+        _id: foundUser._id,
         name: foundUser.name || email,
         email: foundUser.email,
         phone: foundUser.phone || '',
@@ -266,6 +267,16 @@
       };
 
       setCurrentUser(sessionUser);
+
+      // Sync local users database
+      const users = getUsersDB();
+      const idx = users.findIndex(u => u && u.email && u.email.toLowerCase() === email);
+      if (idx > -1) {
+        users[idx] = { ...users[idx], ...sessionUser };
+      } else {
+        users.push(sessionUser);
+      }
+      saveUsersDB(users);
 
       if (window.WooCommerceAdmin) {
         window.WooCommerceAdmin.currentUser = { email: sessionUser.email, role: sessionUser.role, name: sessionUser.name };
@@ -344,6 +355,7 @@
 
       var sessionUser = {
         id: docId,
+        _id: docId,
         name: name,
         email: email,
         phone: phone,
@@ -355,7 +367,18 @@
       };
 
       setCurrentUser(sessionUser);
+
+      var users = getUsersDB();
+      var idx = users.findIndex(u => u && u.email && u.email.toLowerCase() === email);
+      if (idx > -1) {
+        users[idx] = { ...users[idx], ...sessionUser };
+      } else {
+        users.push(sessionUser);
+      }
+      saveUsersDB(users);
+
       window.dispatchEvent(new CustomEvent('urartoo:users-updated', { detail: sessionUser }));
+      window.dispatchEvent(new CustomEvent('urartoo:session-updated', { detail: sessionUser }));
 
       showAlert(alertBox, 'Շնորհավորում ենք, Ձեր հաշիվը հաջողությամբ ստեղծվեց։', 'success');
       setTimeout(function () { renderAccountPage(); }, 400);
@@ -404,56 +427,236 @@
     showAlert(alertBox, 'Գաղտնաբառի վերականգնման հղումն ուղարկվել է Ձեր էլ․ փոստին (դեմո ռեժիմ)։', 'success');
   };
 
-  // --- Profile Update Handler ---
-  window.handleProfileUpdate = function (e) {
-    e.preventDefault();
+  // --- Profile Update Handler (Sanity-First Cloud Sync) ---
+  window.handleProfileUpdate = async function (e) {
+    if (e && e.preventDefault) e.preventDefault();
     const user = getCurrentUser();
-    if (!user) return;
-
     const alertBox = document.getElementById('profile-alert');
+    const submitBtn = document.querySelector('#form-update-profile button[type="submit"]');
+
+    if (!user || !user.email) {
+      showAlert(alertBox, 'Խնդրում ենք նախ մուտք գործել համակարգ։', 'error');
+      return;
+    }
+
     const newName = document.getElementById('edit-name')?.value.trim();
-    const newPhone = document.getElementById('edit-phone')?.value.trim();
+    const newPhone = document.getElementById('edit-phone')?.value.trim() || '';
 
-    user.name = newName;
-    user.phone = newPhone;
-
-    // Update session & database
-    setCurrentUser(user);
-    const users = getUsersDB();
-    const idx = users.findIndex(u => u.email === user.email);
-    if (idx > -1) {
-      users[idx].name = newName;
-      users[idx].phone = newPhone;
-      saveUsersDB(users);
+    if (!newName) {
+      showAlert(alertBox, 'Անուն դաշտը չի կարող դատարկ լինել։', 'error');
+      return;
     }
 
-    showAlert(alertBox, 'Անձնական տվյալները հաջողությամբ թարմացվեցին։', 'success');
-    renderUserBanner(user);
+    const origBtnText = submitBtn ? submitBtn.textContent : 'Պահպանել տվյալները';
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Պահպանվում է...';
+    }
+    showAlert(alertBox, 'Տվյալները պահպանվում են...', 'info');
+
+    const email = user.email.trim().toLowerCase();
+    const docId = user._id || user.id || ('user-' + email.replace(/[^a-z0-9]/gi, '-'));
+
+    try {
+      // 1. Mutate in Sanity CMS Cloud first
+      try {
+        await sanityMutate([
+          {
+            patch: {
+              id: docId,
+              set: {
+                name: newName,
+                phone: newPhone
+              }
+            }
+          }
+        ]);
+      } catch (patchErr) {
+        console.warn('Direct patch failed, falling back to query & createOrReplace:', patchErr);
+        const found = await sanityQuery('*[_type == "userAccount" && email == "' + email + '"][0]{ _id, password, joined, isAdmin, role, address, orders }');
+        const targetId = (found && found._id) ? found._id : docId;
+        const fullDoc = {
+          _id: targetId,
+          _type: 'userAccount',
+          name: newName,
+          email: email,
+          phone: newPhone,
+          password: (found && found.password) || user.password || '',
+          joined: (found && found.joined) || user.joined || String(new Date().getFullYear()),
+          isAdmin: (found && found.isAdmin !== undefined) ? found.isAdmin : Boolean(user.isAdmin),
+          role: (found && found.role) || user.role || (user.isAdmin ? 'Super Admin' : 'Customer'),
+          address: (found && found.address) || user.address || { city: '', street: '', zip: '' },
+          orders: (found && found.orders) || user.orders || []
+        };
+        await sanityMutate([{ createOrReplace: fullDoc }]);
+      }
+
+      // 2. Update current session and local database
+      user.name = newName;
+      user.phone = newPhone;
+      setCurrentUser(user);
+
+      const users = getUsersDB();
+      const idx = users.findIndex(u => u && u.email && u.email.toLowerCase() === email);
+      if (idx > -1) {
+        users[idx].name = newName;
+        users[idx].phone = newPhone;
+      } else {
+        users.push(user);
+      }
+      saveUsersDB(users);
+
+      if (window.WooCommerceAdmin && window.WooCommerceAdmin.currentUser) {
+        window.WooCommerceAdmin.currentUser.name = newName;
+      }
+
+      // 3. Update UI banner and badges
+      renderUserBanner(user);
+      window.dispatchEvent(new CustomEvent('urartoo:users-updated', { detail: user }));
+      window.dispatchEvent(new CustomEvent('urartoo:session-updated', { detail: user }));
+
+      showAlert(alertBox, 'Անձնական տվյալները հաջողությամբ պահպանվեցին։', 'success');
+    } catch (err) {
+      console.error('Profile update error:', err);
+      showAlert(alertBox, 'Տվյալների պահպանման խնդիր՝ խնդրում ենք փորձել նորից։', 'error');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = origBtnText;
+      }
+    }
   };
 
-  // --- Address Update Handler ---
-  window.handleAddressUpdate = function (e) {
-    e.preventDefault();
+  // --- Address Update Handler (Sanity-First Cloud Sync) ---
+  window.handleAddressUpdate = async function (e) {
+    if (e && e.preventDefault) e.preventDefault();
     const user = getCurrentUser();
-    if (!user) return;
-
     const alertBox = document.getElementById('address-alert');
-    user.address = {
-      city: document.getElementById('addr-city')?.value.trim() || '',
-      street: document.getElementById('addr-street')?.value.trim() || '',
-      zip: document.getElementById('addr-zip')?.value.trim() || ''
-    };
+    const submitBtn = document.querySelector('#form-update-address button[type="submit"]');
 
-    setCurrentUser(user);
-    const users = getUsersDB();
-    const idx = users.findIndex(u => u.email === user.email);
-    if (idx > -1) {
-      users[idx].address = user.address;
-      saveUsersDB(users);
+    if (!user || !user.email) {
+      showAlert(alertBox, 'Խնդրում ենք նախ մուտք գործել համակարգ։', 'error');
+      return;
     }
 
-    showAlert(alertBox, 'Առաքման հասցեն հաջողությամբ պահպանվեց։', 'success');
+    const city = document.getElementById('addr-city')?.value.trim() || '';
+    const street = document.getElementById('addr-street')?.value.trim() || '';
+    const zip = document.getElementById('addr-zip')?.value.trim() || '';
+    const addressObj = { city, street, zip };
+
+    const origBtnText = submitBtn ? submitBtn.textContent : 'Պահպանել հասցեն';
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Պահպանվում է...';
+    }
+    showAlert(alertBox, 'Հասցեն պահպանվում է...', 'info');
+
+    const email = user.email.trim().toLowerCase();
+    const docId = user._id || user.id || ('user-' + email.replace(/[^a-z0-9]/gi, '-'));
+
+    try {
+      // 1. Mutate in Sanity CMS Cloud first
+      try {
+        await sanityMutate([
+          {
+            patch: {
+              id: docId,
+              set: {
+                address: addressObj
+              }
+            }
+          }
+        ]);
+      } catch (patchErr) {
+        console.warn('Direct patch failed, falling back to query & createOrReplace:', patchErr);
+        const found = await sanityQuery('*[_type == "userAccount" && email == "' + email + '"][0]{ _id, name, phone, password, joined, isAdmin, role, orders }');
+        const targetId = (found && found._id) ? found._id : docId;
+        const fullDoc = {
+          _id: targetId,
+          _type: 'userAccount',
+          name: (found && found.name) || user.name || email,
+          email: email,
+          phone: (found && found.phone) || user.phone || '',
+          password: (found && found.password) || user.password || '',
+          joined: (found && found.joined) || user.joined || String(new Date().getFullYear()),
+          isAdmin: (found && found.isAdmin !== undefined) ? found.isAdmin : Boolean(user.isAdmin),
+          role: (found && found.role) || user.role || (user.isAdmin ? 'Super Admin' : 'Customer'),
+          address: addressObj,
+          orders: (found && found.orders) || user.orders || []
+        };
+        await sanityMutate([{ createOrReplace: fullDoc }]);
+      }
+
+      // 2. Update current session and local database
+      user.address = addressObj;
+      setCurrentUser(user);
+
+      const users = getUsersDB();
+      const idx = users.findIndex(u => u && u.email && u.email.toLowerCase() === email);
+      if (idx > -1) {
+        users[idx].address = addressObj;
+      } else {
+        users.push(user);
+      }
+      saveUsersDB(users);
+
+      window.dispatchEvent(new CustomEvent('urartoo:users-updated', { detail: user }));
+      window.dispatchEvent(new CustomEvent('urartoo:session-updated', { detail: user }));
+
+      showAlert(alertBox, 'Առաքման հասցեն հաջողությամբ պահպանվեց։', 'success');
+    } catch (err) {
+      console.error('Address update error:', err);
+      showAlert(alertBox, 'Հասցեի պահպանման խնդիր՝ խնդրում ենք փորձել նորից։', 'error');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = origBtnText;
+      }
+    }
   };
+
+  // --- Background sync active session directly from Sanity Cloud ---
+  async function syncCurrentSessionFromSanity() {
+    const user = getCurrentUser();
+    if (!user || !user.email) return;
+    try {
+      const email = user.email.trim().toLowerCase();
+      const groq = '*[_type == "userAccount" && email == "' + email + '"][0]{ _id, name, email, phone, joined, isAdmin, role, address, orders }';
+      const cloudUser = await sanityQuery(groq);
+      if (cloudUser && cloudUser.email) {
+        const SUPER_ADMINS = ['najaryannorayr209@gmail.com', 'mineralsarm@gmail.com', 'norayrnajaryann@gmail.com'];
+        const isSuper = SUPER_ADMINS.includes(email);
+
+        user._id = cloudUser._id;
+        user.id = cloudUser._id;
+        if (cloudUser.name) user.name = cloudUser.name;
+        if (cloudUser.phone !== undefined) user.phone = cloudUser.phone;
+        if (cloudUser.address) user.address = cloudUser.address;
+        if (cloudUser.joined) user.joined = cloudUser.joined;
+        user.isAdmin = isSuper || Boolean(cloudUser.isAdmin);
+        user.role = isSuper ? 'Super Admin' : (cloudUser.role || 'Customer');
+        if (Array.isArray(cloudUser.orders)) user.orders = cloudUser.orders;
+
+        setCurrentUser(user);
+
+        const users = getUsersDB();
+        const idx = users.findIndex(u => u && u.email && u.email.toLowerCase() === email);
+        if (idx > -1) {
+          users[idx] = { ...users[idx], ...user };
+        } else {
+          users.push(user);
+        }
+        saveUsersDB(users);
+
+        renderUserBanner(user);
+        populateProfileForm(user);
+        populateAddressForm(user);
+        renderOrdersPanel(user);
+      }
+    } catch (err) {
+      console.warn('Session sync from Sanity error:', err);
+    }
+  }
 
   // --- Main Page Renderer ---
   function renderAccountPage() {
@@ -500,7 +703,7 @@
     const joinedEl = document.getElementById('dash-user-joined');
     const adminBtn = document.getElementById('btn-admin-access');
 
-    if (nameEl) nameEl.textContent = user.name;
+    if (nameEl) nameEl.textContent = user.name || user.email;
     if (emailEl) emailEl.textContent = user.email;
     if (joinedEl) joinedEl.textContent = 'Անդամ ' + (user.joined || '2026') + ' թ․-ից';
 
@@ -516,11 +719,17 @@
       }
     }
 
-    if (avatarEl && user.name) {
-      const parts = user.name.split(' ');
-      const initials = parts.length > 1
-        ? (parts[0][0] + parts[1][0]).toUpperCase()
-        : user.name.substring(0, 2).toUpperCase();
+    if (avatarEl && (user.name || user.email)) {
+      const displayName = (user.name || user.email).trim();
+      const parts = displayName.split(/\s+/).filter(Boolean);
+      let initials = '';
+      if (parts.length > 1) {
+        initials = (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      } else if (displayName.length >= 2) {
+        initials = displayName.substring(0, 2).toUpperCase();
+      } else {
+        initials = displayName.toUpperCase();
+      }
       avatarEl.textContent = initials;
     }
   }
@@ -734,6 +943,7 @@
   document.addEventListener('DOMContentLoaded', function () {
     initUsersDatabase();
     renderAccountPage();
+    syncCurrentSessionFromSanity();
 
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('msg') === 'unauthorized') {

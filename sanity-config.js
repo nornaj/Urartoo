@@ -643,7 +643,7 @@
       }`;
 
       // GROQ query for user accounts
-      const usersGroq = `*[_type == "user"]{
+      const usersGroq = `*[_type in ["userAccount", "user"]]{
         _id,
         id,
         name,
@@ -991,7 +991,7 @@
      * GROQ Query & Sync Cloud User Accounts from Sanity
      */
     async getUsers() {
-      const usersGroq = `*[_type == "user"]{
+      const usersGroq = `*[_type in ["userAccount", "user"]]{
         _id,
         id,
         name,
@@ -1026,14 +1026,22 @@
         localUsers = JSON.parse(localStorage.getItem('urartoo_users_db_v1')) || [];
       } catch (e) { localUsers = []; }
 
+      let sessionUser = null;
+      try {
+        sessionUser = JSON.parse(localStorage.getItem('urartoo_user_session_v1'));
+      } catch (e) { sessionUser = null; }
+
       let updated = false;
+      let sessionUpdated = false;
+
       cloudUsers.forEach(cu => {
         if (!cu || !cu.email) return;
         const lowerEmail = String(cu.email).trim().toLowerCase();
         const idx = localUsers.findIndex(u => u && u.email && u.email.trim().toLowerCase() === lowerEmail);
 
         const userObj = {
-          id: cu.id || cu._id || `usr_${Date.now()}`,
+          id: cu._id || cu.id || `usr_${Date.now()}`,
+          _id: cu._id,
           name: cu.name || lowerEmail,
           email: lowerEmail,
           phone: cu.phone || '',
@@ -1046,24 +1054,54 @@
         };
 
         if (idx >= 0) {
+          localUsers[idx].id = userObj.id;
+          localUsers[idx]._id = userObj._id;
+          if (userObj.name) localUsers[idx].name = userObj.name;
+          if (userObj.phone !== undefined) localUsers[idx].phone = userObj.phone;
+          if (userObj.address) localUsers[idx].address = userObj.address;
+          if (userObj.joined) localUsers[idx].joined = userObj.joined;
+          if (userObj.orders) localUsers[idx].orders = userObj.orders;
           if (!localUsers[idx].password && userObj.password) {
             localUsers[idx].password = userObj.password;
-            updated = true;
           }
           if (userObj.isAdmin) {
             localUsers[idx].isAdmin = true;
             localUsers[idx].role = 'Super Admin';
-            updated = true;
           }
+          updated = true;
         } else {
           localUsers.push(userObj);
           updated = true;
+        }
+
+        // Sync with active session if matching
+        if (sessionUser && sessionUser.email && sessionUser.email.trim().toLowerCase() === lowerEmail) {
+          sessionUser._id = userObj._id;
+          sessionUser.id = userObj.id;
+          if (userObj.name) sessionUser.name = userObj.name;
+          if (userObj.phone !== undefined) sessionUser.phone = userObj.phone;
+          if (userObj.address) sessionUser.address = userObj.address;
+          if (userObj.joined) sessionUser.joined = userObj.joined;
+          if (userObj.orders) sessionUser.orders = userObj.orders;
+          sessionUser.isAdmin = userObj.isAdmin;
+          sessionUser.role = userObj.role;
+          sessionUpdated = true;
         }
       });
 
       if (updated) {
         try {
           localStorage.setItem('urartoo_users_db_v1', JSON.stringify(localUsers));
+        } catch (e) {}
+      }
+
+      if (sessionUpdated && sessionUser) {
+        try {
+          localStorage.setItem('urartoo_user_session_v1', JSON.stringify(sessionUser));
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('urartoo:users-updated', { detail: sessionUser }));
+            window.dispatchEvent(new CustomEvent('urartoo:session-updated', { detail: sessionUser }));
+          }
         } catch (e) {}
       }
     },
@@ -1074,12 +1112,11 @@
     async saveUser(userData) {
       if (!userData || !userData.email) return false;
       const lowerEmail = String(userData.email).trim().toLowerCase();
-      const docId = `user-${lowerEmail.replace(/[^a-z0-9]/gi, '_')}`;
+      const docId = userData._id || userData.id || `user-${lowerEmail.replace(/[^a-z0-9]/gi, '-')}`;
 
       const doc = {
         _id: docId,
-        _type: 'user',
-        id: userData.id || docId,
+        _type: 'userAccount',
         name: userData.name || lowerEmail,
         email: lowerEmail,
         phone: userData.phone || '',
