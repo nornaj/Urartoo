@@ -4081,8 +4081,10 @@ select, .admin-card select, .admin-input-group select {
   width: 100%;
 }
 
-#ura-custom-admin-bulk-action-select {
-  max-width: 220px;
+#ura-custom-admin-bulk-action-select,
+#ura-custom-admin-journal-bulk-action {
+  min-width: 270px;
+  max-width: 320px;
   width: 100%;
 }
 
@@ -4102,6 +4104,7 @@ select, .admin-card select, .admin-input-group select {
   box-shadow: none;
   text-transform: none !important;
   letter-spacing: normal !important;
+  white-space: nowrap;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   width: 100%;
   box-sizing: border-box;
@@ -4127,6 +4130,7 @@ select, .admin-card select, .admin-input-group select {
   text-transform: none !important;
   letter-spacing: normal !important;
   color: var(--ink, #17181A);
+  white-space: nowrap;
 }
 
 .ura-select-arrow {
