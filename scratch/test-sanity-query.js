@@ -5,29 +5,11 @@ const SANITY_CONFIG = {
   token: 'sknNBnm3TWuTaSZw1TnVkytJGAZT2dTrDMKqVypR4SeaHcq71pMhBnZulwLmjC12rmwe1xMYFIt8t78BcXkmueG1HFwVIzACwXOc4qEq3y0fEHcegdVZCUeCqo9QDZbCzfmprbB4SQQkfWV3Gx4Xdz1ZkEcq0hXpjwnYLO6TPLMuS7c2wsud'
 };
 
-async function uploadRingToSanity() {
-  const fileId = '1GgkU65HaKK_V-RBdRAhbYV3b8eWuu6Iw'; // The gold ring uploaded to Drive
-  const imgUrl = `https://wsrv.nl/?url=https://drive.google.com/uc?id=${fileId}&output=webp&q=94&w=1600`;
-
-  const res = await fetch(imgUrl);
-  console.log('Fetched gold ring status:', res.status);
-  const buf = Buffer.from(await res.arrayBuffer());
-
-  const uploadUrl = `https://${SANITY_CONFIG.projectId}.api.sanity.io/v${SANITY_CONFIG.apiVersion}/assets/images/${SANITY_CONFIG.dataset}`;
-  const upRes = await fetch(uploadUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'image/webp',
-      'Authorization': 'Bearer ' + SANITY_CONFIG.token
-    },
-    body: buf
-  });
-  const upData = await upRes.json();
-  const cdnUrl = upData.document.url;
-  console.log('Uploaded Gold Ring to Sanity CDN:', cdnUrl);
-
+async function fixSanityImages() {
+  const cdnUrl = 'https://cdn.sanity.io/images/g1vi85kp/production/d3e6831bbb961afbd65d58188c93895ef922fb4c-1600x1600.webp';
   const mutateUrl = `https://${SANITY_CONFIG.projectId}.api.sanity.io/v${SANITY_CONFIG.apiVersion}/data/mutate/${SANITY_CONFIG.dataset}`;
-  const mutRes = await fetch(mutateUrl, {
+
+  const res = await fetch(mutateUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -41,9 +23,7 @@ async function uploadRingToSanity() {
             set: {
               image: cdnUrl,
               images: [cdnUrl],
-              stone: 'Hello World',
-              stoneOrigin: 'Vanadzor',
-              region: 'Vanadzor'
+              img: cdnUrl
             }
           }
         },
@@ -53,9 +33,7 @@ async function uploadRingToSanity() {
             set: {
               image: cdnUrl,
               images: [cdnUrl],
-              stone: 'Hello World',
-              stoneOrigin: 'Vanadzor',
-              region: 'Vanadzor'
+              img: cdnUrl
             }
           }
         },
@@ -65,9 +43,7 @@ async function uploadRingToSanity() {
             set: {
               image: cdnUrl,
               images: [cdnUrl],
-              stone: 'Hello World',
-              stoneOrigin: 'Vanadzor',
-              region: 'Vanadzor'
+              img: cdnUrl
             }
           }
         }
@@ -75,8 +51,8 @@ async function uploadRingToSanity() {
     })
   });
 
-  const mutData = await mutRes.json();
-  console.log('Mutated products result:', JSON.stringify(mutData));
+  const data = await res.json();
+  console.log('Patched Sanity:', data);
 }
 
-uploadRingToSanity();
+fixSanityImages();

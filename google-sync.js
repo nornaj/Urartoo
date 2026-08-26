@@ -289,45 +289,55 @@
      */
     async fetchDriveFilesMap(folderId = null) {
       const targetFolderId = folderId || GOOGLE_CONFIG.driveFolderId;
-      try {
-        const folderUrl = `https://drive.google.com/embeddedfolderview?id=${targetFolderId}`;
-        const res = await fetch(folderUrl);
-        if (!res.ok) return new Map();
-        const html = await res.text();
+      const targetUrl = `https://drive.google.com/embeddedfolderview?id=${targetFolderId}`;
+      const proxies = [
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`,
+        targetUrl
+      ];
 
-        const fileMap = new Map();
-        const filesList = [];
+      for (const url of proxies) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) continue;
+          const html = await res.text();
 
-        // Match Google Drive folder entry format: id="entry-FILE_ID" ... class="flip-entry-title">TITLE</div>
-        const entryRegex = /id="entry-([a-zA-Z0-9_-]+)"[\s\S]*?class="flip-entry-title">([^<]+)<\/div>/g;
-        let match;
-        while ((match = entryRegex.exec(html)) !== null) {
-          const fileId = match[1];
-          const rawTitle = match[2].trim();
-          const normKey = normalizeTitleKey(rawTitle);
-          fileMap.set(normKey, fileId);
-          filesList.push({ fileId, title: rawTitle });
-        }
+          const fileMap = new Map();
+          const filesList = [];
 
-        // Fallback regex match: /file/d/FILE_ID/view ... title
-        const linkRegex = /\/file\/d\/([a-zA-Z0-9_-]+)\/view[\s\S]*?class="flip-entry-title">([^<]+)<\/div>/g;
-        while ((match = linkRegex.exec(html)) !== null) {
-          const fileId = match[1];
-          const rawTitle = match[2].trim();
-          const normKey = normalizeTitleKey(rawTitle);
-          if (!fileMap.has(normKey)) {
+          // Match Google Drive folder entry format: id="entry-FILE_ID" ... class="flip-entry-title">TITLE</div>
+          const entryRegex = /id="entry-([a-zA-Z0-9_-]+)"[\s\S]*?class="flip-entry-title">([^<]+)<\/div>/g;
+          let match;
+          while ((match = entryRegex.exec(html)) !== null) {
+            const fileId = match[1];
+            const rawTitle = match[2].trim();
+            const normKey = normalizeTitleKey(rawTitle);
             fileMap.set(normKey, fileId);
             filesList.push({ fileId, title: rawTitle });
           }
-        }
 
-        console.log('[GoogleSync] Drive Files Map:', Array.from(fileMap.entries()));
-        fileMap._filesList = filesList;
-        return fileMap;
-      } catch (e) {
-        console.warn('Google Drive file map error:', e);
-        return new Map();
+          // Fallback regex match: /file/d/FILE_ID/view ... title
+          const linkRegex = /\/file\/d\/([a-zA-Z0-9_-]+)\/view[\s\S]*?class="flip-entry-title">([^<]+)<\/div>/g;
+          while ((match = linkRegex.exec(html)) !== null) {
+            const fileId = match[1];
+            const rawTitle = match[2].trim();
+            const normKey = normalizeTitleKey(rawTitle);
+            if (!fileMap.has(normKey)) {
+              fileMap.set(normKey, fileId);
+              filesList.push({ fileId, title: rawTitle });
+            }
+          }
+
+          if (filesList.length > 0) {
+            console.log('[GoogleSync] Drive Files Map loaded via proxy:', filesList);
+            fileMap._filesList = filesList;
+            return fileMap;
+          }
+        } catch (e) {
+          console.warn('Google Drive file map proxy error:', url, e);
+        }
       }
+      return new Map();
     },
 
     /**
@@ -351,8 +361,9 @@
 
       // Calculate the next available sequential SKU number
       let maxSkuNum = 0;
+      let existingProducts = [];
       if (window.NovaSanity) {
-        const existingProducts = window.NovaSanity.getProducts();
+        existingProducts = window.NovaSanity.getProducts();
         existingProducts.forEach(function(p) {
           if (p.sku) {
             var match = p.sku.match(/^UR-(\d+)$/);
@@ -387,6 +398,16 @@
         if (statusCallback) statusCallback(`Մշակվում է [${i + 1}/${sheetRows.length}]: «${title}» (նկարի WebP սեղմում <200KB)...`);
 
         const numericPrice = Number(String(row.price).replace(/[^0-9.]/g, '')) || 300;
+
+        // Check if this product already has an existing valid image in Sanity
+        const matchedExisting = existingProducts.find(p => p.id === `product-gsheet-${i + 1}` || p.name === title);
+        let fallbackImg = 'Images/bracelet.webp';
+        if (matchedExisting && matchedExisting.image && !matchedExisting.image.includes('bracelet.webp')) {
+          fallbackImg = matchedExisting.image;
+        } else if (matchedExisting && matchedExisting.img && !matchedExisting.img.includes('bracelet.webp')) {
+          fallbackImg = matchedExisting.img;
+        }
+
         const prodData = {
           id: `product-gsheet-${i + 1}`,
           name: title,
@@ -405,34 +426,40 @@
           description: row.description || '',
           sizes: [{ label: "Standard", price: numericPrice }],
           tags: ["Ձեռագործ", row.stone || "Զարդ"],
-          img: 'Images/bracelet.webp',
-          image: 'Images/bracelet.webp',
-          images: ['Images/bracelet.webp']
+          img: fallbackImg,
+          image: fallbackImg,
+          images: [fallbackImg]
         };
 
         // Determine matched Drive file
         let matchedFileId = null;
 
-        // 1. Check if folder URL is provided in row.image
-        const folderIdInRow = extractGoogleDriveFolderId(row.image);
-        if (folderIdInRow) {
-          const rowFolderMap = (folderIdInRow === GOOGLE_CONFIG.driveFolderId) ? driveFileMap : await this.fetchDriveFilesMap(folderIdInRow);
-          const normTitle = normalizeTitleKey(title);
-          matchedFileId = rowFolderMap.get(normTitle);
-          if (!matchedFileId && rowFolderMap._filesList && rowFolderMap._filesList[i]) {
-            matchedFileId = rowFolderMap._filesList[i].fileId;
-          } else if (!matchedFileId && rowFolderMap._filesList && rowFolderMap._filesList.length > 0) {
-            matchedFileId = rowFolderMap._filesList[0].fileId;
+        // 1. Direct file ID in cell (if user pasted direct file share link)
+        const directFileId = extractGoogleDriveFileId(row.image);
+        if (directFileId) {
+          matchedFileId = directFileId;
+        } else {
+          // 2. Check if folder URL is provided in row.image
+          const folderIdInRow = extractGoogleDriveFolderId(row.image);
+          if (folderIdInRow) {
+            const rowFolderMap = (folderIdInRow === GOOGLE_CONFIG.driveFolderId) ? driveFileMap : await this.fetchDriveFilesMap(folderIdInRow);
+            const normTitle = normalizeTitleKey(title);
+            matchedFileId = rowFolderMap.get(normTitle);
+            if (!matchedFileId && rowFolderMap._filesList && rowFolderMap._filesList[i]) {
+              matchedFileId = rowFolderMap._filesList[i].fileId;
+            } else if (!matchedFileId && rowFolderMap._filesList && rowFolderMap._filesList.length > 0) {
+              matchedFileId = rowFolderMap._filesList[0].fileId;
+            }
+          }
+
+          // 3. Fallback match by title from root Drive folder
+          if (!matchedFileId) {
+            const normTitle = normalizeTitleKey(title);
+            matchedFileId = driveFileMap.get(normTitle);
           }
         }
 
-        // 2. Direct file ID match by title if not found yet
-        if (!matchedFileId) {
-          const normTitle = normalizeTitleKey(title);
-          matchedFileId = driveFileMap.get(normTitle);
-        }
-
-        // 3. Resolve, convert to WebP (<200KB) and upload to Sanity
+        // 4. Resolve, convert to WebP (<200KB) and upload to Sanity
         const finalImageUrl = await resolveAndUploadProductImage(row.image, matchedFileId);
         if (finalImageUrl) {
           prodData.img = finalImageUrl;
