@@ -1645,6 +1645,121 @@
       });
     },
 
+    async renderClientsSec() {
+      const tbody = document.getElementById('admin-clients-tbody');
+      const regCountEl = document.getElementById('admin-clients-count-val');
+      const activeBuyersEl = document.getElementById('admin-active-buyers-val');
+      const ltvValEl = document.getElementById('admin-client-ltv-val');
+      const searchInput = document.getElementById('admin-client-search');
+      const searchVal = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+      // 1. Initial local cache render for instant display
+      let users = [];
+      try {
+        const localDb = JSON.parse(localStorage.getItem('urartoo_users_db_v1') || '[]');
+        if (Array.isArray(localDb) && localDb.length > 0) {
+          users = localDb;
+        }
+      } catch (e) {}
+
+      const renderUserList = (list) => {
+        if (!tbody) return;
+
+        // Stats calculation
+        if (regCountEl) regCountEl.textContent = list.length;
+        
+        let activeCount = 0;
+        let totalSpend = 0;
+
+        list.forEach(u => {
+          const ords = Array.isArray(u.orders) ? u.orders : [];
+          if (ords.length > 0) activeCount++;
+          ords.forEach(o => {
+            totalSpend += (Number(o.total) || 0);
+          });
+        });
+
+        if (activeBuyersEl) activeBuyersEl.textContent = activeCount;
+        if (ltvValEl) {
+          const avgLtv = list.length > 0 ? Math.round(totalSpend / list.length) : 0;
+          ltvValEl.textContent = avgLtv > 0 ? `$${avgLtv}` : '0 $';
+        }
+
+        // Search filtering
+        const filtered = list.filter(u => {
+          if (!searchVal) return true;
+          const nameStr = (u.name || '').toLowerCase();
+          const emailStr = (u.email || '').toLowerCase();
+          const phoneStr = (u.phone || '').toLowerCase();
+          const cityStr = (u.address?.city || '').toLowerCase();
+          return nameStr.includes(searchVal) || emailStr.includes(searchVal) || phoneStr.includes(searchVal) || cityStr.includes(searchVal);
+        });
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:36px; color:var(--tuff);">Գրանցված հաճախորդներ չեն գտնվել</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = filtered.map(u => {
+          const ordCount = Array.isArray(u.orders) ? u.orders.length : 0;
+          let userSpend = 0;
+          if (Array.isArray(u.orders)) {
+            u.orders.forEach(o => { userSpend += (Number(o.total) || 0); });
+          }
+
+          let badgeHtml = '';
+          if (u.isAdmin) {
+            badgeHtml = '<span style="display:inline-block; padding:3px 10px; font-size:11.5px; font-weight:700; border-radius:12px; background:#FFF3D6; color:#946300; border:1px solid #FFE082;">👑 Ադմին</span>';
+          } else if (ordCount > 0) {
+            badgeHtml = '<span style="display:inline-block; padding:3px 10px; font-size:11.5px; font-weight:600; border-radius:12px; background:#E6F4EA; color:#137333; border:1px solid #CEEAD6;">Ակտիվ Գնորդ</span>';
+          } else {
+            badgeHtml = '<span style="display:inline-block; padding:3px 10px; font-size:11.5px; font-weight:600; border-radius:12px; background:#F1F3F4; color:#5F6368; border:1px solid #DADCE0;">Գրանցված</span>';
+          }
+
+          const cityInfo = (u.address && u.address.city) ? ` · ${u.address.city}` : '';
+
+          return `
+            <tr>
+              <td>
+                <strong style="color:var(--obsidian); font-size:13.5px; display:block;">${u.name || 'Անանուն Գնորդ'}</strong>
+                <span style="font-size:12px; color:var(--tuff);">${u.phone || 'Հեռ․ նշված չէ'}${cityInfo}</span>
+              </td>
+              <td><span style="font-family:var(--mono); font-size:12.5px; color:#444;">${u.email || '-'}</span></td>
+              <td><strong style="font-size:13px;">${ordCount}</strong> <span style="font-size:11.5px; color:var(--tuff);">պատվեր</span></td>
+              <td><strong style="color:var(--green); font-size:13px;">${userSpend > 0 ? ('$' + userSpend.toLocaleString()) : '$0'}</strong></td>
+              <td style="font-size:12.5px; color:#666;">${u.joined || '2026'}</td>
+              <td>${badgeHtml}</td>
+            </tr>
+          `;
+        }).join('');
+      };
+
+      if (users.length > 0) {
+        renderUserList(users);
+      }
+
+      // 2. Fetch live data directly from Sanity Cloud
+      try {
+        const SANITY_TOKEN = 'sknNBnm3TWuTaSZw1TnVkytJGAZT2dTrDMKqVypR4SeaHcq71pMhBnZulwLmjC12rmwe1xMYFIt8t78BcXkmueG1HFwVIzACwXOc4qEq3y0fEHcegdVZCUeCqo9QDZbCzfmprbB4SQQkfWV3Gx4Xdz1ZkEcq0hXpjwnYLO6TPLMuS7c2wsud';
+        const groq = encodeURIComponent('*[_type in ["userAccount", "user", "customer"]]{ _id, name, email, phone, address, joined, isAdmin, role, orders } | order(joined desc)');
+        const url = `https://g1vi85kp.api.sanity.io/v2024-01-01/data/query/production?query=${groq}`;
+
+        const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + SANITY_TOKEN } });
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.result) && data.result.length > 0) {
+            users = data.result;
+            try {
+              localStorage.setItem('urartoo_users_db_v1', JSON.stringify(users));
+            } catch (e) {}
+            renderUserList(users);
+          }
+        }
+      } catch (err) {
+        console.warn('[Admin] Live clients fetch error:', err);
+      }
+    },
+
     async renderJournalSec() {
       const tbody = document.getElementById('admin-journal-tbody');
       const mobileCards = document.getElementById('admin-journal-mobile-cards');
