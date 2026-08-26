@@ -70,6 +70,16 @@
     }
   }
 
+  function normalizeCategory(cat) {
+    if (!cat) return 'Մատանիներ';
+    const c = String(cat).trim().toLowerCase();
+    if (c.includes('մատան') || c.includes('ring')) return 'Մատանիներ';
+    if (c.includes('վզնոց') || c.includes('վզնօց') || c.includes('necklace') || c.includes('կախազարդ') || c.includes('pendant')) return 'Վզնոցներ';
+    if (c.includes('ապարանջ') || c.includes('bracelet')) return 'Ապարանջաններ';
+    if (c.includes('ականջ') || c.includes('earring')) return 'Ականջօղեր';
+    return cat.trim();
+  }
+
   function getProductsList() {
     if (window.NovaSanity && window.NovaSanity._ready) {
       return window.NovaSanity.getProducts();
@@ -81,7 +91,7 @@
   let activeStone = 'all';
   let searchQuery = '';
   let minPrice = 0;
-  let maxPrice = 99999;
+  let maxPrice = Infinity;
   let activeSort = 'new';
 
   // Read URL parameters if coming from Homepage stone/category cards
@@ -150,15 +160,27 @@
   function filterAndSort() {
     const productsList = getProductsList();
     let list = productsList.filter(function (p) {
-      if (activeCat !== 'all' && (p.cat || p.category) !== activeCat) return false;
-      if (activeStone !== 'all' && (p.stone || '') !== activeStone) return false;
-      if (p.price < minPrice || p.price > maxPrice) return false;
+      if (activeCat !== 'all') {
+        const pCat = normalizeCategory(p.cat || p.category);
+        const aCat = normalizeCategory(activeCat);
+        if (pCat.toLowerCase() !== aCat.toLowerCase()) return false;
+      }
+      if (activeStone !== 'all') {
+        const pStone = String(p.stone || '').trim().toLowerCase();
+        const aStone = String(activeStone || '').trim().toLowerCase();
+        if (pStone !== aStone) return false;
+      }
+      const price = Number(p.price) || 0;
+      if (minPrice > 0 && price < minPrice) return false;
+      if (maxPrice < Infinity && price > maxPrice) return false;
       if (searchQuery) {
-        var q = searchQuery.toLowerCase();
+        var q = searchQuery.toLowerCase().trim();
         var match = (p.name || '').toLowerCase().includes(q) ||
                     (p.stone || '').toLowerCase().includes(q) ||
                     (p.region || p.stoneOrigin || '').toLowerCase().includes(q) ||
-                    (p.cat || p.category || '').toLowerCase().includes(q);
+                    (p.cat || p.category || '').toLowerCase().includes(q) ||
+                    (p.material || '').toLowerCase().includes(q) ||
+                    (p.sku || '').toLowerCase().includes(q);
         if (!match) return false;
       }
       return true;
@@ -229,14 +251,12 @@
     activeStone = 'all';
     searchQuery = '';
     minPrice = 0;
-    maxPrice = 10000;
+    maxPrice = Infinity;
     activeSort = 'new';
 
     if (searchInput) searchInput.value = '';
     if (priceMinInput) priceMinInput.value = '';
     if (priceMaxInput) priceMaxInput.value = '';
-    minPrice = 0;
-    maxPrice = 99999;
     if (sortSelect) sortSelect.value = 'new';
 
     document.querySelectorAll('#cat-chips .filter-chip').forEach(c => c.classList.remove('active'));
@@ -283,7 +303,7 @@
 
   if (priceMaxInput) {
     priceMaxInput.addEventListener('input', function (e) {
-      maxPrice = e.target.value ? (Number(e.target.value) || 99999) : 99999;
+      maxPrice = e.target.value ? (Number(e.target.value) || Infinity) : Infinity;
       filterAndSort();
     });
   }
