@@ -2236,7 +2236,7 @@
       const file = event.target.files && event.target.files[0];
       if (!file) return;
 
-      const toast = this.showToast ? this.showToast('Նկարը սեղմվում է WebP (<200KB) և վերբեռնվում...', 'loading', 0) : null;
+      const toast = typeof this.showToast === 'function' ? this.showToast('Նկարը սեղմվում է WebP (<200KB) և վերբեռնվում...', 'loading', 0) : null;
 
       try {
         console.log('[Urartoo] Compressing in-content media to WebP < 200KB...');
@@ -2273,19 +2273,17 @@
           cdnUrl = URL.createObjectURL(webpBlob);
         }
 
-        // Get caption
-        let defaultCaption = '';
+        // Caption from existing placeholder text (NO prompt alert!)
+        let caption = '';
         if (this._activeTargetFigure) {
-          const existingCaption = this._activeTargetFigure.querySelector('figcaption, .journal-post-figure-caption');
-          if (existingCaption) defaultCaption = existingCaption.textContent.trim();
+          const capEl = this._activeTargetFigure.querySelector('figcaption, .journal-post-figure-caption');
+          if (capEl) caption = capEl.textContent.trim();
         }
-
-        const caption = prompt('Մուտքագրեք լուսանկարի նկարագրությունը (Caption, ոչ պարտադիր):', defaultCaption) || defaultCaption;
 
         const figureHtml = `
           <figure class="article-figure" style="margin:28px 0; text-align:center;">
-            <img src="${cdnUrl}" alt="${caption}" style="max-width:100%; height:auto; border-radius:3px; display:block; margin:0 auto;" loading="lazy">
-            ${caption ? `<figcaption style="font-size:12.5px; color:#787C82; margin-top:8px; font-style:italic;">${caption}</figcaption>` : ''}
+            <img src="${cdnUrl}" alt="${caption || 'Urartoo'}" style="max-width:100%; height:auto; border-radius:4px; display:block; margin:0 auto;" loading="lazy">
+            ${caption ? `<figcaption style="font-size:12.5px; color:#787C82; margin-top:8px; font-style:italic; text-align:center;">${caption}</figcaption>` : ''}
           </figure>
           <p><br></p>
         `;
@@ -2293,25 +2291,40 @@
         this.switchBlogEditorMode('visual');
         const visualEl = document.getElementById('be-content-visual');
         if (visualEl) {
+          let replaced = false;
           if (this._activeTargetFigure && this._activeTargetFigure.parentElement) {
-            const targetFig = this._activeTargetFigure;
-            this._activeTargetFigure = null;
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = figureHtml.trim();
-            const newFig = tempDiv.firstElementChild;
-            targetFig.replaceWith(newFig);
+            const target = this._activeTargetFigure;
+            const parentFig = target.closest('figure') || target;
+            const temp = document.createElement('div');
+            temp.innerHTML = figureHtml.trim();
+            parentFig.replaceWith(temp.firstElementChild);
+            replaced = true;
           } else {
+            // Check if there is an existing placeholder in the editor
+            const placeholder = visualEl.querySelector('.journal-post-figure-img, .journal-post-hero-placeholder, .journal-placeholder-box');
+            if (placeholder) {
+              const parentFig = placeholder.closest('figure') || placeholder;
+              const temp = document.createElement('div');
+              temp.innerHTML = figureHtml.trim();
+              parentFig.replaceWith(temp.firstElementChild);
+              replaced = true;
+            }
+          }
+
+          if (!replaced) {
             visualEl.focus();
             document.execCommand('insertHTML', false, figureHtml);
           }
+
+          this._activeTargetFigure = null;
           this.syncBlogVisualToText();
         }
 
-        if (toast) toast.update('Նկարը հաջողությամբ ավելացվեց (WebP, <200KB)։', 'success', 3500);
+        if (toast) toast.update('Նկարը հաջողությամբ ավելացվեց (WebP, <200KB)։', 'success', 3000);
         event.target.value = '';
       } catch (err) {
         console.error('Error adding in-content media:', err);
-        if (toast) toast.update('Նկարի ավելացումը ձախողվեց։', 'danger', 3500);
+        if (toast) toast.update('Նկարի ավելացումը ձախողվեց։', 'danger', 3000);
         alert('Նկարի ավելացումը ձախողվեց։ Խնդրում ենք կրկին փորձել։');
       }
     },

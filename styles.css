@@ -5424,31 +5424,19 @@ select, .admin-card select, .admin-input-group select {
   font-style: italic;
 }
 
-.scf-editor-content figure {
-  margin: 20px 0;
-  text-align: center;
-  background: #F9F9FB;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #E2E0D8;
-}
-
 .scf-editor-content figure,
 .scf-editor-content .journal-post-block figure {
   margin: 24px 0;
-  cursor: pointer;
+  text-align: center;
   position: relative;
-  transition: all 0.2s ease;
-}
-
-.scf-editor-content figure:hover {
-  outline: 2px dashed var(--gold, #C2A379);
-  outline-offset: 4px;
-  border-radius: 4px;
+  background: transparent;
+  padding: 0;
+  border: none;
 }
 
 .scf-editor-content figure img {
   max-width: 100%;
+  height: auto;
   border-radius: 4px;
   display: block;
   margin: 0 auto;
@@ -5456,37 +5444,45 @@ select, .admin-card select, .admin-input-group select {
 
 .scf-editor-content .journal-post-figure-img,
 .scf-editor-content .journal-post-hero-placeholder {
-  min-height: 200px;
-  background: #EAE7DC;
-  border: 2px dashed #C2A379;
+  min-height: 120px;
+  max-width: 480px;
+  margin: 16px auto;
+  background: #FAF8F5;
+  border: 1.5px dashed #D0CEC5;
+  border-radius: 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px 20px;
+  padding: 24px 16px;
   text-align: center;
-  border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
+  user-select: none;
 }
 
 .scf-editor-content .journal-post-figure-img:hover,
 .scf-editor-content .journal-post-hero-placeholder:hover {
-  background: #DFDBCF;
-  border-color: var(--green, #191B1A);
+  background: #F4F1EA;
+  border-color: #191B1A;
 }
 
 .scf-editor-content .journal-post-hero-placeholder::before {
-  content: '📷 Սեղմեք այստեղ՝ լուսանկար վերբեռնելու համար (WebP < 200KB)';
-  display: block;
-  font-weight: 700;
-  font-size: 13.5px;
+  content: '+';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  font-size: 26px;
+  font-weight: 300;
+  line-height: 1;
   color: #191B1A;
+  background: #FFFFFF;
+  border: 1px solid #D8D5CB;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
   margin-bottom: 8px;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 6px 16px;
-  border-radius: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .scf-editor-content figcaption,
