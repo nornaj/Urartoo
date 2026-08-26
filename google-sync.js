@@ -359,64 +359,65 @@
 
       if (statusCallback) statusCallback(`Սինխրոնացվում է Sanity CMS-ի հետ...`);
 
-      // Calculate the next available sequential SKU number
-      let maxSkuNum = 0;
+      // Load fresh products from Sanity to preserve existing SKUs and images
       let existingProducts = [];
-      if (window.NovaSanity) {
-        existingProducts = window.NovaSanity.getProducts();
-        existingProducts.forEach(function(p) {
-          if (p.sku) {
-            var match = p.sku.match(/^UR-(\d+)$/);
-            if (match) {
-              var num = parseInt(match[1], 10);
-              if (num > maxSkuNum) maxSkuNum = num;
-            }
-          }
-        });
+      if (window.NovaSanity && typeof window.NovaSanity.getProducts === 'function') {
+        try {
+          existingProducts = await window.NovaSanity.getProducts();
+        } catch (e) {
+          existingProducts = window.NovaSanity.getProducts() || [];
+        }
       }
-      // Also check trash
-      try {
-        var trashItems = JSON.parse(localStorage.getItem('urartoo_trash_v1')) || [];
-        trashItems.forEach(function(p) {
-          if (p.sku) {
-            var match = p.sku.match(/^UR-(\d+)$/);
-            if (match) {
-              var num = parseInt(match[1], 10);
-              if (num > maxSkuNum) maxSkuNum = num;
-            }
+
+      // Calculate max SKU number for truly new products only
+      let maxSkuNum = 0;
+      existingProducts.forEach(function(p) {
+        if (p.sku) {
+          var match = p.sku.match(/^UR-(\d+)$/);
+          if (match) {
+            var num = parseInt(match[1], 10);
+            if (num > maxSkuNum) maxSkuNum = num;
           }
-        });
-      } catch (e) {}
+        }
+      });
 
       let syncedCount = 0;
 
       for (let i = 0; i < sheetRows.length; i++) {
         const row = sheetRows[i];
-        const title = row.title;
+        const title = row.title ? row.title.trim() : '';
         if (!title) continue;
 
-        if (statusCallback) statusCallback(`Մշակվում է [${i + 1}/${sheetRows.length}]: «${title}» (նկարի WebP սեղմում <200KB)...`);
+        if (statusCallback) statusCallback(`Մշակվում է [${i + 1}/${sheetRows.length}]: «${title}»...`);
 
         const numericPrice = Number(String(row.price).replace(/[^0-9.]/g, '')) || 300;
+        const prodDocId = `product-gsheet-${i + 1}`;
 
-        // Check if this product already has an existing valid image in Sanity
-        const matchedExisting = existingProducts.find(p => p.id === `product-gsheet-${i + 1}` || p.name === title);
-        let fallbackImg = 'Images/bracelet.webp';
-        if (matchedExisting && matchedExisting.image && !matchedExisting.image.includes('bracelet.webp')) {
-          fallbackImg = matchedExisting.image;
-        } else if (matchedExisting && matchedExisting.img && !matchedExisting.img.includes('bracelet.webp')) {
-          fallbackImg = matchedExisting.img;
+        // Find if this product already exists in Sanity
+        const matchedExisting = existingProducts.find(p => p.id === prodDocId || p._sanityId === prodDocId || (p.name && p.name.trim().toLowerCase() === title.toLowerCase()));
+
+        // Preserve existing SKU or assign next available
+        const assignedSku = (matchedExisting && matchedExisting.sku)
+          ? matchedExisting.sku
+          : ('UR-' + String(maxSkuNum + i + 1).padStart(3, '0'));
+
+        // Default to existing Sanity CDN image if valid, otherwise fallback
+        let resolvedImg = 'https://cdn.sanity.io/images/g1vi85kp/production/d3e6831bbb961afbd65d58188c93895ef922fb4c-1600x1600.webp';
+        if (matchedExisting && matchedExisting.image && !matchedExisting.image.includes('bracelet.webp') && !matchedExisting.image.includes('VVVV')) {
+          resolvedImg = matchedExisting.image;
+        } else if (matchedExisting && matchedExisting.img && !matchedExisting.img.includes('bracelet.webp') && !matchedExisting.img.includes('VVVV')) {
+          resolvedImg = matchedExisting.img;
         }
 
         const prodData = {
-          id: `product-gsheet-${i + 1}`,
+          id: prodDocId,
           name: title,
-          sku: 'UR-' + String(maxSkuNum + i + 1).padStart(3, '0'),
+          sku: assignedSku,
           cat: row.category || 'Մատանիներ',
           category: row.category || 'Մատանիներ',
           stone: ensureStoneExists(row.stone),
-          region: row.location || 'Վայոց Ձոր',
-          stoneOrigin: row.location || 'Վայոց Ձոր',
+          region: row.location || 'Vanadzor',
+          stoneOrigin: row.location || 'Vanadzor',
           material: row.substance || '925 արծաթ',
           price: numericPrice,
           stock: (row.stock !== undefined && row.stock !== '') ? (Number(String(row.stock).replace(/[^0-9]/g, '')) || 1) : 1,
@@ -426,45 +427,41 @@
           description: row.description || '',
           sizes: [{ label: "Standard", price: numericPrice }],
           tags: ["Ձեռագործ", row.stone || "Զարդ"],
-          img: fallbackImg,
-          image: fallbackImg,
-          images: [fallbackImg]
+          img: resolvedImg,
+          image: resolvedImg,
+          images: [resolvedImg]
         };
 
         // Determine matched Drive file
         let matchedFileId = null;
 
-        // 1. Direct file ID in cell (if user pasted direct file share link)
+        // 1. Direct file link in row.image (highest priority)
         const directFileId = extractGoogleDriveFileId(row.image);
         if (directFileId) {
           matchedFileId = directFileId;
         } else {
-          // 2. Check if folder URL is provided in row.image
+          // 2. Folder in row.image
           const folderIdInRow = extractGoogleDriveFolderId(row.image);
           if (folderIdInRow) {
             const rowFolderMap = (folderIdInRow === GOOGLE_CONFIG.driveFolderId) ? driveFileMap : await this.fetchDriveFilesMap(folderIdInRow);
+            const validFiles = (rowFolderMap._filesList || []).filter(f => !f.title.toLowerCase().includes('vvvv') && !f.title.toLowerCase().includes('bracelet'));
+
             const normTitle = normalizeTitleKey(title);
             matchedFileId = rowFolderMap.get(normTitle);
-            if (!matchedFileId && rowFolderMap._filesList && rowFolderMap._filesList[i]) {
-              matchedFileId = rowFolderMap._filesList[i].fileId;
-            } else if (!matchedFileId && rowFolderMap._filesList && rowFolderMap._filesList.length > 0) {
-              matchedFileId = rowFolderMap._filesList[0].fileId;
+            if (!matchedFileId && validFiles.length > 0) {
+              matchedFileId = (validFiles[i] || validFiles[0]).fileId;
             }
-          }
-
-          // 3. Fallback match by title from root Drive folder
-          if (!matchedFileId) {
-            const normTitle = normalizeTitleKey(title);
-            matchedFileId = driveFileMap.get(normTitle);
           }
         }
 
-        // 4. Resolve, convert to WebP (<200KB) and upload to Sanity
-        const finalImageUrl = await resolveAndUploadProductImage(row.image, matchedFileId);
-        if (finalImageUrl) {
-          prodData.img = finalImageUrl;
-          prodData.image = finalImageUrl;
-          prodData.images = [finalImageUrl];
+        // 3. Resolve and upload new image if matched from Drive
+        if (matchedFileId) {
+          const finalImageUrl = await resolveAndUploadProductImage(row.image, matchedFileId);
+          if (finalImageUrl && !finalImageUrl.includes('bracelet.webp') && !finalImageUrl.includes('VVVV')) {
+            prodData.img = finalImageUrl;
+            prodData.image = finalImageUrl;
+            prodData.images = [finalImageUrl];
+          }
         }
 
         // Save document directly to Sanity CMS
