@@ -2,7 +2,16 @@
   "cleanUrls": true,
   "headers": [
     {
-      "source": "/(.*).(css|js|webp|jpg|jpeg|png|svg|woff2)",
+      "source": "/(.*).(html|js|css)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/(.*).(webp|jpg|jpeg|png|svg|woff2)",
       "headers": [
         {
           "key": "Cache-Control",

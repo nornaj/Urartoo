@@ -574,9 +574,9 @@
      */
     async init() {
       // One-time cleanup: remove old seed journal posts from localStorage
-      if (!localStorage.getItem('urartoo_journal_cleaned_v3')) {
+      if (!localStorage.getItem('urartoo_journal_cleaned_v4')) {
         localStorage.removeItem('urartoo_journal_posts_v1');
-        localStorage.setItem('urartoo_journal_cleaned_v3', '1');
+        localStorage.setItem('urartoo_journal_cleaned_v4', '1');
       }
 
       // Load local storage cached products first (for instant render & local persistence)
