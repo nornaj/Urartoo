@@ -1712,7 +1712,7 @@ body.nav-open {
   margin-bottom: 6px;
 }
 
-.footer-col a {
+.footer-col a:not(.footer-social-btn) {
   color: rgba(232, 226, 218, 0.72);
   transition: all 0.25s ease;
   display: inline-flex;
@@ -1722,7 +1722,7 @@ body.nav-open {
   width: fit-content;
   max-width: max-content;
 }
-.footer-col a:hover {
+.footer-col a:not(.footer-social-btn):hover {
   color: var(--amber);
   transform: translateX(2px);
 }
@@ -1734,23 +1734,40 @@ body.nav-open {
   gap: 12px;
   margin-bottom: 16px;
 }
-.footer-social-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+.footer-social-btn,
+.footer-col .footer-social-btn {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  max-width: 36px !important;
+  max-height: 36px !important;
+  border-radius: 50% !important;
   border: 1px solid rgba(232, 226, 218, 0.22);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   color: var(--bone);
   transition: all 0.25s ease;
   background: rgba(255, 255, 255, 0.03);
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0;
+  text-decoration: none;
 }
-.footer-social-btn:hover {
+.footer-social-btn:hover,
+.footer-col .footer-social-btn:hover {
   border-color: var(--amber);
   color: var(--amber);
   background: rgba(194, 163, 121, 0.12);
   transform: translateY(-2px);
+}
+.footer-social-btn svg,
+.footer-col .footer-social-btn svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+  flex-shrink: 0;
 }
 
 /* Contact Info list */
