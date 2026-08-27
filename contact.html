@@ -121,16 +121,16 @@
       <div class="contact-form-card">
         <form class="contact-form" id="contact-form" onsubmit="event.preventDefault();">
           <div class="contact-fields-grid">
-            <label>
-              <span>Անուն</span>
-              <input type="text" placeholder="Անահիտ Սարգսյան" required>
-            </label>
-            <label>
-              <span>Էլ․ փոստ</span>
-              <input type="email" placeholder="ձեր@էլ.փոստը" required>
-            </label>
-            <div>
-              <span class="contact-field-label">Հարցի տեսակը</span>
+            <div class="contact-field-group">
+              <label for="contact-name" class="contact-field-label">Անուն</label>
+              <input id="contact-name" type="text" placeholder="Անահիտ Սարգսյան" required>
+            </div>
+            <div class="contact-field-group">
+              <label for="contact-email" class="contact-field-label">Էլ․ փոստ</label>
+              <input id="contact-email" type="email" placeholder="ձեր@էլ.փոստը" required>
+            </div>
+            <div class="contact-field-group">
+              <label for="contact-topic-select" class="contact-field-label">Հարցի տեսակը</label>
               <select id="contact-topic-select" style="cursor: pointer;">
                 <option>Անհատական պատվեր</option>
                 <option>Զարդ խանութից</option>
@@ -140,14 +140,14 @@
                 <option>Այլ հարց</option>
               </select>
             </div>
-            <label>
-              <span>Հեռախոսահամար</span>
-              <input type="tel" placeholder="+374 98 470177">
-            </label>
-            <label style="grid-column: 1 / -1;">
-              <span>Հաղորդագրություն</span>
-              <textarea rows="6" placeholder="Ունեմ կարևոր հարց հետևյալի վերաբերյալ..." required></textarea>
-            </label>
+            <div class="contact-field-group">
+              <label for="contact-phone" class="contact-field-label">Հեռախոսահամար</label>
+              <input id="contact-phone" type="tel" placeholder="+374 98 470177">
+            </div>
+            <div class="contact-field-group" style="grid-column: 1 / -1;">
+              <label for="contact-message" class="contact-field-label">Հաղորդագրություն</label>
+              <textarea id="contact-message" rows="6" placeholder="Ունեմ կարևոր հարց հետևյալի վերաբերյալ..." required></textarea>
+            </div>
           </div>
 
           <div style="display: flex; align-items: center; gap: 20px; margin-top: 28px; flex-wrap: wrap;">
