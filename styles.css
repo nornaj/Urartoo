@@ -1756,22 +1756,31 @@ body.nav-open {
 }
 .footer-contact-item {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
   color: rgba(232, 226, 218, 0.75);
   line-height: 1.5;
+  transition: all 0.25s ease;
 }
 .footer-contact-item svg {
   flex-shrink: 0;
-  margin-top: 2px;
   color: var(--amber);
+  transition: transform 0.25s ease, color 0.25s ease;
 }
 .footer-contact-item a {
-  color: inherit;
-  transition: color 0.2s ease;
+  color: rgba(232, 226, 218, 0.75);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.25s ease;
 }
 .footer-contact-item a:hover {
   color: var(--amber);
+  transform: translateX(2px);
+}
+.footer-contact-item:hover svg {
+  color: #DFC49D;
+  transform: scale(1.08);
 }
 
 .footer-bottom {
