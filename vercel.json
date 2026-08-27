@@ -3,7 +3,11 @@
   "rewrites": [
     {
       "source": "/journal/:slug",
-      "destination": "/journal-post.html"
+      "destination": "/journal-post"
+    },
+    {
+      "source": "/product/:slug",
+      "destination": "/product"
     }
   ],
   "headers": [

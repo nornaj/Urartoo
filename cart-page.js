@@ -68,10 +68,10 @@
         '<button class="cart-item-remove" data-remove="' + idx + '" aria-label="Remove">' +
           '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
         '</button>' +
-        '<a href="product.html?id=' + item.id + '" class="cart-item-img">' +
+        '<a href="/product/' + (item.slug || item.id) + '" class="cart-item-img">' +
           '<img src="' + item.img + '" alt="' + item.name + '" loading="lazy">' +
         '</a>' +
-        '<a href="product.html?id=' + item.id + '" class="cart-item-name">' + item.name + '</a>' +
+        '<a href="/product/' + (item.slug || item.id) + '" class="cart-item-name">' + item.name + '</a>' +
         '<span class="cart-item-price">' + itemPrice + '֏' + '</span>' +
         '<div class="cart-item-qty">' +
           '<button class="qty-btn" data-qty-minus="' + idx + '">-</button>' +

@@ -813,10 +813,10 @@
         const formattedPrice = typeof p.price === 'number' ? (p.price + '֏') : p.price;
         return '<div class="wishlist-card" data-id="' + pId + '">' +
           '<div class="wishlist-card-media">' +
-            '<a href="product.html?id=' + pId + '" style="display:block; width:100%; height:100%;"><img src="' + pImg + '" alt="' + p.name + '" loading="lazy"></a>' +
+            '<a href="/product/' + (p.slug || pId) + '" style="display:block; width:100%; height:100%;"><img src="' + pImg + '" alt="' + p.name + '" loading="lazy"></a>' +
           '</div>' +
           '<div class="wishlist-card-body">' +
-            '<div class="wishlist-card-name"><a href="product.html?id=' + pId + '" style="color:inherit;text-decoration:none;">' + p.name + '</a></div>' +
+            '<div class="wishlist-card-name"><a href="/product/' + (p.slug || pId) + '" style="color:inherit;text-decoration:none;">' + p.name + '</a></div>' +
             '<div class="wishlist-card-price">' + formattedPrice + '</div>' +
             '<div class="wishlist-actions">' +
               '<button class="btn-wish-add" onclick="addWishlistItemToCart(\'' + pId + '\')">Ավելացնել զամբյուղ</button>' +

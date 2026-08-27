@@ -344,7 +344,7 @@
 
       return '<div class="product-card' + (isSold ? ' sold' : '') + '" data-idx="' + pId + '">' +
         '<div class="media">' +
-          '<a href="product.html?id=' + pId + '" class="media-inner">' +
+          '<a href="/product/' + (p.slug || pId) + '" class="media-inner">' +
             '<img src="' + (p.img || p.image || 'Images/bracelet.webp') + '" alt="' + p.name + '" loading="lazy" width="300" height="300">' +
           '</a>' +
           '<button class="heart' + (isSaved ? ' saved' : '') + '" data-save="' + pId + '" aria-label="Պահպանել զարդը">' + heartSvg + '</button>' +

@@ -21,6 +21,21 @@
 
   var allProducts = [];
 
+  function getProductIdFromUrl() {
+    // 1. Path-based routing: /product/slug-or-id
+    const pathname = window.location.pathname;
+    const match = pathname.match(/\/product\/([^/?#]+)/i);
+    if (match && match[1]) {
+      const seg = decodeURIComponent(match[1]).replace(/\.html$/i, '');
+      if (seg && seg !== 'product' && seg !== 'product.html') {
+        return seg;
+      }
+    }
+    // 2. Search params fallback: ?id=... or ?slug=...
+    var params = new URLSearchParams(window.location.search);
+    return params.get('id') || params.get('slug') || '';
+  }
+
   async function initProductPage() {
     let currentCatalog = [];
     if (window.NovaSanity) {
@@ -35,13 +50,15 @@
       currentCatalog = allProducts;
     }
 
-    // Get product ID from URL
-    var params = new URLSearchParams(window.location.search);
-    var rawId = params.get('id');
+    // Get product ID or slug from URL
+    var rawId = getProductIdFromUrl();
     var productId = Number(rawId) || rawId;
 
     var product = currentCatalog.find(function (p) {
-      return String(p.id) === String(rawId) || String(p._sanityId) === String(rawId) || p.id === productId;
+      return String(p.id) === String(rawId) || 
+             String(p._sanityId) === String(rawId) || 
+             String(p.slug) === String(rawId) || 
+             p.id === productId;
     });
 
     if (!product) {
@@ -52,6 +69,16 @@
           '<a href="shop.html" class="btn-primary" style="display:inline-block; padding:15px 32px; text-decoration:none;">Վերադառնալ խանութ</a>' +
         '</div>';
       return;
+    }
+
+    // Clean URL in address bar to /product/:slug
+    if (window.history && window.history.replaceState && product) {
+      const cleanSlug = product.slug || product.id;
+      if (cleanSlug && !window.location.pathname.startsWith('/product/')) {
+        try {
+          window.history.replaceState(null, '', `/product/${cleanSlug}`);
+        } catch (e) {}
+      }
     }
 
     renderProductDetails(product, currentCatalog);
@@ -202,8 +229,8 @@
       relGrid.innerHTML = related.map(function (p) {
         var dot = STONE_DOTS[p.stone] || '#2C2F2E';
         var pImg = p.img || p.image || 'Images/bracelet.webp';
-        var pId = p._sanityId || p.id;
-        return '<a href="product.html?id=' + pId + '" class="pdp-rel-card">' +
+        var pSlug = p.slug || pId;
+        return '<a href="/product/' + pSlug + '" class="pdp-rel-card">' +
           '<div class="pdp-rel-img"><img src="' + pImg + '" alt="' + p.name + '" loading="lazy">' +
             (p.sold ? '<span class="pdp-rel-sold">Վաճառված</span>' : '') +
           '</div>' +
