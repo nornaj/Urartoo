@@ -21,11 +21,28 @@
 
   function getAllStones() {
     const mergedMap = new Map();
-    DEFAULT_STONES.forEach(s => mergedMap.set(s.name, s));
+    DEFAULT_STONES.forEach(s => mergedMap.set(s.name.trim().toLowerCase(), s));
     try {
       const custom = JSON.parse(localStorage.getItem('urartoo_stones_db_v1')) || [];
-      custom.forEach(s => { if (s.name) mergedMap.set(s.name, s); });
+      custom.forEach(s => {
+        if (s.name) mergedMap.set(s.name.trim().toLowerCase(), { name: s.name, color: s.color || '#C2A379' });
+      });
     } catch (e) {}
+
+    // Automatically include stones present in live product catalog
+    try {
+      const prods = getProductsList();
+      prods.forEach(p => {
+        const stoneName = (p.stone || '').trim();
+        if (stoneName && !mergedMap.has(stoneName.toLowerCase())) {
+          mergedMap.set(stoneName.toLowerCase(), {
+            name: stoneName,
+            color: '#C2A379'
+          });
+        }
+      });
+    } catch (e) {}
+
     return Array.from(mergedMap.values());
   }
 
@@ -438,26 +455,22 @@
     if (e.key === WISHLIST_KEY) reloadWishlistFromStorage();
   });
 
-  // Initial render - try immediately, then re-render when Sanity data arrives
-  filterAndSort();
+  function handleDataReady() {
+    renderStoneChips();
+    STONE_DOTS = getStoneDots();
+    filterAndSort();
+  }
 
-  window.addEventListener('sanityCatalogReady', function() {
-    STONE_DOTS = getStoneDots();
-    filterAndSort();
-  });
-  window.addEventListener('urartoo:products-updated', function() {
-    STONE_DOTS = getStoneDots();
-    filterAndSort();
-  });
+  // Initial render - try immediately, then re-render when Sanity data arrives
+  handleDataReady();
+
+  window.addEventListener('sanityCatalogReady', handleDataReady);
+  window.addEventListener('urartoo:products-updated', handleDataReady);
 
   if (window.NovaSanity && !window.NovaSanity._ready) {
-    window.NovaSanity.init().then(function() {
-      STONE_DOTS = getStoneDots();
-      filterAndSort();
-    });
+    window.NovaSanity.init().then(handleDataReady);
   } else if (window.NovaSanity && window.NovaSanity._ready) {
-    // Already ready, just render
-    filterAndSort();
+    handleDataReady();
   }
 
 })();
