@@ -1880,7 +1880,7 @@
               <td style="text-align:right;">
                 <div style="display:inline-flex; align-items:center; gap:6px;">
                   <button type="button" class="filter-clear-btn" style="padding:5px 10px; font-size:11.5px;" onclick="window.WooCommerceAdmin.openBlogEditor('${pId}')" title="Խմբագրել ACF դաշտերը">✏️ Խմբագրել</button>
-                  <a href="journal-post.html?id=${p.slug || pId}" target="_blank" class="filter-clear-btn" style="padding:5px 8px; font-size:11.5px; text-decoration:none; display:inline-flex; align-items:center;" title="Դիտել կայքում">👁</a>
+                  <a href="/journal/${p.slug || pId}" target="_blank" class="filter-clear-btn" style="padding:5px 8px; font-size:11.5px; text-decoration:none; display:inline-flex; align-items:center;" title="Դիտել կայքում">👁</a>
                   <button type="button" class="filter-clear-btn" style="color:#C5221F; border-color:#E8C4C4; padding:5px 8px; font-size:11.5px;" onclick="window.WooCommerceAdmin.deleteJournalPost('${pId}')" title="Ջնջել նշումը">🗑</button>
                 </div>
               </td>
@@ -1914,7 +1914,7 @@
               </div>
               <div class="admin-prod-mobile-actions" style="margin-top:10px;">
                 <button class="filter-clear-btn" onclick="window.WooCommerceAdmin.openBlogEditor('${pId}')">✏️ Խմբագրել</button>
-                <a href="journal-post.html?id=${p.slug || pId}" target="_blank" class="filter-clear-btn" style="text-decoration:none;">👁 Դիտել</a>
+                <a href="/journal/${p.slug || pId}" target="_blank" class="filter-clear-btn" style="text-decoration:none;">👁 Դիտել</a>
                 <button class="filter-clear-btn" style="color:red; border-color:red;" onclick="window.WooCommerceAdmin.deleteJournalPost('${pId}')">🗑 Ջնջել</button>
               </div>
             </div>

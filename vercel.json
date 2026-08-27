@@ -1,5 +1,11 @@
 {
   "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/journal/:slug",
+      "destination": "/journal-post.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*).(html|js|css)",

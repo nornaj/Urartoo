@@ -605,7 +605,7 @@
     notesGrid.innerHTML = latest.map(function (n) {
       var imgUrl = n.heroImg || n.image || n.img || '';
       var meta = (n.topic || '') + (n.date ? ' · ' + n.date : '');
-      return '<a href="journal-post.html?id=' + (n.slug || n.id) + '" class="note-card">' +
+      return '<a href="/journal/' + (n.slug || n.id) + '" class="note-card">' +
         '<div class="note-img" style="background:var(--basalt);">' +
           '<div class="note-img-inner">' +
             (imgUrl

@@ -326,10 +326,24 @@
   // Default current article ID
   let currentArticle = BLOG_ARTICLES['gutanasar-obsidian'];
 
+  function getArticleIdFromUrl() {
+    // 1. Path-based routing: /journal/slug-or-id
+    const pathname = window.location.pathname;
+    const match = pathname.match(/\/journal\/([^/?#]+)/i);
+    if (match && match[1]) {
+      const seg = decodeURIComponent(match[1]).replace(/\.html$/i, '');
+      if (seg && seg !== 'journal' && seg !== 'journal.html') {
+        return seg;
+      }
+    }
+    // 2. Search parameters fallback: ?id=... or ?slug=...
+    const params = new URLSearchParams(window.location.search);
+    return params.get('id') || params.get('slug') || '';
+  }
+
   // Initialize Page
   function initPage() {
-    const params = new URLSearchParams(window.location.search);
-    const articleId = params.get('id') || params.get('slug');
+    const articleId = getArticleIdFromUrl();
 
     let allPosts = [];
     if (window.NovaSanity && typeof window.NovaSanity.getJournalPosts === 'function') {
@@ -343,11 +357,21 @@
       } else if (BLOG_ARTICLES[articleId]) {
         currentArticle = BLOG_ARTICLES[articleId];
       } else {
-        const foundBySlug = Object.values(BLOG_ARTICLES).find(p => String(p.slug) === String(articleId));
+        const foundBySlug = Object.values(BLOG_ARTICLES).find(p => String(p.slug) === String(articleId) || String(p.id) === String(articleId));
         if (foundBySlug) currentArticle = foundBySlug;
       }
     } else if (allPosts.length > 0) {
       currentArticle = allPosts.find(p => p.featured) || allPosts[0];
+    }
+
+    // Clean URL in address bar to /journal/:slug
+    if (window.history && window.history.replaceState && currentArticle) {
+      const cleanSlug = currentArticle.slug || currentArticle.id;
+      if (cleanSlug && !window.location.pathname.startsWith('/journal/')) {
+        try {
+          window.history.replaceState(null, '', `/journal/${cleanSlug}`);
+        } catch (e) {}
+      }
     }
 
     renderArticleMeta();
@@ -545,7 +569,7 @@
     // Render using exact home page .note-card markup
     let html = '';
     relatedList.forEach(rel => {
-      html += '<a href="journal-post.html?id=' + (rel.id || '') + '" class="note-card">' +
+      html += '<a href="/journal/' + (rel.id || '') + '" class="note-card">' +
         '<div class="note-img">' +
           '<div class="note-img-inner">' +
             (rel.img

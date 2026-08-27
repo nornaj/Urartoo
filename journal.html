@@ -293,7 +293,7 @@
         leadSection.style.display = 'block';
         const heroImg = featPost.heroImg || featPost.image || '';
         leadSection.innerHTML = `
-          <a href="journal-post.html?id=${featPost.slug || featPost.id}" class="lead-note-card">
+          <a href="/journal/${featPost.slug || featPost.id}" class="lead-note-card">
             <div style="position: relative; overflow: hidden; min-height: 320px; display: flex; align-items: center; justify-content: center; background: var(--basalt);">
               ${heroImg
                 ? `<img src="${heroImg}" alt="${featPost.title || ''}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">`
@@ -323,7 +323,7 @@
       gridEl.innerHTML = gridPosts.map(p => {
         const imgUrl = p.heroImg || p.image || '';
         return `
-          <a href="journal-post.html?id=${p.slug || p.id}" class="note-card" style="text-decoration:none; color:inherit; display:block;">
+          <a href="/journal/${p.slug || p.id}" class="note-card" style="text-decoration:none; color:inherit; display:block;">
             <div class="note-img" style="aspect-ratio:16/10; overflow:hidden; background:var(--basalt);">
               <div class="note-img-inner" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
                 ${imgUrl
