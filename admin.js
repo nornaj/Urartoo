@@ -10,6 +10,8 @@
 
   const LOCAL_ADMINS_KEY = 'urartoo_admin_emails_v1';
   const LOCAL_SESSION_KEY = 'urartoo_user_session_v1';
+  const LOCAL_ORDERS_KEY = 'urartoo_orders_v1';
+  const LOCAL_LOGS_KEY = 'urartoo_audit_logs_v1';
 
   function getAdminEmails() {
     let emails = ['najaryannorayr209@gmail.com', 'mineralsarm@gmail.com', 'norayrnajaryann@gmail.com'];
