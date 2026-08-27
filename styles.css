@@ -3377,7 +3377,7 @@ body.nav-open {
   font-family: var(--font);
 }
 
-body.in-admin-mode > *:not(#view-admin):not(#product-editor-modal):not(#stone-editor-modal):not(#blog-editor-modal) {
+body.in-admin-mode > *:not(#view-admin):not(#product-editor-modal):not(#stone-editor-modal):not(#blog-editor-modal):not(#delete-user-modal) {
   display: none !important;
 }
 
@@ -3679,8 +3679,8 @@ body.in-admin-mode > *:not(#view-admin):not(#product-editor-modal):not(#stone-ed
 .product-editor-page {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  width: 100vw;
-  max-width: 100vw;
+  width: 100%;
+  max-width: 100%;
   height: 100vh;
   background: #F4F3EF;
   z-index: 10000;
@@ -3694,7 +3694,7 @@ body.in-admin-mode > *:not(#view-admin):not(#product-editor-modal):not(#stone-ed
 .pe-topbar {
   background: var(--green);
   color: #FFFFFF;
-  padding: 14px 24px;
+  padding: 12px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -3705,7 +3705,7 @@ body.in-admin-mode > *:not(#view-admin):not(#product-editor-modal):not(#stone-ed
   position: sticky;
   top: 0;
   z-index: 100;
-  gap: 16px;
+  gap: 12px;
 }
 
 .pe-topbar-title {
@@ -3714,6 +3714,7 @@ body.in-admin-mode > *:not(#view-admin):not(#product-editor-modal):not(#stone-ed
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .pe-content {

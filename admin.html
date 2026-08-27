@@ -85,7 +85,7 @@
             <div class="admin-stats-grid">
               <div class="admin-stat-card">
                 <div class="admin-stat-label">Ընդհանուր Հասույթ</div>
-                <div class="admin-stat-val" id="admin-rev-val">0֏</div>
+                <div class="admin-stat-val" id="admin-rev-val">$0</div>
               </div>
               <div class="admin-stat-card">
                 <div class="admin-stat-label">Պատվերների Քանակ</div>
@@ -93,7 +93,7 @@
               </div>
               <div class="admin-stat-card">
                 <div class="admin-stat-label">Միջին Պատվեր (AOV)</div>
-                <div class="admin-stat-val" id="admin-aov-val">0֏</div>
+                <div class="admin-stat-val" id="admin-aov-val">$0</div>
               </div>
               <div class="admin-stat-card">
                 <div class="admin-stat-label">Առկա Տեսականի</div>
@@ -273,7 +273,7 @@
               </div>
               <div class="admin-stat-card">
                 <div class="admin-stat-label">Միջին Հաճախորդի LTV</div>
-                <div class="admin-stat-val" id="admin-client-ltv-val">0֏</div>
+                <div class="admin-stat-val" id="admin-client-ltv-val">$0</div>
               </div>
             </div>
 
@@ -296,6 +296,7 @@
                       <th>Ընդհանուր Գումար (LTV)</th>
                       <th>Վերջին Պատվեր</th>
                       <th>Կարգավիճակ</th>
+                      <th style="text-align:right;">Գործողություն</th>
                     </tr>
                   </thead>
                   <tbody id="admin-clients-tbody"></tbody>
@@ -389,12 +390,12 @@
   <!-- ═══ WORDPRESS-STYLE FULL-PAGE PRODUCT EDITOR MODAL OVERLAY ═══ -->
   <div id="product-editor-modal" class="product-editor-page" style="display:none;">
     <div class="pe-topbar">
-      <div style="display:flex; align-items:center; gap:16px;">
-        <button type="button" onclick="window.WooCommerceAdmin.closeProductEditor()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">✕</button>
+      <div style="display:flex; align-items:center; gap:16px; min-width:0; flex:1 1 auto; overflow:hidden;">
+        <button type="button" onclick="window.WooCommerceAdmin.closeProductEditor()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer; flex-shrink:0; line-height:1;">✕</button>
         <div class="pe-topbar-title" id="pe-modal-title">Խմբագրել Ապրանքը</div>
       </div>
-      <div>
-        <button type="button" class="admin-btn" id="btn-pe-save" onclick="window.WooCommerceAdmin.saveProductFromEditor()" style="padding:10px 24px; font-size:13.5px; background:var(--gold); color:var(--green); font-weight:700;">💾 ՊԱՀՊԱՆԵԼ</button>
+      <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+        <button type="button" class="admin-btn" id="btn-pe-save" onclick="window.WooCommerceAdmin.saveProductFromEditor()" style="padding:9px 22px; font-size:13px; background:var(--gold); color:var(--green); font-weight:700;">💾 ՊԱՀՊԱՆԵԼ</button>
       </div>
     </div>
 
@@ -476,12 +477,12 @@
   <!-- ═══ STONE EDITOR MODAL OVERLAY ═══ -->
   <div id="stone-editor-modal" class="product-editor-page" style="display:none;">
     <div class="pe-topbar">
-      <div style="display:flex; align-items:center; gap:16px;">
-        <button type="button" onclick="window.WooCommerceAdmin.closeStoneEditor()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">✕</button>
+      <div style="display:flex; align-items:center; gap:16px; min-width:0; flex:1 1 auto; overflow:hidden;">
+        <button type="button" onclick="window.WooCommerceAdmin.closeStoneEditor()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer; flex-shrink:0; line-height:1;">✕</button>
         <div class="pe-topbar-title" id="stone-modal-title">Ավելացնել Նոր Քար</div>
       </div>
-      <div>
-        <button type="button" class="admin-btn" id="btn-stone-save" onclick="window.WooCommerceAdmin.saveStoneFromEditor()" style="padding:10px 24px; font-size:13.5px; background:var(--gold); color:var(--green); font-weight:700;">💾 ՊԱՀՊԱՆԵԼ</button>
+      <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+        <button type="button" class="admin-btn" id="btn-stone-save" onclick="window.WooCommerceAdmin.saveStoneFromEditor()" style="padding:9px 22px; font-size:13px; background:var(--gold); color:var(--green); font-weight:700;">💾 ՊԱՀՊԱՆԵԼ</button>
       </div>
     </div>
 
@@ -529,13 +530,13 @@
   <!-- ═══ ACF / SCF BLOG POST FULL-PAGE EDITOR MODAL OVERLAY ═══ -->
   <div id="blog-editor-modal" class="product-editor-page" style="display:none;">
     <div class="pe-topbar" style="background:#191B1A; border-bottom:1px solid #333;">
-      <div style="display:flex; align-items:center; gap:16px;">
-        <button type="button" onclick="window.WooCommerceAdmin.closeBlogEditor()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;" title="Փակել">✕</button>
-        <div class="pe-topbar-title" id="blog-modal-title" style="color:var(--gold);">📝 Խմբագրել Դաշտային Նշումը (ACF Editor)</div>
+      <div style="display:flex; align-items:center; gap:16px; min-width:0; flex:1 1 auto; overflow:hidden;">
+        <button type="button" onclick="window.WooCommerceAdmin.closeBlogEditor()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer; flex-shrink:0; line-height:1;" title="Փակել">✕</button>
+        <div class="pe-topbar-title" id="blog-modal-title" style="color:var(--gold); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📝 Խմբագրել Դաշտային Նշումը (ACF Editor)</div>
       </div>
-      <div style="display:flex; align-items:center; gap:12px; flex-shrink:0;">
-        <a id="btn-blog-preview" href="journal-post.html" target="_blank" class="admin-btn" style="padding:10px 22px; font-size:12.5px; font-weight:700; background:rgba(255,255,255,0.12); color:#FFF; border:1px solid rgba(255,255,255,0.28); text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:6px; white-space:nowrap; letter-spacing:0.04em; min-width:max-content; text-transform:uppercase;">👁 Նախադիտել Կայքում</a>
-        <button type="button" class="admin-btn" id="btn-blog-save" onclick="window.WooCommerceAdmin.saveBlogFromEditor()" style="padding:10px 24px; font-size:13.5px; background:var(--gold); color:var(--green); font-weight:700; border:none; cursor:pointer; white-space:nowrap; flex-shrink:0;">💾 ՊԱՀՊԱՆԵԼ</button>
+      <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+        <a id="btn-blog-preview" href="journal-post.html" target="_blank" class="admin-btn" style="padding:9px 18px; font-size:12px; font-weight:700; background:rgba(255,255,255,0.12); color:#FFF; border:1px solid rgba(255,255,255,0.28); text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:6px; white-space:nowrap; letter-spacing:0.04em; text-transform:uppercase;">👁 Նախադիտել Կայքում</a>
+        <button type="button" class="admin-btn" id="btn-blog-save" onclick="window.WooCommerceAdmin.saveBlogFromEditor()" style="padding:9px 22px; font-size:13px; background:var(--gold); color:var(--green); font-weight:700; border:none; cursor:pointer; white-space:nowrap; flex-shrink:0;">💾 ՊԱՀՊԱՆԵԼ</button>
       </div>
     </div>
 
@@ -759,6 +760,19 @@
           </div>
         </div>
 
+      </div>
+    </div>
+  <!-- ═══ DELETE ACCOUNT CONFIRMATION MODAL OVERLAY ═══ -->
+  <div id="delete-user-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100vh; background:rgba(0,0,0,0.6); backdrop-filter:blur(3px); z-index:11000; align-items:center; justify-content:center;">
+    <div style="background:#FFF; width:92%; max-width:440px; border-radius:12px; padding:28px 24px; box-shadow:0 12px 40px rgba(0,0,0,0.25); text-align:center; position:relative;">
+      <div style="width:52px; height:52px; background:#FDE8E8; color:#E02424; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; margin:0 auto 16px;">
+        ⚠️
+      </div>
+      <h3 style="margin:0 0 10px; font-size:18px; font-weight:700; color:#1F2A37;">Վստա՞հ եք, որ ցանկանում եք ջնջել այս հաշիվը:</h3>
+      <div id="delete-user-modal-name" style="margin:0 0 24px; font-size:14px; color:#4B5563; word-break:break-word; line-height:1.5;"></div>
+      <div style="display:flex; align-items:center; justify-content:center; gap:12px;">
+        <button type="button" class="admin-btn" onclick="window.WooCommerceAdmin.closeDeleteUserModal()" style="padding:10px 24px; font-size:13.5px; font-weight:600; background:#F3F4F6; color:#374151; border:1px solid #D1D5DB; cursor:pointer; border-radius:6px;">Ոչ</button>
+        <button type="button" class="admin-btn" id="btn-confirm-delete-user" onclick="window.WooCommerceAdmin.executeDeleteUser()" style="padding:10px 24px; font-size:13.5px; font-weight:700; background:#E02424; color:#FFF; border:none; cursor:pointer; border-radius:6px;">Այո, Ջնջել</button>
       </div>
     </div>
   </div>

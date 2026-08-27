@@ -1242,9 +1242,9 @@
       const aovEl = document.getElementById('admin-aov-val');
       const stockEl = document.getElementById('admin-stock-count-val');
 
-      if (revEl) revEl.textContent = `${totalRev}֏`;
+      if (revEl) revEl.textContent = `$${totalRev.toLocaleString()}`;
       if (countEl) countEl.textContent = ordersCount;
-      if (aovEl) aovEl.textContent = `${avgOrder}֏`;
+      if (aovEl) aovEl.textContent = `$${avgOrder.toLocaleString()}`;
       if (stockEl) stockEl.textContent = stockCount;
 
       // Category Sales Chart
@@ -1677,6 +1677,12 @@
       const renderUserList = (list) => {
         if (!tbody) return;
 
+        // Save list reference for delete lookup
+        this._currentUsersList = list;
+
+        // Retrieve all store orders to cross-reference with users
+        const allStoreOrders = getOrders();
+
         // Stats calculation
         if (regCountEl) regCountEl.textContent = list.length;
         
@@ -1684,9 +1690,19 @@
         let totalSpend = 0;
 
         list.forEach(u => {
-          const ords = Array.isArray(u.orders) ? u.orders : [];
-          if (ords.length > 0) activeCount++;
-          ords.forEach(o => {
+          const uOrders = Array.isArray(u.orders) ? [...u.orders] : [];
+          if (u.email) {
+            allStoreOrders.forEach(so => {
+              if (so.customerEmail && so.customerEmail.toLowerCase() === u.email.toLowerCase() && !uOrders.some(uo => uo.id === so.id)) {
+                uOrders.push(so);
+              }
+            });
+          }
+          u._computedOrders = uOrders;
+
+          const validOrds = uOrders.filter(o => o.status !== 'failed' && o.status !== 'cancelled');
+          if (validOrds.length > 0) activeCount++;
+          validOrds.forEach(o => {
             totalSpend += (Number(o.total) || 0);
           });
         });
@@ -1694,7 +1710,7 @@
         if (activeBuyersEl) activeBuyersEl.textContent = activeCount;
         if (ltvValEl) {
           const avgLtv = list.length > 0 ? Math.round(totalSpend / list.length) : 0;
-          ltvValEl.textContent = avgLtv > 0 ? `$${avgLtv}` : '0 $';
+          ltvValEl.textContent = avgLtv > 0 ? `$${avgLtv.toLocaleString()}` : '$0';
         }
 
         // Search filtering
@@ -1707,17 +1723,31 @@
           return nameStr.includes(searchVal) || emailStr.includes(searchVal) || phoneStr.includes(searchVal) || cityStr.includes(searchVal);
         });
 
+        this._filteredUsersList = filtered;
+
         if (filtered.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:36px; color:var(--tuff);">Գրանցված հաճախորդներ չեն գտնվել</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:36px; color:var(--tuff);">Գրանցված հաճախորդներ չեն գտնվել</td></tr>';
           return;
         }
 
-        tbody.innerHTML = filtered.map(u => {
-          const ordCount = Array.isArray(u.orders) ? u.orders.length : 0;
+        tbody.innerHTML = filtered.map((u, idx) => {
+          const userOrders = u._computedOrders || (Array.isArray(u.orders) ? u.orders : []);
+          const ordCount = userOrders.length;
           let userSpend = 0;
-          if (Array.isArray(u.orders)) {
-            u.orders.forEach(o => { userSpend += (Number(o.total) || 0); });
-          }
+          let latestOrderDate = null;
+
+          userOrders.forEach(o => {
+            if (o.status !== 'failed' && o.status !== 'cancelled') {
+              userSpend += (Number(o.total) || 0);
+            }
+            const d = o.date || o.createdAt;
+            if (d && !latestOrderDate) {
+              latestOrderDate = d;
+            }
+          });
+
+          // Last order: show "-" if no orders exist, or the date of the latest order
+          const lastOrderDisplay = ordCount > 0 ? (latestOrderDate || '2026') : '-';
 
           let badgeHtml = '';
           if (u.isAdmin) {
@@ -1739,8 +1769,11 @@
               <td><span style="font-family:var(--mono); font-size:12.5px; color:#444;">${u.email || '-'}</span></td>
               <td><strong style="font-size:13px;">${ordCount}</strong> <span style="font-size:11.5px; color:var(--tuff);">պատվեր</span></td>
               <td><strong style="color:var(--green); font-size:13px;">${userSpend > 0 ? ('$' + userSpend.toLocaleString()) : '$0'}</strong></td>
-              <td style="font-size:12.5px; color:#666;">${u.joined || '2026'}</td>
+              <td style="font-size:12.5px; color:#666;">${lastOrderDisplay}</td>
               <td>${badgeHtml}</td>
+              <td style="text-align:right;">
+                <button type="button" class="filter-clear-btn" style="color:#C5221F; border-color:#FCE8E6; background:#FFF5F5; padding:6px 12px; font-size:12px; border-radius:6px; cursor:pointer; font-weight:600; display:inline-flex; align-items:center; gap:4px;" onclick="window.WooCommerceAdmin.confirmDeleteUser(${idx})" title="Ջնջել հաշիվը">🗑 Ջնջել</button>
+              </td>
             </tr>
           `;
         }).join('');
@@ -1769,6 +1802,133 @@
         }
       } catch (err) {
         console.warn('[Admin] Live clients fetch error:', err);
+      }
+    },
+
+    confirmDeleteUser(filteredIdx) {
+      const user = this._filteredUsersList ? this._filteredUsersList[filteredIdx] : (this._currentUsersList ? this._currentUsersList[filteredIdx] : null);
+      if (!user) return;
+
+      this._pendingDeleteUser = user;
+
+      const modal = document.getElementById('delete-user-modal');
+      const nameEl = document.getElementById('delete-user-modal-name');
+      if (nameEl) {
+        const displayName = user.name || 'Անանուն Օգտատեր';
+        const email = user.email ? ` (${user.email})` : '';
+        nameEl.innerHTML = `<strong>${displayName}</strong>${email ? `<br><span style="color:#6B7280; font-size:13px;">${email}</span>` : ''}`;
+      }
+      if (modal) {
+        modal.style.setProperty('display', 'flex', 'important');
+      }
+    },
+
+    closeDeleteUserModal() {
+      const modal = document.getElementById('delete-user-modal');
+      if (modal) {
+        modal.style.setProperty('display', 'none', 'important');
+      }
+      this._pendingDeleteUser = null;
+    },
+
+    async executeDeleteUser() {
+      const user = this._pendingDeleteUser;
+      if (!user) {
+        this.closeDeleteUserModal();
+        return;
+      }
+
+      const btnConfirm = document.getElementById('btn-confirm-delete-user');
+      const originalText = btnConfirm ? btnConfirm.textContent : 'Այո, Ջնջել';
+      if (btnConfirm) {
+        btnConfirm.disabled = true;
+        btnConfirm.textContent = 'Ջնջվում է...';
+      }
+
+      const userName = user.name || user.email || 'Հաճախորդ';
+
+      try {
+        const SANITY_PROJECT_ID = 'g1vi85kp';
+        const SANITY_DATASET = 'production';
+        const SANITY_TOKEN = 'sknNBnm3TWuTaSZw1TnVkytJGAZT2dTrDMKqVypR4SeaHcq71pMhBnZulwLmjC12rmwe1xMYFIt8t78BcXkmueG1HFwVIzACwXOc4qEq3y0fEHcegdVZCUeCqo9QDZbCzfmprbB4SQQkfWV3Gx4Xdz1ZkEcq0hXpjwnYLO6TPLMuS7c2wsud';
+
+        // 1. Collect all matching document IDs to delete in Sanity
+        const docIdsToDelete = new Set();
+        if (user._id) docIdsToDelete.add(user._id);
+
+        if (user.email) {
+          try {
+            const groq = encodeURIComponent(`*[_type in ["userAccount", "user", "customer"] && email == "${user.email}"]{ _id }`);
+            const queryUrl = `https://${SANITY_PROJECT_ID}.api.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=${groq}`;
+            const qRes = await fetch(queryUrl, { headers: { 'Authorization': 'Bearer ' + SANITY_TOKEN } });
+            if (qRes.ok) {
+              const qData = await qRes.json();
+              if (Array.isArray(qData.result)) {
+                qData.result.forEach(d => { if (d._id) docIdsToDelete.add(d._id); });
+              }
+            }
+          } catch (err) {
+            console.warn('Error querying user docs to delete:', err);
+          }
+        }
+
+        // 2. Delete from Sanity directly
+        if (docIdsToDelete.size > 0) {
+          const mutations = Array.from(docIdsToDelete).map(id => ({ delete: { id } }));
+          const mutateUrl = `https://${SANITY_PROJECT_ID}.api.sanity.io/v2024-01-01/data/mutate/${SANITY_DATASET}`;
+          const mRes = await fetch(mutateUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + SANITY_TOKEN
+            },
+            body: JSON.stringify({ mutations })
+          });
+
+          if (!mRes.ok) {
+            const errJson = await mRes.json().catch(() => ({}));
+            console.error('Failed to delete user from Sanity:', errJson);
+            throw new Error(errJson.message || 'Sanity deletion failed');
+          }
+        }
+
+        // 3. Remove user from localStorage
+        try {
+          let localDb = JSON.parse(localStorage.getItem('urartoo_users_db_v1') || '[]');
+          if (Array.isArray(localDb)) {
+            localDb = localDb.filter(u => {
+              if (user._id && u._id === user._id) return false;
+              if (user.email && u.email && u.email.toLowerCase() === user.email.toLowerCase()) return false;
+              return true;
+            });
+            localStorage.setItem('urartoo_users_db_v1', JSON.stringify(localDb));
+          }
+
+          const session = JSON.parse(localStorage.getItem('urartoo_user_session_v1') || 'null');
+          if (session && user.email && session.email && session.email.toLowerCase() === user.email.toLowerCase()) {
+            localStorage.removeItem('urartoo_user_session_v1');
+          }
+        } catch (e) {}
+
+        addAuditLog(`Ջնջվեց հաճախորդի հաշիվը Sanity-ից: ${userName}`);
+
+        this.closeDeleteUserModal();
+
+        if (this.showToast) {
+          this.showToast(`🗑 «${userName}» հաշիվը հաջողությամբ ջնջվեց Sanity-ից։`, 'danger', 4000);
+        }
+
+        // Refresh clients table
+        await this.renderClientsSec();
+
+      } catch (error) {
+        console.error('executeDeleteUser error:', error);
+        alert('Սխալ տեղի ունեցավ հաշիվը ջնջելիս: ' + error.message);
+      } finally {
+        if (btnConfirm) {
+          btnConfirm.disabled = false;
+          btnConfirm.textContent = originalText;
+        }
       }
     },
 
