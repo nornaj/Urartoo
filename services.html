@@ -344,7 +344,7 @@
       font-size: 16px;
       font-weight: 700;
       color: var(--amber);
-      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease;
       position: relative;
       z-index: 2;
       pointer-events: none; /* No hover hitbox on numbers */
@@ -403,48 +403,55 @@
       text-align: center;
     }
 
-    /* ── Original Progress Bar Style (Dots + Segments) ── */
+    /* ── Single Continuous Progress Bar ── */
     .hiw-progress-bar {
       margin-top: 48px;
+      position: relative;
+      width: 100%;
+      height: 16px;
       display: flex;
       align-items: center;
-      gap: 0;
       pointer-events: none; /* No hover hitbox on bar */
     }
-    .hiw-progress-segment {
-      flex: 1;
-      height: 3px;
-      background: rgba(184,134,11,0.12);
-      border-radius: 2px;
-      position: relative;
-      overflow: hidden;
-    }
-    .hiw-progress-segment::after {
-      content: '';
+    .hiw-progress-track {
       position: absolute;
-      top: 0; left: 0;
+      left: 5px;
+      right: 5px;
+      height: 3px;
+      background: rgba(184, 134, 11, 0.12);
+      border-radius: 2px;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .hiw-progress-fill {
       height: 100%;
       width: 0%;
       background: linear-gradient(90deg, var(--amber), #D4A843);
       border-radius: 2px;
-      transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .hiw-progress-segment.filled::after {
+    .hiw-progress-dots {
+      position: relative;
       width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 2;
     }
     .hiw-progress-dot {
       width: 10px;
       height: 10px;
       min-width: 10px;
       border-radius: 50%;
-      background: rgba(184,134,11,0.2);
-      border: 2px solid rgba(184,134,11,0.3);
-      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      background: var(--surface, #FAF8F5);
+      border: 2px solid rgba(184, 134, 11, 0.3);
+      transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+      box-sizing: border-box;
     }
     .hiw-progress-dot.active {
       background: var(--amber);
       border-color: var(--amber);
-      box-shadow: 0 0 12px rgba(184,134,11,0.4);
+      box-shadow: 0 0 12px rgba(184, 134, 11, 0.5);
     }
 
     @media (min-width: 768px) {
@@ -468,7 +475,6 @@
         padding: 28px 20px;
         border-radius: 0;
       }
-      
       .hiw-step-title { font-size: 18px; }
       .hiw-step-desc { font-size: 13.5px; }
     }
@@ -519,15 +525,17 @@
 
     </div>
 
-    <!-- Original style progress bar (Dots + Segments) -->
+    <!-- Single Continuous Progress Bar -->
     <div class="hiw-progress-bar" id="hiw-progress">
-      <div class="hiw-progress-dot active"></div>
-      <div class="hiw-progress-segment"></div>
-      <div class="hiw-progress-dot"></div>
-      <div class="hiw-progress-segment"></div>
-      <div class="hiw-progress-dot"></div>
-      <div class="hiw-progress-segment"></div>
-      <div class="hiw-progress-dot"></div>
+      <div class="hiw-progress-track">
+        <div class="hiw-progress-fill" id="hiw-progress-fill"></div>
+      </div>
+      <div class="hiw-progress-dots">
+        <div class="hiw-progress-dot active" data-step="0"></div>
+        <div class="hiw-progress-dot" data-step="1"></div>
+        <div class="hiw-progress-dot" data-step="2"></div>
+        <div class="hiw-progress-dot" data-step="3"></div>
+      </div>
     </div>
 
   </section>
@@ -536,8 +544,10 @@
   (function() {
     const cards = document.querySelectorAll('.hiw-step-card');
     const steps = document.querySelectorAll('.hiw-step');
-    const segments = document.querySelectorAll('.hiw-progress-segment');
     const dots = document.querySelectorAll('.hiw-progress-dot');
+    const fillLine = document.getElementById('hiw-progress-fill');
+
+    const fillPercentages = [0, 33.333, 66.666, 100];
 
     function setHoverStep(stepIndex) {
       // Step number & card active highlight
@@ -549,11 +559,12 @@
         }
       });
 
-      // Progress bar fill:
-      // step 0: dot 0 active, 0 segments filled
-      // step 1: dot 0 & 1 active, segment 0 filled
-      // step 2: dot 0, 1, 2 active, segment 0, 1 filled
-      // step 3: dot 0, 1, 2, 3 active, segment 0, 1, 2 filled
+      // Single continuous line fill from initial dot (0%) to target dot
+      if (fillLine) {
+        fillLine.style.width = fillPercentages[stepIndex] + '%';
+      }
+
+      // Activate all dots up to the target
       dots.forEach((dot, idx) => {
         if (idx <= stepIndex) {
           dot.classList.add('active');
@@ -561,25 +572,22 @@
           dot.classList.remove('active');
         }
       });
-
-      segments.forEach((seg, idx) => {
-        if (idx < stepIndex) {
-          seg.classList.add('filled');
-        } else {
-          seg.classList.remove('filled');
-        }
-      });
     }
 
     function resetProgress() {
       // Reset all steps highlight
       steps.forEach(step => step.classList.remove('is-active'));
-      // Reset progress bar to initial base state (dot 0 active)
+      
+      // Reset single continuous line back to initial dot (0%)
+      if (fillLine) {
+        fillLine.style.width = '0%';
+      }
+
+      // Reset dots to initial base state (dot 0 active)
       dots.forEach((dot, idx) => {
         if (idx === 0) dot.classList.add('active');
         else dot.classList.remove('active');
       });
-      segments.forEach(seg => seg.classList.remove('filled'));
     }
 
     // Attach hover listeners ONLY to .hiw-step-card (strictly not numbers, not bar)
