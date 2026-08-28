@@ -320,20 +320,12 @@
       gap: 0;
       position: relative;
     }
-    .hiw-timeline::before {
-      content: '';
-      position: absolute;
-      left: 23px;
-      top: 48px;
-      bottom: 48px;
-      width: 2px;
-      background: linear-gradient(to bottom, var(--amber) 0%, rgba(184,134,11,0.15) 100%);
-      border-radius: 1px;
-    }
+    .hiw-timeline::before { display: none; }
     .hiw-step {
       display: flex;
-      gap: 20px;
-      align-items: flex-start;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
       padding: 20px 0;
       position: relative;
       z-index: 1;
@@ -394,37 +386,15 @@
       font-weight: 600;
       color: var(--bone);
       margin: 0 0 8px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      text-align: center;
     }
-    .hiw-step-icon { font-size: 18px; line-height: 1; }
     .hiw-step-desc {
       font-size: 14px;
       line-height: 1.7;
       color: rgba(232, 226, 218, 0.6);
-      margin: 0 0 14px;
+      margin: 0;
+      text-align: center;
     }
-    .hiw-step-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .hiw-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 10px;
-      border-radius: 20px;
-      background: rgba(184,134,11,0.1);
-      border: 1px solid rgba(184,134,11,0.18);
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--amber);
-      letter-spacing: 0.02em;
-      white-space: nowrap;
-    }
-    .hiw-tag-icon { font-size: 11px; }
     .hiw-progress-bar {
       margin-top: 48px;
       display: flex;
@@ -492,9 +462,8 @@
         border-radius: 16px;
       }
       .hiw-step:hover .hiw-step-card { transform: translateY(-6px); }
-      .hiw-step-title { justify-content: center; font-size: 18px; }
+      .hiw-step-title { font-size: 18px; }
       .hiw-step-desc { font-size: 13.5px; }
-      .hiw-step-tags { justify-content: center; }
     }
     @media (min-width: 1024px) {
       .hiw-timeline { gap: 28px; }
@@ -512,57 +481,33 @@
       <div class="hiw-step">
         <div class="hiw-step-num">01</div>
         <div class="hiw-step-card">
-          <div class="hiw-step-title">
-            <span class="hiw-step-icon">✉️</span> Հարցում
+          <div class="hiw-step-title">Հարցում
           </div>
-          <p class="hiw-step-desc">Գրեք մեզ ձեր գաղափարի, նախընտրած քարի կամ չափսի մասին։</p>
-          <div class="hiw-step-tags">
-            <span class="hiw-tag"><span class="hiw-tag-icon">💬</span> WhatsApp / Email</span>
-            <span class="hiw-tag"><span class="hiw-tag-icon">📐</span> Instagram DM</span>
-          </div>
-        </div>
+          <p class="hiw-step-desc">Գրեք մեզ ձեր գաղափարի, նախընտրած քարի կամ չափսի մասին։</p></div>
       </div>
 
       <div class="hiw-step">
         <div class="hiw-step-num">02</div>
         <div class="hiw-step-card">
-          <div class="hiw-step-title">
-            <span class="hiw-step-icon">💎</span> Գնառաջարկ և քար
+          <div class="hiw-step-title">Գնառաջարկ և քար
           </div>
-          <p class="hiw-step-desc">Ստացեք ֆիքսված գին և հասանելի քարերի լուսանկարներ նախքան սկսելը։</p>
-          <div class="hiw-step-tags">
-            <span class="hiw-tag"><span class="hiw-tag-icon">📸</span> HD</span>
-            <span class="hiw-tag"><span class="hiw-tag-icon">💰</span> USD</span>
-          </div>
-        </div>
+          <p class="hiw-step-desc">Ստացեք ֆիքսված գին և հասանելի քարերի լուսանկարներ նախքան սկսելը։</p></div>
       </div>
 
       <div class="hiw-step">
         <div class="hiw-step-num">03</div>
         <div class="hiw-step-card">
-          <div class="hiw-step-title">
-            <span class="hiw-step-icon">🔨</span> Աշխատանք
+          <div class="hiw-step-title">Աշխատանք
           </div>
-          <p class="hiw-step-desc">Ձեռագործ մշակում և տեղադրում 925 արծաթում Երևանի աշխատանոցում։</p>
-          <div class="hiw-step-tags">
-            <span class="hiw-tag"><span class="hiw-tag-icon">⌛</span> 5–14 days</span>
-            <span class="hiw-tag"><span class="hiw-tag-icon">🏷</span> 925 Silver</span>
-          </div>
-        </div>
+          <p class="hiw-step-desc">Ձեռագործ մշակում և տեղադրում 925 արծաթում Երևանի աշխատանոցում։</p></div>
       </div>
 
       <div class="hiw-step">
         <div class="hiw-step-num">04</div>
         <div class="hiw-step-card">
-          <div class="hiw-step-title">
-            <span class="hiw-step-icon">📦</span> Վկայական և առաքում
+          <div class="hiw-step-title">Վկայական և առաքում
           </div>
-          <p class="hiw-step-desc">Ապահով փաթեթավորում և առաքում ծագման վկայականով։</p>
-          <div class="hiw-step-tags">
-            <span class="hiw-tag"><span class="hiw-tag-icon">📜</span> Certificate</span>
-            <span class="hiw-tag"><span class="hiw-tag-icon">🌍</span> Worldwide</span>
-          </div>
-        </div>
+          <p class="hiw-step-desc">Ապահով փաթեթավորում և առաքում ծագման վկայականով։</p></div>
       </div>
 
     </div>
