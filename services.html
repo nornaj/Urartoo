@@ -294,32 +294,313 @@
 
   </section>
 
-  <!-- ═══ 4. HOW IT WORKS ═══ -->
-  <section style="padding: 88px max(var(--gutter), calc((100% - var(--max)) / 2)) 0;">
-    <h2 style="font-family: 'Instrument Sans', 'Noto Sans Armenian', sans-serif; font-weight: 400; font-size: clamp(26px, 2.6vw, 38px); line-height: 1.1; letter-spacing: -0.02em; margin: 0 0 32px;">Ինչպես է դա աշխատում</h2>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px;">
-      <div style="border-top: 1px solid var(--obsidian); padding-top: 18px;">
-        <div style="font-family: 'Instrument Sans', 'Noto Sans Armenian', sans-serif; font-size: 12px; color: var(--tuff); margin-bottom: 12px;">01</div>
-        <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Հարցում</div>
-        <p style="font-size: 14px; line-height: 1.65; color: var(--graphite); margin: 0;">Գրեք մեզ ձեր գաղափարի, նախընտրած քարի կամ չափսի մասին։</p>
-      </div>
-      <div style="border-top: 1px solid var(--obsidian); padding-top: 18px;">
-        <div style="font-family: 'Instrument Sans', 'Noto Sans Armenian', sans-serif; font-size: 12px; color: var(--tuff); margin-bottom: 12px;">02</div>
-        <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Գնառաջարկ և քար</div>
-        <p style="font-size: 14px; line-height: 1.65; color: var(--graphite); margin: 0;">Ստացեք ֆիքսված գին և հասանելի քարերի լուսանկարներ նախքան սկսելը։</p>
-      </div>
-      <div style="border-top: 1px solid var(--obsidian); padding-top: 18px;">
-        <div style="font-family: 'Instrument Sans', 'Noto Sans Armenian', sans-serif; font-size: 12px; color: var(--tuff); margin-bottom: 12px;">03</div>
-        <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Աշխատանք</div>
-        <p style="font-size: 14px; line-height: 1.65; color: var(--graphite); margin: 0;">Ձեռագործ մշակում և տեղադրում 925 արծաթում Երևանի աշխատանոցում։</p>
-      </div>
-      <div style="border-top: 1px solid var(--obsidian); padding-top: 18px;">
-        <div style="font-family: 'Instrument Sans', 'Noto Sans Armenian', sans-serif; font-size: 12px; color: var(--tuff); margin-bottom: 12px;">04</div>
-        <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Վկայական և առաքում</div>
-        <p style="font-size: 14px; line-height: 1.65; color: var(--graphite); margin: 0;">Ապահով փաթեթավորում և առաքում ծագման վկայականով։</p>
-      </div>
+  <!-- ═══ 4. HOW IT WORKS — Premium Redesign ═══ -->
+  <style>
+    .hiw-section {
+      padding: 72px max(var(--gutter), calc((100% - var(--max)) / 2)) 0;
+    }
+    .hiw-header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+    .hiw-title {
+      font-family: var(--font-serif);
+      font-weight: 400;
+      font-size: 28px;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: var(--obsidian);
+      margin: 0;
+    }
+    .hiw-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+    }
+    .hiw-timeline::before {
+      content: '';
+      position: absolute;
+      left: 23px;
+      top: 48px;
+      bottom: 48px;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--amber) 0%, rgba(184,134,11,0.15) 100%);
+      border-radius: 1px;
+    }
+    .hiw-step {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      padding: 20px 0;
+      position: relative;
+      z-index: 1;
+    }
+    .hiw-step-num {
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+      border-radius: 50%;
+      background: var(--basalt);
+      border: 2px solid rgba(184,134,11,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--amber);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      z-index: 2;
+    }
+    .hiw-step-card {
+      flex: 1;
+      background: var(--basalt);
+      border: 1px solid rgba(232, 226, 218, 0.08);
+      border-radius: 14px;
+      padding: 24px 22px;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .hiw-step-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--amber), transparent);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .hiw-step:hover .hiw-step-card::before { opacity: 1; }
+    .hiw-step:hover .hiw-step-card {
+      border-color: rgba(184,134,11,0.25);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 0 0 1px rgba(184,134,11,0.08);
+      transform: translateX(4px);
+    }
+    .hiw-step:hover .hiw-step-num {
+      background: var(--amber);
+      color: var(--obsidian);
+      border-color: var(--amber);
+      box-shadow: 0 0 20px rgba(184,134,11,0.35);
+      transform: scale(1.08);
+    }
+    .hiw-step-title {
+      font-family: var(--font);
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--bone);
+      margin: 0 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .hiw-step-icon { font-size: 18px; line-height: 1; }
+    .hiw-step-desc {
+      font-size: 14px;
+      line-height: 1.7;
+      color: rgba(232, 226, 218, 0.6);
+      margin: 0 0 14px;
+    }
+    .hiw-step-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .hiw-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(184,134,11,0.1);
+      border: 1px solid rgba(184,134,11,0.18);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--amber);
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .hiw-tag-icon { font-size: 11px; }
+    .hiw-progress-bar {
+      margin-top: 48px;
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+    .hiw-progress-segment {
+      flex: 1;
+      height: 3px;
+      background: rgba(184,134,11,0.12);
+      border-radius: 2px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hiw-progress-segment::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--amber), #D4A843);
+      border-radius: 2px;
+      transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hiw-progress-segment.filled::after { width: 100%; }
+    .hiw-progress-dot {
+      width: 10px;
+      height: 10px;
+      min-width: 10px;
+      border-radius: 50%;
+      background: rgba(184,134,11,0.2);
+      border: 2px solid rgba(184,134,11,0.3);
+      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hiw-progress-dot.active {
+      background: var(--amber);
+      border-color: var(--amber);
+      box-shadow: 0 0 12px rgba(184,134,11,0.4);
+    }
+    @media (min-width: 768px) {
+      .hiw-section { padding-top: 96px; }
+      .hiw-title { font-size: clamp(28px, 2.8vw, 40px); }
+      .hiw-header { margin-bottom: 56px; }
+      .hiw-timeline {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+      .hiw-timeline::before { display: none; }
+      .hiw-step {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 0;
+        gap: 0;
+      }
+      .hiw-step-num {
+        width: 56px; height: 56px; min-width: 56px;
+        font-size: 18px;
+        margin-bottom: 20px;
+      }
+      .hiw-step-card {
+        padding: 28px 20px;
+        width: 100%;
+        border-radius: 16px;
+      }
+      .hiw-step:hover .hiw-step-card { transform: translateY(-6px); }
+      .hiw-step-title { justify-content: center; font-size: 18px; }
+      .hiw-step-desc { font-size: 13.5px; }
+      .hiw-step-tags { justify-content: center; }
+    }
+    @media (min-width: 1024px) {
+      .hiw-timeline { gap: 28px; }
+      .hiw-step-card { padding: 32px 24px; }
+    }
+  </style>
+
+  <section class="hiw-section">
+    <div class="hiw-header">
+      <h2 class="hiw-title">Ինչպես է դա աշխատում</h2>
     </div>
+
+    <div class="hiw-timeline" id="hiw-timeline">
+
+      <div class="hiw-step">
+        <div class="hiw-step-num">01</div>
+        <div class="hiw-step-card">
+          <div class="hiw-step-title">
+            <span class="hiw-step-icon">✉️</span> Հարցում
+          </div>
+          <p class="hiw-step-desc">Գրեք մեզ ձեր գաղափարի, նախընտրած քարի կամ չափսի մասին։</p>
+          <div class="hiw-step-tags">
+            <span class="hiw-tag"><span class="hiw-tag-icon">💬</span> WhatsApp / Email</span>
+            <span class="hiw-tag"><span class="hiw-tag-icon">📐</span> Instagram DM</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hiw-step">
+        <div class="hiw-step-num">02</div>
+        <div class="hiw-step-card">
+          <div class="hiw-step-title">
+            <span class="hiw-step-icon">💎</span> Գնառաջարկ և քար
+          </div>
+          <p class="hiw-step-desc">Ստացեք ֆիքսված գին և հասանելի քարերի լուսանկարներ նախքան սկսելը։</p>
+          <div class="hiw-step-tags">
+            <span class="hiw-tag"><span class="hiw-tag-icon">📸</span> HD</span>
+            <span class="hiw-tag"><span class="hiw-tag-icon">💰</span> USD</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hiw-step">
+        <div class="hiw-step-num">03</div>
+        <div class="hiw-step-card">
+          <div class="hiw-step-title">
+            <span class="hiw-step-icon">🔨</span> Աշխատանք
+          </div>
+          <p class="hiw-step-desc">Ձեռագործ մշակում և տեղադրում 925 արծաթում Երևանի աշխատանոցում։</p>
+          <div class="hiw-step-tags">
+            <span class="hiw-tag"><span class="hiw-tag-icon">⌛</span> 5–14 days</span>
+            <span class="hiw-tag"><span class="hiw-tag-icon">🏷</span> 925 Silver</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hiw-step">
+        <div class="hiw-step-num">04</div>
+        <div class="hiw-step-card">
+          <div class="hiw-step-title">
+            <span class="hiw-step-icon">📦</span> Վկայական և առաքում
+          </div>
+          <p class="hiw-step-desc">Ապահով փաթեթավորում և առաքում ծագման վկայականով։</p>
+          <div class="hiw-step-tags">
+            <span class="hiw-tag"><span class="hiw-tag-icon">📜</span> Certificate</span>
+            <span class="hiw-tag"><span class="hiw-tag-icon">🌍</span> Worldwide</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="hiw-progress-bar" id="hiw-progress">
+      <div class="hiw-progress-dot active"></div>
+      <div class="hiw-progress-segment"></div>
+      <div class="hiw-progress-dot"></div>
+      <div class="hiw-progress-segment"></div>
+      <div class="hiw-progress-dot"></div>
+      <div class="hiw-progress-segment"></div>
+      <div class="hiw-progress-dot"></div>
+    </div>
+
   </section>
+
+  <script>
+  (function() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const segments = entry.target.querySelectorAll('.hiw-progress-segment');
+          const dots = entry.target.querySelectorAll('.hiw-progress-dot');
+          segments.forEach((seg, i) => {
+            setTimeout(() => {
+              seg.classList.add('filled');
+              if (dots[i + 1]) dots[i + 1].classList.add('active');
+            }, 400 + i * 500);
+          });
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    const bar = document.getElementById('hiw-progress');
+    if (bar) observer.observe(bar);
+  })();
+  </script>
 
   <!-- ═══ 5. CTA BANNER ═══ -->
   <section style="padding: 88px max(var(--gutter), calc((100% - var(--max)) / 2)) 88px;">
