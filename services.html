@@ -356,7 +356,7 @@
       border: 1px solid rgba(232, 226, 218, 0.08);
       border-radius: 0;
       padding: 24px 22px;
-      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+      transition: border-color 0.35s ease, box-shadow 0.35s ease, background 0.35s ease;
       position: relative;
       overflow: hidden;
       box-sizing: border-box;
@@ -468,10 +468,7 @@
         padding: 28px 20px;
         border-radius: 0;
       }
-      .hiw-step-card:hover,
-      .hiw-step.is-active .hiw-step-card {
-        transform: translateY(-6px);
-      }
+      
       .hiw-step-title { font-size: 18px; }
       .hiw-step-desc { font-size: 13.5px; }
     }
