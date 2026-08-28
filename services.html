@@ -329,7 +329,6 @@
       padding: 20px 0;
       position: relative;
       z-index: 1;
-      cursor: pointer;
     }
     .hiw-step-num {
       width: 48px;
@@ -348,6 +347,7 @@
       transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
       z-index: 2;
+      pointer-events: none; /* No hover hitbox on numbers */
     }
     .hiw-step-card {
       flex: 1;
@@ -356,10 +356,11 @@
       border: 1px solid rgba(232, 226, 218, 0.08);
       border-radius: 0;
       padding: 24px 22px;
-      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease, box-shadow 0.35s ease;
       position: relative;
       overflow: hidden;
       box-sizing: border-box;
+      cursor: pointer;
     }
     .hiw-step-card::before {
       content: '';
@@ -370,17 +371,16 @@
       opacity: 0;
       transition: opacity 0.35s ease;
     }
-    .hiw-step:hover .hiw-step-card::before,
-    .hiw-step.active .hiw-step-card::before {
+    .hiw-step-card:hover::before,
+    .hiw-step.is-active .hiw-step-card::before {
       opacity: 1;
     }
-    .hiw-step:hover .hiw-step-card,
-    .hiw-step.active .hiw-step-card {
+    .hiw-step-card:hover,
+    .hiw-step.is-active .hiw-step-card {
       border-color: rgba(184,134,11,0.35);
       box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 0 0 1px rgba(184,134,11,0.1);
     }
-    .hiw-step:hover .hiw-step-num,
-    .hiw-step.active .hiw-step-num {
+    .hiw-step.is-active .hiw-step-num {
       background: var(--amber);
       color: var(--obsidian);
       border-color: var(--amber);
@@ -402,20 +402,22 @@
       margin: 0;
       text-align: center;
     }
+
+    /* ── Original Progress Bar Style (Dots + Segments) ── */
     .hiw-progress-bar {
-      margin-top: 40px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+      margin-top: 48px;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      pointer-events: none; /* No hover hitbox on bar */
     }
     .hiw-progress-segment {
-      height: 4px;
-      background: rgba(184, 134, 11, 0.15);
-      border-radius: 0;
+      flex: 1;
+      height: 3px;
+      background: rgba(184,134,11,0.12);
+      border-radius: 2px;
       position: relative;
       overflow: hidden;
-      cursor: pointer;
-      transition: background 0.3s ease;
     }
     .hiw-progress-segment::after {
       content: '';
@@ -424,12 +426,27 @@
       height: 100%;
       width: 0%;
       background: linear-gradient(90deg, var(--amber), #D4A843);
-      border-radius: 0;
+      border-radius: 2px;
       transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .hiw-progress-segment.filled::after {
       width: 100%;
     }
+    .hiw-progress-dot {
+      width: 10px;
+      height: 10px;
+      min-width: 10px;
+      border-radius: 50%;
+      background: rgba(184,134,11,0.2);
+      border: 2px solid rgba(184,134,11,0.3);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hiw-progress-dot.active {
+      background: var(--amber);
+      border-color: var(--amber);
+      box-shadow: 0 0 12px rgba(184,134,11,0.4);
+    }
+
     @media (min-width: 768px) {
       .hiw-section { padding-top: 96px; }
       .hiw-title { font-size: clamp(28px, 2.8vw, 40px); }
@@ -451,21 +468,16 @@
         padding: 28px 20px;
         border-radius: 0;
       }
-      .hiw-step:hover .hiw-step-card,
-      .hiw-step.active .hiw-step-card {
+      .hiw-step-card:hover,
+      .hiw-step.is-active .hiw-step-card {
         transform: translateY(-6px);
       }
       .hiw-step-title { font-size: 18px; }
       .hiw-step-desc { font-size: 13.5px; }
-      .hiw-progress-bar {
-        margin-top: 44px;
-        gap: 20px;
-      }
     }
     @media (min-width: 1024px) {
       .hiw-timeline { gap: 28px; }
       .hiw-step-card { padding: 32px 24px; }
-      .hiw-progress-bar { gap: 28px; }
     }
   </style>
 
@@ -510,24 +522,51 @@
 
     </div>
 
+    <!-- Original style progress bar (Dots + Segments) -->
     <div class="hiw-progress-bar" id="hiw-progress">
-      <div class="hiw-progress-segment filled" data-step="0"></div>
-      <div class="hiw-progress-segment" data-step="1"></div>
-      <div class="hiw-progress-segment" data-step="2"></div>
-      <div class="hiw-progress-segment" data-step="3"></div>
+      <div class="hiw-progress-dot active"></div>
+      <div class="hiw-progress-segment"></div>
+      <div class="hiw-progress-dot"></div>
+      <div class="hiw-progress-segment"></div>
+      <div class="hiw-progress-dot"></div>
+      <div class="hiw-progress-segment"></div>
+      <div class="hiw-progress-dot"></div>
     </div>
 
   </section>
 
   <script>
   (function() {
+    const cards = document.querySelectorAll('.hiw-step-card');
     const steps = document.querySelectorAll('.hiw-step');
     const segments = document.querySelectorAll('.hiw-progress-segment');
-    const timeline = document.getElementById('hiw-timeline');
+    const dots = document.querySelectorAll('.hiw-progress-dot');
 
-    function updateProgress(stepIndex) {
-      segments.forEach((seg, idx) => {
+    function setHoverStep(stepIndex) {
+      // Step number & card active highlight
+      steps.forEach((step, idx) => {
+        if (idx === stepIndex) {
+          step.classList.add('is-active');
+        } else {
+          step.classList.remove('is-active');
+        }
+      });
+
+      // Progress bar fill:
+      // step 0: dot 0 active, 0 segments filled
+      // step 1: dot 0 & 1 active, segment 0 filled
+      // step 2: dot 0, 1, 2 active, segment 0, 1 filled
+      // step 3: dot 0, 1, 2, 3 active, segment 0, 1, 2 filled
+      dots.forEach((dot, idx) => {
         if (idx <= stepIndex) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+
+      segments.forEach((seg, idx) => {
+        if (idx < stepIndex) {
           seg.classList.add('filled');
         } else {
           seg.classList.remove('filled');
@@ -535,26 +574,26 @@
       });
     }
 
-    steps.forEach((step, idx) => {
-      step.addEventListener('mouseenter', () => {
-        updateProgress(idx);
+    function resetProgress() {
+      // Reset all steps highlight
+      steps.forEach(step => step.classList.remove('is-active'));
+      // Reset progress bar to initial base state (dot 0 active)
+      dots.forEach((dot, idx) => {
+        if (idx === 0) dot.classList.add('active');
+        else dot.classList.remove('active');
       });
-      step.addEventListener('click', () => {
-        updateProgress(idx);
-      });
-    });
-
-    segments.forEach((seg, idx) => {
-      seg.addEventListener('mouseenter', () => {
-        updateProgress(idx);
-      });
-    });
-
-    if (timeline) {
-      timeline.addEventListener('mouseleave', () => {
-        updateProgress(0);
-      });
+      segments.forEach(seg => seg.classList.remove('filled'));
     }
+
+    // Attach hover listeners ONLY to .hiw-step-card (strictly not numbers, not bar)
+    cards.forEach((card, idx) => {
+      card.addEventListener('mouseenter', () => {
+        setHoverStep(idx);
+      });
+      card.addEventListener('mouseleave', () => {
+        resetProgress();
+      });
+    });
   })();
   </script>
 
