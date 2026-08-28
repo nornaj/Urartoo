@@ -329,6 +329,7 @@
       padding: 20px 0;
       position: relative;
       z-index: 1;
+      cursor: pointer;
     }
     .hiw-step-num {
       width: 48px;
@@ -344,19 +345,21 @@
       font-size: 16px;
       font-weight: 700;
       color: var(--amber);
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
       z-index: 2;
     }
     .hiw-step-card {
       flex: 1;
+      width: 100%;
       background: var(--basalt);
       border: 1px solid rgba(232, 226, 218, 0.08);
-      border-radius: 14px;
+      border-radius: 0;
       padding: 24px 22px;
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
       overflow: hidden;
+      box-sizing: border-box;
     }
     .hiw-step-card::before {
       content: '';
@@ -365,20 +368,24 @@
       height: 2px;
       background: linear-gradient(90deg, transparent, var(--amber), transparent);
       opacity: 0;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.35s ease;
     }
-    .hiw-step:hover .hiw-step-card::before { opacity: 1; }
-    .hiw-step:hover .hiw-step-card {
-      border-color: rgba(184,134,11,0.25);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 0 0 1px rgba(184,134,11,0.08);
-      transform: translateX(4px);
+    .hiw-step:hover .hiw-step-card::before,
+    .hiw-step.active .hiw-step-card::before {
+      opacity: 1;
     }
-    .hiw-step:hover .hiw-step-num {
+    .hiw-step:hover .hiw-step-card,
+    .hiw-step.active .hiw-step-card {
+      border-color: rgba(184,134,11,0.35);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 0 0 1px rgba(184,134,11,0.1);
+    }
+    .hiw-step:hover .hiw-step-num,
+    .hiw-step.active .hiw-step-num {
       background: var(--amber);
       color: var(--obsidian);
       border-color: var(--amber);
       box-shadow: 0 0 20px rgba(184,134,11,0.35);
-      transform: scale(1.08);
+      transform: scale(1.06);
     }
     .hiw-step-title {
       font-family: var(--font);
@@ -396,18 +403,19 @@
       text-align: center;
     }
     .hiw-progress-bar {
-      margin-top: 48px;
-      display: flex;
-      align-items: center;
-      gap: 0;
+      margin-top: 40px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
     }
     .hiw-progress-segment {
-      flex: 1;
-      height: 3px;
-      background: rgba(184,134,11,0.12);
-      border-radius: 2px;
+      height: 4px;
+      background: rgba(184, 134, 11, 0.15);
+      border-radius: 0;
       position: relative;
       overflow: hidden;
+      cursor: pointer;
+      transition: background 0.3s ease;
     }
     .hiw-progress-segment::after {
       content: '';
@@ -416,23 +424,11 @@
       height: 100%;
       width: 0%;
       background: linear-gradient(90deg, var(--amber), #D4A843);
-      border-radius: 2px;
-      transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: 0;
+      transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .hiw-progress-segment.filled::after { width: 100%; }
-    .hiw-progress-dot {
-      width: 10px;
-      height: 10px;
-      min-width: 10px;
-      border-radius: 50%;
-      background: rgba(184,134,11,0.2);
-      border: 2px solid rgba(184,134,11,0.3);
-      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .hiw-progress-dot.active {
-      background: var(--amber);
-      border-color: var(--amber);
-      box-shadow: 0 0 12px rgba(184,134,11,0.4);
+    .hiw-progress-segment.filled::after {
+      width: 100%;
     }
     @media (min-width: 768px) {
       .hiw-section { padding-top: 96px; }
@@ -443,13 +439,8 @@
         grid-template-columns: repeat(4, 1fr);
         gap: 20px;
       }
-      .hiw-timeline::before { display: none; }
       .hiw-step {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
         padding: 0;
-        gap: 0;
       }
       .hiw-step-num {
         width: 56px; height: 56px; min-width: 56px;
@@ -458,16 +449,23 @@
       }
       .hiw-step-card {
         padding: 28px 20px;
-        width: 100%;
-        border-radius: 16px;
+        border-radius: 0;
       }
-      .hiw-step:hover .hiw-step-card { transform: translateY(-6px); }
+      .hiw-step:hover .hiw-step-card,
+      .hiw-step.active .hiw-step-card {
+        transform: translateY(-6px);
+      }
       .hiw-step-title { font-size: 18px; }
       .hiw-step-desc { font-size: 13.5px; }
+      .hiw-progress-bar {
+        margin-top: 44px;
+        gap: 20px;
+      }
     }
     @media (min-width: 1024px) {
       .hiw-timeline { gap: 28px; }
       .hiw-step-card { padding: 32px 24px; }
+      .hiw-progress-bar { gap: 28px; }
     }
   </style>
 
@@ -478,72 +476,85 @@
 
     <div class="hiw-timeline" id="hiw-timeline">
 
-      <div class="hiw-step">
+      <div class="hiw-step" data-step="0">
         <div class="hiw-step-num">01</div>
         <div class="hiw-step-card">
-          <div class="hiw-step-title">Հարցում
-          </div>
-          <p class="hiw-step-desc">Գրեք մեզ ձեր գաղափարի, նախընտրած քարի կամ չափսի մասին։</p></div>
+          <div class="hiw-step-title">Հարցում</div>
+          <p class="hiw-step-desc">Գրեք մեզ ձեր գաղափարի, նախընտրած քարի կամ չափսի մասին։</p>
+        </div>
       </div>
 
-      <div class="hiw-step">
+      <div class="hiw-step" data-step="1">
         <div class="hiw-step-num">02</div>
         <div class="hiw-step-card">
-          <div class="hiw-step-title">Գնառաջարկ և քար
-          </div>
-          <p class="hiw-step-desc">Ստացեք ֆիքսված գին և հասանելի քարերի լուսանկարներ նախքան սկսելը։</p></div>
+          <div class="hiw-step-title">Գնառաջարկ և քար</div>
+          <p class="hiw-step-desc">Ստացեք ֆիքսված գին և հասանելի քարերի լուսանկարներ նախքան սկսելը։</p>
+        </div>
       </div>
 
-      <div class="hiw-step">
+      <div class="hiw-step" data-step="2">
         <div class="hiw-step-num">03</div>
         <div class="hiw-step-card">
-          <div class="hiw-step-title">Աշխատանք
-          </div>
-          <p class="hiw-step-desc">Ձեռագործ մշակում և տեղադրում 925 արծաթում Երևանի աշխատանոցում։</p></div>
+          <div class="hiw-step-title">Աշխատանք</div>
+          <p class="hiw-step-desc">Ձեռագործ մշակում և տեղադրում 925 արծաթում Երևանի աշխատանոցում։</p>
+        </div>
       </div>
 
-      <div class="hiw-step">
+      <div class="hiw-step" data-step="3">
         <div class="hiw-step-num">04</div>
         <div class="hiw-step-card">
-          <div class="hiw-step-title">Վկայական և առաքում
-          </div>
-          <p class="hiw-step-desc">Ապահով փաթեթավորում և առաքում ծագման վկայականով։</p></div>
+          <div class="hiw-step-title">Վկայական և առաքում</div>
+          <p class="hiw-step-desc">Ապահով փաթեթավորում և առաքում ծագման վկայականով։</p>
+        </div>
       </div>
 
     </div>
 
     <div class="hiw-progress-bar" id="hiw-progress">
-      <div class="hiw-progress-dot active"></div>
-      <div class="hiw-progress-segment"></div>
-      <div class="hiw-progress-dot"></div>
-      <div class="hiw-progress-segment"></div>
-      <div class="hiw-progress-dot"></div>
-      <div class="hiw-progress-segment"></div>
-      <div class="hiw-progress-dot"></div>
+      <div class="hiw-progress-segment filled" data-step="0"></div>
+      <div class="hiw-progress-segment" data-step="1"></div>
+      <div class="hiw-progress-segment" data-step="2"></div>
+      <div class="hiw-progress-segment" data-step="3"></div>
     </div>
 
   </section>
 
   <script>
   (function() {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const segments = entry.target.querySelectorAll('.hiw-progress-segment');
-          const dots = entry.target.querySelectorAll('.hiw-progress-dot');
-          segments.forEach((seg, i) => {
-            setTimeout(() => {
-              seg.classList.add('filled');
-              if (dots[i + 1]) dots[i + 1].classList.add('active');
-            }, 400 + i * 500);
-          });
-          observer.unobserve(entry.target);
+    const steps = document.querySelectorAll('.hiw-step');
+    const segments = document.querySelectorAll('.hiw-progress-segment');
+    const timeline = document.getElementById('hiw-timeline');
+
+    function updateProgress(stepIndex) {
+      segments.forEach((seg, idx) => {
+        if (idx <= stepIndex) {
+          seg.classList.add('filled');
+        } else {
+          seg.classList.remove('filled');
         }
       });
-    }, { threshold: 0.3 });
+    }
 
-    const bar = document.getElementById('hiw-progress');
-    if (bar) observer.observe(bar);
+    steps.forEach((step, idx) => {
+      step.addEventListener('mouseenter', () => {
+        updateProgress(idx);
+      });
+      step.addEventListener('click', () => {
+        updateProgress(idx);
+      });
+    });
+
+    segments.forEach((seg, idx) => {
+      seg.addEventListener('mouseenter', () => {
+        updateProgress(idx);
+      });
+    });
+
+    if (timeline) {
+      timeline.addEventListener('mouseleave', () => {
+        updateProgress(0);
+      });
+    }
   })();
   </script>
 
